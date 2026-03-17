@@ -14,7 +14,20 @@ from src.refinement import RefinementAgent
 from src.response import ResponseInterface
 from src.dashboard import DashboardServer, ConfigManager
 
+# 领域权重模块导出
+from src.domain import (
+    DomainConfig,
+    DomainConfigManager,
+    KeywordLevel,
+    DomainLevel,
+    CompositeWeightCalculator,
+    TemporalWeightCalculator,
+    DomainRelevanceCalculator,
+    create_example_domain,
+)
+
 __all__ = [
+    # 核心模块
     "PerceptionEngine",
     "MemoryManager",
     "AdaptiveRetriever",
@@ -22,4 +35,13 @@ __all__ = [
     "ResponseInterface",
     "DashboardServer",
     "ConfigManager",
+    # 领域权重模块
+    "DomainConfig",
+    "DomainConfigManager",
+    "KeywordLevel",
+    "DomainLevel",
+    "CompositeWeightCalculator",
+    "TemporalWeightCalculator",
+    "DomainRelevanceCalculator",
+    "create_example_domain",
 ]

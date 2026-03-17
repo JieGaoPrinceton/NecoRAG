@@ -1,7 +1,7 @@
 📜 NecoRAG 技术框架设计任务书 (Technical Design Charter)
 
 项目名称：NecoRAG (Neuro-Cognitive Retrieval-Augmented Generation)  
-版本号：v1.0-Alpha  
+版本号：v1.1-Alpha  
 日期：2026-03-17  
 状态：草案评审中  
 核心理念：模拟人脑双系统记忆与认知科学理论，构建下一代认知型 RAG 框架。
@@ -22,6 +22,82 @@
 开源生态核心：基于现有成熟开源组件（RAGFlow, Neo4j, Qdrant, LangGraph）进行深度编排，降低开发者构建复杂认知应用的门槛。
 
 核心架构设计 (Core Architecture)
+
+顶层设计逻辑 (Top-Level Design Philosophy)
+
+NecoRAG 作为面向特定领域的智能知识系统，采用多维权重融合策略，确保检索结果的精准性和时效性。
+
+1. 领域知识与关键字权重系统 (Domain Knowledge & Keyword Weighting)
+
+设计原理：
+    不同于通用 RAG 系统，NecoRAG 针对特定领域进行深度优化，通过预定义的领域关键字词典和权重配置，
+    在索引构建和检索时对领域核心概念进行增强。
+
+核心机制：
+    领域关键字词典：维护领域核心术语、专业词汇、缩写映射表。
+    关键字权重分级：
+        - 核心关键字 (Core Keywords): 权重 1.5-2.0，领域最核心的概念和术语
+        - 重要关键字 (Important Keywords): 权重 1.2-1.5，领域常用但非核心的词汇
+        - 普通关键字 (Normal Keywords): 权重 1.0，一般性领域相关词汇
+        - 边缘关键字 (Peripheral Keywords): 权重 0.5-0.8，领域边缘或跨领域词汇
+    索引增强：在向量化时，对包含高权重关键字的文本块进行向量加权。
+    检索增强：查询时识别关键字并动态调整检索权重。
+
+权重计算公式：
+    keyword_score = Σ(keyword_weight[i] × keyword_frequency[i]) / total_keywords
+
+2. 时间权重机制 (Temporal Weighting Mechanism)
+
+设计原理：
+    知识具有时效性，最新的知识往往更具参考价值。系统通过时间衰减函数，
+    自动降低陈旧知识的检索优先级，确保用户获取最新、最相关的信息。
+
+核心机制：
+    时间衰减函数：采用指数衰减模型
+        temporal_weight = e^(-λ × (current_time - document_time))
+        其中 λ 为衰减系数，可根据领域特性调整（快速变化领域 λ 较大）
+    
+    时间分级策略：
+        - 最近期 (0-30天): 权重乘数 1.0-1.2
+        - 近期 (30-90天): 权重乘数 0.8-1.0
+        - 中期 (90-365天): 权重乘数 0.5-0.8
+        - 远期 (1-3年): 权重乘数 0.3-0.5
+        - 历史 (>3年): 权重乘数 0.1-0.3
+    
+    例外处理：标记为"经典/永久"的知识不受时间衰减影响（如基础理论、定律等）。
+
+3. 领域相关性权重 (Domain Relevance Weighting)
+
+设计原理：
+    在检索时优先返回领域内知识，降低领域外知识的干扰，
+    同时保留跨领域知识作为补充参考。
+
+核心机制：
+    领域分类器：基于文本特征和关键字分布，判断知识所属领域。
+    领域相关性评分：
+        - 核心领域 (Core Domain): 权重乘数 1.5，完全属于目标领域
+        - 相关领域 (Related Domain): 权重乘数 1.0-1.2，与目标领域有交集
+        - 边缘领域 (Peripheral Domain): 权重乘数 0.6-0.8，弱相关
+        - 领域外 (Out-of-Domain): 权重乘数 0.2-0.4，基本无关
+    
+    领域边界软化：允许一定比例的跨领域知识进入结果，促进知识创新。
+
+综合权重计算 (Composite Weight Calculation)
+
+最终检索权重采用多因子加权融合：
+
+final_weight = base_score × α × keyword_weight × β × temporal_weight × γ × domain_weight
+
+其中：
+    - base_score: 向量相似度基础分数
+    - keyword_weight: 关键字权重因子
+    - temporal_weight: 时间权重因子
+    - domain_weight: 领域相关性权重因子
+    - α, β, γ: 可配置的因子系数（默认各为 1.0）
+
+---
+
+五层认知架构设计
 
 NecoRAG 采用 "五层认知" 分层架构，对应人脑认知机制的不同阶段。
 
@@ -123,6 +199,6 @@ NecoRAG 不仅仅是一个工具库，它是认知科学理论在工程领域的
 
 Let's make AI think like a brain! 🧠
 
-批准人：[待填写]  
-项目负责人：[待填写]  
-GitHub 仓库：github.com/NecoRAG/core (预留)
+批准人：Qi Jie
+项目负责人：Qijie  
+GitHub 仓库：github.com/qijie2026/NecoRAG
