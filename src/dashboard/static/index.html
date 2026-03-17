@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NecoRAG Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .logo {
+            font-size: 32px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            color: #333;
+            font-size: 20px;
+        }
+
+        .profile-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .profile-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .profile-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .profile-item.active {
+            border-color: #4CAF50;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+
+        .profile-item h3 {
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-item .badge {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .profile-item .description {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .profile-item .meta {
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .module-tabs {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .module-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .module-tab:hover {
+            color: #667eea;
+        }
+
+        .module-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+
+        .module-content {
+            display: none;
+        }
+
+        .module-content.active {
+            display: block;
+        }
+
+        .param-group {
+            margin-bottom: 20px;
+        }
+
+        .param-group h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .param-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .param-row label {
+            width: 250px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .param-row .param-input {
+            flex: 1;
+        }
+
+        .param-row input[type="text"],
+        .param-row input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .param-row input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .param-row select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .param-row .param-hint {
+            color: #999;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
+        }
+
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #616161;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 500px;
+            max-width: 90%;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .param-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .param-row label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="logo">🐱</span>
+                NecoRAG Dashboard
+            </h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="showCreateProfileModal()">
+                    + 新建 Profile
+                </button>
+                <button class="btn btn-secondary" onclick="refreshAll()">
+                    刷新
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column: Profiles & Stats -->
+            <div>
+                <!-- Profiles Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>配置 Profiles</h2>
+                    </div>
+                    <div class="profile-list" id="profileList">
+                        <div class="loading">加载中...</div>
+                    </div>
+                </div>
+
+                <!-- Stats Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>统计信息</h2>
+                        <button class="btn btn-secondary" onclick="resetStats()">重置</button>
+                    </div>
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <h3 id="stat-documents">0</h3>
+                            <p>文档总数</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="stat-chunks">0</h3>
+                            <p>块总数</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="stat-queries">0</h3>
+                            <p>查询总数</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="stat-sessions">0</h3>
+                            <p>活动会话</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Module Configuration -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>模块配置</h2>
+                    <div>
+                        <button class="btn btn-success" onclick="saveCurrentConfig()">保存配置</button>
+                        <button class="btn btn-danger" onclick="deleteSelectedProfile()">删除</button>
+                    </div>
+                </div>
+
+                <!-- Module Tabs -->
+                <div class="module-tabs">
+                    <div class="module-tab active" onclick="switchModule('whiskers')">Whiskers</div>
+                    <div class="module-tab" onclick="switchModule('memory')">Memory</div>
+                    <div class="module-tab" onclick="switchModule('retrieval')">Retrieval</div>
+                    <div class="module-tab" onclick="switchModule('grooming')">Grooming</div>
+                    <div class="module-tab" onclick="switchModule('purr')">Purr</div>
+                </div>
+
+                <!-- Module Contents -->
+                <div id="moduleContents">
+                    <!-- Whiskers Module -->
+                    <div class="module-content active" id="module-whiskers">
+                        <div class="param-group">
+                            <h3>文档处理</h3>
+                            <div class="param-row">
+                                <label>分块大小 (chunk_size)</label>
+                                <div class="param-input">
+                                    <input type="number" id="whiskers-chunk_size" value="512">
+                                    <span class="param-hint">建议: 256-1024</span>
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>分块重叠 (chunk_overlap)</label>
+                                <div class="param-input">
+                                    <input type="number" id="whiskers-chunk_overlap" value="50">
+                                    <span class="param-hint">建议: 10-100</span>
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>启用 OCR (enable_ocr)</label>
+                                <div class="param-input">
+                                    <input type="checkbox" id="whiskers-enable_ocr" checked>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h3>向量化配置</h3>
+                            <div class="param-row">
+                                <label>向量模型 (vector_model)</label>
+                                <div class="param-input">
+                                    <select id="whiskers-vector_model">
+                                        <option value="BGE-M3">BGE-M3</option>
+                                        <option value="text-embedding-ada-002">text-embedding-ada-002</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>向量维度 (vector_size)</label>
+                                <div class="param-input">
+                                    <input type="number" id="whiskers-vector_size" value="1024">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Module -->
+                    <div class="module-content" id="module-memory">
+                        <div class="param-group">
+                            <h3>L1 工作记忆</h3>
+                            <div class="param-row">
+                                <label>TTL (秒)</label>
+                                <div class="param-input">
+                                    <input type="number" id="memory-l1_ttl" value="3600">
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>最大会话条目</label>
+                                <div class="param-input">
+                                    <input type="number" id="memory-l1_max_session_items" value="1000">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h3>记忆衰减</h3>
+                            <div class="param-row">
+                                <label>衰减速率 (decay_rate)</label>
+                                <div class="param-input">
+                                    <input type="number" step="0.01" id="memory-decay_rate" value="0.1">
+                                    <span class="param-hint">0-1, 越大衰减越快</span>
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>归档阈值 (archive_threshold)</label>
+                                <div class="param-input">
+                                    <input type="number" step="0.01" id="memory-archive_threshold" value="0.05">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Retrieval Module -->
+                    <div class="module-content" id="module-retrieval">
+                        <div class="param-group">
+                            <h3>检索配置</h3>
+                            <div class="param-row">
+                                <label>检索数量 (top_k)</label>
+                                <div class="param-input">
+                                    <input type="number" id="retrieval-top_k" value="10">
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>最低分数 (min_score)</label>
+                                <div class="param-input">
+                                    <input type="number" step="0.1" id="retrieval-min_score" value="0.3">
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>启用 HyDE (hyde_enabled)</label>
+                                <div class="param-input">
+                                    <input type="checkbox" id="retrieval-hyde_enabled" checked>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h3>Pounce 机制</h3>
+                            <div class="param-row">
+                                <label>扑击阈值 (pounce_threshold)</label>
+                                <div class="param-input">
+                                    <input type="number" step="0.01" id="retrieval-pounce_threshold" value="0.85">
+                                    <span class="param-hint">0-1, 置信度阈值</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grooming Module -->
+                    <div class="module-content" id="module-grooming">
+                        <div class="param-group">
+                            <h3>验证配置</h3>
+                            <div class="param-row">
+                                <label>最低置信度 (min_confidence)</label>
+                                <div class="param-input">
+                                    <input type="number" step="0.1" id="grooming-min_confidence" value="0.7">
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>最大迭代次数 (max_iterations)</label>
+                                <div class="param-input">
+                                    <input type="number" id="grooming-max_iterations" value="3">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h3>幻觉检测</h3>
+                            <div class="param-row">
+                                <label>幻觉阈值 (hallucination_threshold)</label>
+                                <div class="param-input">
+                                    <input type="number" step="0.1" id="grooming-hallucination_threshold" value="0.6">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Purr Module -->
+                    <div class="module-content" id="module-purr">
+                        <div class="param-group">
+                            <h3>交互配置</h3>
+                            <div class="param-row">
+                                <label>默认语气 (default_tone)</label>
+                                <div class="param-input">
+                                    <select id="purr-default_tone">
+                                        <option value="formal">专业严谨</option>
+                                        <option value="friendly" selected>亲切友好</option>
+                                        <option value="humorous">幽默轻松</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>详细程度 (default_detail_level)</label>
+                                <div class="param-input">
+                                    <select id="purr-default_detail_level">
+                                        <option value="1">简洁摘要</option>
+                                        <option value="2" selected>标准回答</option>
+                                        <option value="3">详细解释</option>
+                                        <option value="4">深度分析</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h3>可视化配置</h3>
+                            <div class="param-row">
+                                <label>显示检索路径 (show_trace)</label>
+                                <div class="param-input">
+                                    <input type="checkbox" id="purr-show_trace" checked>
+                                </div>
+                            </div>
+                            <div class="param-row">
+                                <label>显示证据来源 (show_evidence)</label>
+                                <div class="param-input">
+                                    <input type="checkbox" id="purr-show_evidence" checked>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Profile Modal -->
+    <div class="modal" id="createProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>创建新 Profile</h2>
+            </div>
+            <div class="form-group">
+                <label>Profile 名称</label>
+                <input type="text" id="newProfileName" placeholder="例如: 生产环境配置">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="newProfileDescription" placeholder="例如: 用于生产环境的优化配置"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideCreateProfileModal()">取消</button>
+                <button class="btn btn-primary" onclick="createProfile()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let profiles = [];
+        let selectedProfileId = null;
+        let currentModule = 'whiskers';
+
+        // API 基础 URL
+        const API_BASE = '/api';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfiles();
+            loadStats();
+            
+            // 定时刷新统计信息
+            setInterval(loadStats, 5000);
+        });
+
+        // 加载 Profiles
+        async function loadProfiles() {
+            try {
+                const response = await fetch(`${API_BASE}/profiles`);
+                profiles = await response.json();
+                renderProfiles();
+                
+                // 加载活动 Profile 的配置
+                const activeProfile = profiles.find(p => p.is_active);
+                if (activeProfile) {
+                    selectProfile(activeProfile.profile_id);
+                }
+            } catch (error) {
+                console.error('加载 Profiles 失败:', error);
+                showToast('加载配置失败', 'error');
+            }
+        }
+
+        // 渲染 Profiles 列表
+        function renderProfiles() {
+            const container = document.getElementById('profileList');
+            
+            if (profiles.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📁</div>
+                        <p>暂无配置 Profile</p>
+                        <button class="btn btn-primary" onclick="showCreateProfileModal()" style="margin-top: 10px;">
+                            创建第一个 Profile
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = profiles.map(profile => `
+                <div class="profile-item ${profile.is_active ? 'active' : ''}" 
+                     onclick="selectProfile('${profile.profile_id}')">
+                    <h3>
+                        ${profile.profile_name}
+                        ${profile.is_active ? '<span class="badge">活动</span>' : ''}
+                    </h3>
+                    <div class="description">${profile.description || '无描述'}</div>
+                    <div class="meta">
+                        创建: ${new Date(profile.created_at).toLocaleString()} | 
+                        更新: ${new Date(profile.updated_at).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 选择 Profile
+        async function selectProfile(profileId) {
+            selectedProfileId = profileId;
+            
+            // 高亮显示
+            document.querySelectorAll('.profile-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // 加载配置
+            const profile = profiles.find(p => p.profile_id === profileId);
+            if (profile) {
+                loadModuleConfig('whiskers', profile.whiskers_config.parameters);
+                loadModuleConfig('memory', profile.memory_config.parameters);
+                loadModuleConfig('retrieval', profile.retrieval_config.parameters);
+                loadModuleConfig('grooming', profile.grooming_config.parameters);
+                loadModuleConfig('purr', profile.purr_config.parameters);
+            }
+        }
+
+        // 加载模块配置到表单
+        function loadModuleConfig(module, parameters) {
+            Object.keys(parameters).forEach(key => {
+                const element = document.getElementById(`${module}-${key}`);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = parameters[key];
+                    } else {
+                        element.value = parameters[key];
+                    }
+                }
+            });
+        }
+
+        // 切换模块
+        function switchModule(module) {
+            currentModule = module;
+            
+            // 更新 Tab 样式
+            document.querySelectorAll('.module-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // 更新内容显示
+            document.querySelectorAll('.module-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`module-${module}`).classList.add('active');
+        }
+
+        // 保存配置
+        async function saveCurrentConfig() {
+            if (!selectedProfileId) {
+                showToast('请先选择一个 Profile', 'error');
+                return;
+            }
+            
+            const updates = {
+                whiskers_config: getModuleConfig('whiskers'),
+                memory_config: getModuleConfig('memory'),
+                retrieval_config: getModuleConfig('retrieval'),
+                grooming_config: getModuleConfig('grooming'),
+                purr_config: getModuleConfig('purr')
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/profiles/${selectedProfileId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (response.ok) {
+                    showToast('配置保存成功');
+                    loadProfiles();
+                } else {
+                    showToast('保存失败', 'error');
+                }
+            } catch (error) {
+                console.error('保存配置失败:', error);
+                showToast('保存失败', 'error');
+            }
+        }
+
+        // 获取模块配置
+        function getModuleConfig(module) {
+            const parameters = {};
+            const prefix = `${module}-`;
+            
+            document.querySelectorAll(`[id^="${prefix}"]`).forEach(element => {
+                const key = element.id.replace(prefix, '');
+                if (element.type === 'checkbox') {
+                    parameters[key] = element.checked;
+                } else if (element.type === 'number') {
+                    parameters[key] = parseFloat(element.value);
+                } else {
+                    parameters[key] = element.value;
+                }
+            });
+            
+            return parameters;
+        }
+
+        // 激活 Profile
+        async function activateProfile(profileId) {
+            try {
+                const response = await fetch(`${API_BASE}/profiles/${profileId}/activate`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showToast('Profile 已激活');
+                    loadProfiles();
+                }
+            } catch (error) {
+                console.error('激活失败:', error);
+                showToast('激活失败', 'error');
+            }
+        }
+
+        // 删除 Profile
+        async function deleteSelectedProfile() {
+            if (!selectedProfileId) {
+                showToast('请先选择一个 Profile', 'error');
+                return;
+            }
+            
+            if (!confirm('确定要删除此 Profile 吗？')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/profiles/${selectedProfileId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showToast('Profile 已删除');
+                    selectedProfileId = null;
+                    loadProfiles();
+                }
+            } catch (error) {
+                console.error('删除失败:', error);
+                showToast('删除失败', 'error');
+            }
+        }
+
+        // 加载统计信息
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const stats = await response.json();
+                
+                document.getElementById('stat-documents').textContent = stats.total_documents;
+                document.getElementById('stat-chunks').textContent = stats.total_chunks;
+                document.getElementById('stat-queries').textContent = stats.total_queries;
+                document.getElementById('stat-sessions').textContent = stats.active_sessions;
+            } catch (error) {
+                console.error('加载统计信息失败:', error);
+            }
+        }
+
+        // 重置统计
+        async function resetStats() {
+            try {
+                await fetch(`${API_BASE}/stats/reset`, { method: 'POST' });
+                loadStats();
+                showToast('统计信息已重置');
+            } catch (error) {
+                console.error('重置失败:', error);
+            }
+        }
+
+        // 显示创建 Profile 模态框
+        function showCreateProfileModal() {
+            document.getElementById('createProfileModal').classList.add('active');
+        }
+
+        // 隐藏创建 Profile 模态框
+        function hideCreateProfileModal() {
+            document.getElementById('createProfileModal').classList.remove('active');
+            document.getElementById('newProfileName').value = '';
+            document.getElementById('newProfileDescription').value = '';
+        }
+
+        // 创建 Profile
+        async function createProfile() {
+            const name = document.getElementById('newProfileName').value.trim();
+            const description = document.getElementById('newProfileDescription').value.trim();
+            
+            if (!name) {
+                showToast('请输入 Profile 名称', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/profiles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        profile_name: name,
+                        description: description
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('Profile 创建成功');
+                    hideCreateProfileModal();
+                    loadProfiles();
+                } else {
+                    showToast('创建失败', 'error');
+                }
+            } catch (error) {
+                console.error('创建失败:', error);
+                showToast('创建失败', 'error');
+            }
+        }
+
+        // 刷新所有
+        function refreshAll() {
+            loadProfiles();
+            loadStats();
+            showToast('已刷新');
+        }
+
+        // 显示 Toast 消息
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'error' ? '#f44336' : '#4CAF50';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
