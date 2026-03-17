@@ -128,3 +128,4 @@ Let's make AI think like a brain, and act like a cat. 🐱🧠
 批准人：[待填写]  
 项目负责人：[待填写]  
 GitHub 仓库：github.com/NecoRAG/core (预留)
+95f0f0cea68ee3129be96762d8d50bf8
