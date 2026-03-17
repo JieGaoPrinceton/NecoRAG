@@ -3,7 +3,7 @@ Generator - 答案生成器
 """
 
 from typing import List, Dict, Any
-from src.grooming.models import GeneratedAnswer
+from src.refinement.models import GeneratedAnswer
 
 
 class Generator:

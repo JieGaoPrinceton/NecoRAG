@@ -4,7 +4,7 @@
 """
 
 from typing import List, Optional
-from src.whiskers.models import Chunk, ContextTags
+from src.perception.models import Chunk, ContextTags
 
 
 class ContextualTagger:

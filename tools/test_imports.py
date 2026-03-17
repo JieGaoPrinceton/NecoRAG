@@ -14,7 +14,7 @@ def test_imports():
     
     # 测试 Whiskers Engine
     print("[OK] 导入 necorag.whiskers")
-    from src.whiskers import WhiskersEngine, DocumentParser, ChunkStrategy
+    from src.perception import WhiskersEngine, DocumentParser, ChunkStrategy
     
     # 测试 Memory
     print("[OK] 导入 necorag.memory")
@@ -26,11 +26,11 @@ def test_imports():
     
     # 测试 Grooming
     print("[OK] 导入 necorag.grooming")
-    from src.grooming import GroomingAgent, Generator, Critic
+    from src.refinement import GroomingAgent, Generator, Critic
     
     # 测试 Purr
     print("[OK] 导入 necorag.purr")
-    from src.purr import PurrInterface, UserProfileManager
+    from src.response import PurrInterface, UserProfileManager
     
     print("\n" + "="*60)
     print("所有模块导入成功！")

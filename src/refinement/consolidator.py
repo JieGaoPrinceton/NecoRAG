@@ -3,7 +3,7 @@ Knowledge Consolidator - 知识固化器
 """
 
 from typing import List, Optional
-from src.grooming.models import KnowledgeGap, QueryPattern
+from src.refinement.models import KnowledgeGap, QueryPattern
 
 
 class KnowledgeConsolidator:

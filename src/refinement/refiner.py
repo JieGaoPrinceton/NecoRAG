@@ -2,7 +2,7 @@
 Refiner - 答案修正器
 """
 
-from src.grooming.models import GeneratedAnswer, CritiqueReport
+from src.refinement.models import GeneratedAnswer, CritiqueReport
 
 
 class Refiner:

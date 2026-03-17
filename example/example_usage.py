@@ -4,21 +4,21 @@ NecoRAG 完整使用示例
 演示如何使用 NecoRAG 框架的各个组件
 """
 
-from src import WhiskersEngine, MemoryManager, PounceRetriever, GroomingAgent, PurrInterface
-from src.whiskers.models import EncodedChunk
+from src import PerceptionEngine, MemoryManager, AdaptiveRetriever, RefinementAgent, ResponseInterface
+from src.perception.models import EncodedChunk
 import numpy as np
 
 
-def example_whiskers():
+def example_perception():
     """
-    示例1：使用 Whiskers Engine 处理文档
+    示例1：使用 Perception Engine 处理文档
     """
     print("=" * 60)
-    print("示例1：Whiskers Engine - 文档解析与编码")
+    print("示例1：Perception Engine - 文档解析与编码")
     print("=" * 60)
     
     # 初始化引擎
-    engine = WhiskersEngine(
+    engine = PerceptionEngine(
         model="BGE-M3",
         chunk_size=512,
         chunk_overlap=50
@@ -93,17 +93,17 @@ def example_memory(encoded_chunks):
 
 def example_retrieval(memory):
     """
-    示例3：使用 Pounce Retriever 智能检索
+    示例3：使用 Adaptive Retriever 智能检索
     """
     print("=" * 60)
-    print("示例3：Pounce Retriever - 智能检索与重排序")
+    print("示例3：Adaptive Retriever - 智能检索与重排序")
     print("=" * 60)
     
     # 初始化检索器
-    retriever = PounceRetriever(
+    retriever = AdaptiveRetriever(
         memory=memory,
         reranker_model="BGE-Reranker-v2",
-        pounce_threshold=0.85,
+        confidence_threshold=0.85,
         enable_hyde=True
     )
     
@@ -136,16 +136,16 @@ def example_retrieval(memory):
     return results
 
 
-def example_grooming(evidence):
+def example_refinement(evidence):
     """
-    示例4：使用 Grooming Agent 生成和验证答案
+    示例4：使用 Refinement Agent 生成和验证答案
     """
     print("=" * 60)
-    print("示例4：Grooming Agent - 答案生成与幻觉检测")
+    print("示例4：Refinement Agent - 答案生成与幻觉检测")
     print("=" * 60)
     
-    # 初始化梳理代理
-    grooming = GroomingAgent(
+    # 初始化精炼代理
+    refinement = RefinementAgent(
         llm_model="default",
         memory=None,  # 示例中不需要 memory
         max_iterations=3
@@ -156,7 +156,7 @@ def example_grooming(evidence):
     
     # 处理查询
     query = "深度学习有哪些应用领域？"
-    result = grooming.process(query, evidence_texts)
+    result = refinement.process(query, evidence_texts)
     
     print(f"\n查询: {query}")
     print(f"\n答案:\n{result.answer}")
@@ -173,16 +173,16 @@ def example_grooming(evidence):
     return result
 
 
-def example_purr(grooming_result, memory):
+def example_response(refinement_result, memory):
     """
-    示例5：使用 Purr Interface 生成交互响应
+    示例5：使用 Response Interface 生成交互响应
     """
     print("=" * 60)
-    print("示例5：Purr Interface - 情境自适应交互")
+    print("示例5：Response Interface - 情境自适应交互")
     print("=" * 60)
     
     # 初始化交互接口
-    interface = PurrInterface(
+    interface = ResponseInterface(
         memory=memory,
         default_tone="friendly",
         default_detail_level=2
@@ -192,7 +192,7 @@ def example_purr(grooming_result, memory):
     query = "深度学习有哪些应用领域？"
     response = interface.respond(
         query=query,
-        grooming_result=grooming_result,
+        refinement_result=refinement_result,
         session_id="user_123",
         tone="friendly",
         detail_level=2
@@ -222,24 +222,24 @@ def main():
     print("\n")
     print("╔══════════════════════════════════════════════════════════╗")
     print("║         NecoRAG - 完整工作流程演示                      ║")
-    print("║  Let's make AI think like a brain, and act like a cat!  ║")
+    print("║     Let's make AI think like a brain! 🧠               ║")
     print("╚══════════════════════════════════════════════════════════╝")
     print()
     
-    # 1. 感知层：Whiskers Engine
-    encoded_chunks = example_whiskers()
+    # 1. 感知层：Perception Engine
+    encoded_chunks = example_perception()
     
     # 2. 记忆层：Memory Manager
     memory = example_memory(encoded_chunks)
     
-    # 3. 检索层：Pounce Retriever
+    # 3. 检索层：Adaptive Retriever
     retrieval_results = example_retrieval(memory)
     
-    # 4. 巩固层：Grooming Agent
-    grooming_result = example_grooming(retrieval_results)
+    # 4. 巩固层：Refinement Agent
+    refinement_result = example_refinement(retrieval_results)
     
-    # 5. 交互层：Purr Interface
-    response = example_purr(grooming_result, memory)
+    # 5. 交互层：Response Interface
+    response = example_response(refinement_result, memory)
     
     print("\n" + "=" * 60)
     print("演示完成！NecoRAG 各模块协同工作示例结束")

@@ -3,7 +3,7 @@ Hallucination Detector - 幻觉检测器
 """
 
 from typing import List
-from src.grooming.models import HallucinationReport
+from src.refinement.models import HallucinationReport
 
 
 class HallucinationDetector:

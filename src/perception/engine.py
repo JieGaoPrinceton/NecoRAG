@@ -1,19 +1,19 @@
 """
-Whiskers Engine - 胡须感知引擎主类
+Perception Engine - 感知引擎主类
 """
 
 from typing import List, Optional
-from src.whiskers.parser import DocumentParser
-from src.whiskers.chunker import ChunkStrategy
-from src.whiskers.tagger import ContextualTagger
-from src.whiskers.encoder import VectorEncoder
-from src.whiskers.models import ParsedDocument, EncodedChunk, Chunk
+from src.perception.parser import DocumentParser
+from src.perception.chunker import ChunkStrategy
+from src.perception.tagger import ContextualTagger
+from src.perception.encoder import VectorEncoder
+from src.perception.models import ParsedDocument, EncodedChunk, Chunk
 import uuid
 
 
-class WhiskersEngine:
+class PerceptionEngine:
     """
-    Whiskers Engine - 胡须感知引擎
+    Perception Engine - 感知引擎
     
     多模态数据的高精度编码与情境标记
     """

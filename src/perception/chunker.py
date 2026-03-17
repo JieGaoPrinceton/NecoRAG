@@ -4,7 +4,7 @@
 """
 
 from typing import List
-from src.whiskers.models import Chunk
+from src.perception.models import Chunk
 
 
 class ChunkStrategy:

@@ -4,7 +4,7 @@ Memory Manager - 记忆管理器
 """
 
 from typing import List, Optional
-from src.whiskers.models import EncodedChunk
+from src.perception.models import EncodedChunk
 from src.memory.working_memory import WorkingMemory
 from src.memory.semantic_memory import SemanticMemory
 from src.memory.episodic_graph import EpisodicGraph

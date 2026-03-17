@@ -1,21 +1,21 @@
 """
-Grooming Agent - 梳理代理主类
+Refinement Agent - 精炼代理主类
 """
 
 from typing import List, Optional
 from src.memory.manager import MemoryManager
-from src.grooming.generator import Generator
-from src.grooming.critic import Critic
-from src.grooming.refiner import Refiner
-from src.grooming.hallucination import HallucinationDetector
-from src.grooming.consolidator import KnowledgeConsolidator
-from src.grooming.pruner import MemoryPruner
-from src.grooming.models import GroomingResult, HallucinationReport
+from src.refinement.generator import Generator
+from src.refinement.critic import Critic
+from src.refinement.refiner import Refiner
+from src.refinement.hallucination import HallucinationDetector
+from src.refinement.consolidator import KnowledgeConsolidator
+from src.refinement.pruner import MemoryPruner
+from src.refinement.models import RefinementResult, HallucinationReport
 
 
-class GroomingAgent:
+class RefinementAgent:
     """
-    梳理代理
+    精炼代理
     
     功能：
     - Generator -> Critic -> Refiner 闭环
@@ -32,7 +32,7 @@ class GroomingAgent:
         min_confidence: float = 0.7
     ):
         """
-        初始化梳理代理
+        初始化精炼代理
         
         Args:
             llm_model: LLM 模型
@@ -63,7 +63,7 @@ class GroomingAgent:
         query: str,
         evidence: List[str],
         context: dict = None
-    ) -> GroomingResult:
+    ) -> RefinementResult:
         """
         处理查询，生成并验证答案
         
@@ -73,7 +73,7 @@ class GroomingAgent:
             context: 上下文
             
         Returns:
-            GroomingResult: 梳理结果
+            RefinementResult: 精炼结果
         """
         iteration = 0
         current_evidence = evidence.copy()
@@ -96,7 +96,7 @@ class GroomingAgent:
             # 检查是否通过
             if critique.is_valid and not hallucination_report.is_hallucination:
                 # 通过验证，返回结果
-                return GroomingResult(
+                return RefinementResult(
                     query=query,
                     answer=answer.content,
                     confidence=answer.confidence,
@@ -118,7 +118,7 @@ class GroomingAgent:
                 answer.confidence *= 0.8
         
         # 达到最大迭代次数，返回当前结果
-        return GroomingResult(
+        return RefinementResult(
             query=query,
             answer=answer.content if answer.confidence >= self.min_confidence else "抱歉，我无法提供可靠的答案。",
             confidence=answer.confidence,

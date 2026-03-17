@@ -3,7 +3,7 @@ Thinking Chain Visualizer - 思维链可视化器
 """
 
 from typing import List, Dict, Any
-from src.purr.models import RetrievalVisualization
+from src.response.models import RetrievalVisualization
 
 
 class ThinkingChainVisualizer:

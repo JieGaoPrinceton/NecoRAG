@@ -3,7 +3,7 @@ Critic - 批判评估器
 """
 
 from typing import List
-from src.grooming.models import GeneratedAnswer, CritiqueReport
+from src.refinement.models import GeneratedAnswer, CritiqueReport
 
 
 class Critic:

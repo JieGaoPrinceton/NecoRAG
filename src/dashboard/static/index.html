@@ -492,37 +492,37 @@
 
                 <!-- Module Tabs -->
                 <div class="module-tabs">
-                    <div class="module-tab active" onclick="switchModule('whiskers')">Whiskers</div>
+                    <div class="module-tab active" onclick="switchModule('perception')">Perception</div>
                     <div class="module-tab" onclick="switchModule('memory')">Memory</div>
                     <div class="module-tab" onclick="switchModule('retrieval')">Retrieval</div>
-                    <div class="module-tab" onclick="switchModule('grooming')">Grooming</div>
-                    <div class="module-tab" onclick="switchModule('purr')">Purr</div>
+                    <div class="module-tab" onclick="switchModule('refinement')">Refinement</div>
+                    <div class="module-tab" onclick="switchModule('response')">Response</div>
                 </div>
 
                 <!-- Module Contents -->
                 <div id="moduleContents">
-                    <!-- Whiskers Module -->
-                    <div class="module-content active" id="module-whiskers">
+                    <!-- Perception Module -->
+                    <div class="module-content active" id="module-perception">
                         <div class="param-group">
                             <h3>文档处理</h3>
                             <div class="param-row">
                                 <label>分块大小 (chunk_size)</label>
                                 <div class="param-input">
-                                    <input type="number" id="whiskers-chunk_size" value="512">
+                                    <input type="number" id="perception-chunk_size" value="512">
                                     <span class="param-hint">建议: 256-1024</span>
                                 </div>
                             </div>
                             <div class="param-row">
                                 <label>分块重叠 (chunk_overlap)</label>
                                 <div class="param-input">
-                                    <input type="number" id="whiskers-chunk_overlap" value="50">
+                                    <input type="number" id="perception-chunk_overlap" value="50">
                                     <span class="param-hint">建议: 10-100</span>
                                 </div>
                             </div>
                             <div class="param-row">
                                 <label>启用 OCR (enable_ocr)</label>
                                 <div class="param-input">
-                                    <input type="checkbox" id="whiskers-enable_ocr" checked>
+                                    <input type="checkbox" id="perception-enable_ocr" checked>
                                 </div>
                             </div>
                         </div>
@@ -531,7 +531,7 @@
                             <div class="param-row">
                                 <label>向量模型 (vector_model)</label>
                                 <div class="param-input">
-                                    <select id="whiskers-vector_model">
+                                    <select id="perception-vector_model">
                                         <option value="BGE-M3">BGE-M3</option>
                                         <option value="text-embedding-ada-002">text-embedding-ada-002</option>
                                     </select>
@@ -540,7 +540,7 @@
                             <div class="param-row">
                                 <label>向量维度 (vector_size)</label>
                                 <div class="param-input">
-                                    <input type="number" id="whiskers-vector_size" value="1024">
+                                    <input type="number" id="perception-vector_size" value="1024">
                                 </div>
                             </div>
                         </div>
@@ -605,31 +605,31 @@
                             </div>
                         </div>
                         <div class="param-group">
-                            <h3>Pounce 机制</h3>
+                            <h3>早停机制</h3>
                             <div class="param-row">
-                                <label>扑击阈值 (pounce_threshold)</label>
+                                <label>早停阈值 (confidence_threshold)</label>
                                 <div class="param-input">
-                                    <input type="number" step="0.01" id="retrieval-pounce_threshold" value="0.85">
+                                    <input type="number" step="0.01" id="retrieval-confidence_threshold" value="0.85">
                                     <span class="param-hint">0-1, 置信度阈值</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Grooming Module -->
-                    <div class="module-content" id="module-grooming">
+                    <!-- Refinement Module -->
+                    <div class="module-content" id="module-refinement">
                         <div class="param-group">
                             <h3>验证配置</h3>
                             <div class="param-row">
                                 <label>最低置信度 (min_confidence)</label>
                                 <div class="param-input">
-                                    <input type="number" step="0.1" id="grooming-min_confidence" value="0.7">
+                                    <input type="number" step="0.1" id="refinement-min_confidence" value="0.7">
                                 </div>
                             </div>
                             <div class="param-row">
                                 <label>最大迭代次数 (max_iterations)</label>
                                 <div class="param-input">
-                                    <input type="number" id="grooming-max_iterations" value="3">
+                                    <input type="number" id="refinement-max_iterations" value="3">
                                 </div>
                             </div>
                         </div>
@@ -638,20 +638,20 @@
                             <div class="param-row">
                                 <label>幻觉阈值 (hallucination_threshold)</label>
                                 <div class="param-input">
-                                    <input type="number" step="0.1" id="grooming-hallucination_threshold" value="0.6">
+                                    <input type="number" step="0.1" id="refinement-hallucination_threshold" value="0.6">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Purr Module -->
-                    <div class="module-content" id="module-purr">
+                    <!-- Response Module -->
+                    <div class="module-content" id="module-response">
                         <div class="param-group">
                             <h3>交互配置</h3>
                             <div class="param-row">
                                 <label>默认语气 (default_tone)</label>
                                 <div class="param-input">
-                                    <select id="purr-default_tone">
+                                    <select id="response-default_tone">
                                         <option value="formal">专业严谨</option>
                                         <option value="friendly" selected>亲切友好</option>
                                         <option value="humorous">幽默轻松</option>
@@ -661,7 +661,7 @@
                             <div class="param-row">
                                 <label>详细程度 (default_detail_level)</label>
                                 <div class="param-input">
-                                    <select id="purr-default_detail_level">
+                                    <select id="response-default_detail_level">
                                         <option value="1">简洁摘要</option>
                                         <option value="2" selected>标准回答</option>
                                         <option value="3">详细解释</option>
@@ -675,13 +675,13 @@
                             <div class="param-row">
                                 <label>显示检索路径 (show_trace)</label>
                                 <div class="param-input">
-                                    <input type="checkbox" id="purr-show_trace" checked>
+                                    <input type="checkbox" id="response-show_trace" checked>
                                 </div>
                             </div>
                             <div class="param-row">
                                 <label>显示证据来源 (show_evidence)</label>
                                 <div class="param-input">
-                                    <input type="checkbox" id="purr-show_evidence" checked>
+                                    <input type="checkbox" id="response-show_evidence" checked>
                                 </div>
                             </div>
                         </div>
@@ -716,7 +716,7 @@
         // 全局变量
         let profiles = [];
         let selectedProfileId = null;
-        let currentModule = 'whiskers';
+        let currentModule = 'perception';
 
         // API 基础 URL
         const API_BASE = '/api';
@@ -794,11 +794,11 @@
             // 加载配置
             const profile = profiles.find(p => p.profile_id === profileId);
             if (profile) {
-                loadModuleConfig('whiskers', profile.whiskers_config.parameters);
+                loadModuleConfig('perception', profile.perception_config.parameters);
                 loadModuleConfig('memory', profile.memory_config.parameters);
                 loadModuleConfig('retrieval', profile.retrieval_config.parameters);
-                loadModuleConfig('grooming', profile.grooming_config.parameters);
-                loadModuleConfig('purr', profile.purr_config.parameters);
+                loadModuleConfig('refinement', profile.refinement_config.parameters);
+                loadModuleConfig('response', profile.response_config.parameters);
             }
         }
 
@@ -841,11 +841,11 @@
             }
             
             const updates = {
-                whiskers_config: getModuleConfig('whiskers'),
+                perception_config: getModuleConfig('perception'),
                 memory_config: getModuleConfig('memory'),
                 retrieval_config: getModuleConfig('retrieval'),
-                grooming_config: getModuleConfig('grooming'),
-                purr_config: getModuleConfig('purr')
+                refinement_config: getModuleConfig('refinement'),
+                response_config: getModuleConfig('response')
             };
             
             try {

@@ -5,7 +5,7 @@
 
 from typing import Dict, List, Tuple
 import numpy as np
-from src.whiskers.models import Chunk
+from src.perception.models import Chunk
 
 
 class VectorEncoder:

@@ -1,6 +1,6 @@
 """
-Pounce Retriever - 扑击检索器
-模拟猫捕猎时的"锁定-跳跃"机制
+Adaptive Retriever - 自适应检索器
+实现智能化的"早停机制"
 """
 
 from typing import List, Optional
@@ -13,11 +13,11 @@ from src.retrieval.reranker import ReRanker
 from src.retrieval.fusion import FusionStrategy
 
 
-class PounceController:
+class EarlyTerminationController:
     """
-    扑击控制器
+    早停控制器
     
-    模拟猫捕猎的"锁定-跳跃"行为：
+    智能检索终止策略：
     - 一旦置信度超过阈值，立即终止冗余检索
     - 避免浪费计算资源
     """
@@ -28,7 +28,7 @@ class PounceController:
         min_gain: float = 0.05
     ):
         """
-        初始化扑击控制器
+        初始化早停控制器
         
         Args:
             threshold: 置信度阈值
@@ -64,9 +64,9 @@ class PounceController:
         confidence = top_score * (1 + score_gap)
         return min(confidence, 1.0)
     
-    def should_pounce(self, confidence: float) -> bool:
+    def should_terminate(self, confidence: float) -> bool:
         """
-        判断是否应该"扑击"（返回结果）
+        判断是否应该提前终止（返回结果）
         
         Args:
             confidence: 当前置信度
@@ -105,9 +105,9 @@ class PounceController:
             return self.threshold
 
 
-class PounceRetriever:
+class AdaptiveRetriever:
     """
-    扑击检索器
+    自适应检索器
     
     集成多种检索策略和重排序
     """
@@ -116,7 +116,7 @@ class PounceRetriever:
         self,
         memory: MemoryManager,
         reranker_model: str = "BGE-Reranker-v2",
-        pounce_threshold: float = 0.85,
+        confidence_threshold: float = 0.85,
         enable_hyde: bool = True
     ):
         """
@@ -125,13 +125,13 @@ class PounceRetriever:
         Args:
             memory: 记忆管理器
             reranker_model: 重排序模型
-            pounce_threshold: 扑击阈值
+            confidence_threshold: 置信度阈值
             enable_hyde: 是否启用 HyDE
         """
         self.memory = memory
         self.hyde = HyDEEnhancer() if enable_hyde else None
         self.reranker = ReRanker(model=reranker_model)
-        self.pounce_controller = PounceController(threshold=pounce_threshold)
+        self.termination_controller = EarlyTerminationController(threshold=confidence_threshold)
         self.fusion = FusionStrategy()
         
         # 检索路径追踪
@@ -190,11 +190,11 @@ class PounceRetriever:
         # 5. 过滤低分结果
         filtered_results = [r for r in reranked_results if r.score >= min_score]
         
-        # 6. Pounce 判断
-        confidence = self.pounce_controller.evaluate_confidence(filtered_results)
+        # 6. 早停判断
+        confidence = self.termination_controller.evaluate_confidence(filtered_results)
         
-        if self.pounce_controller.should_pounce(confidence):
-            self._retrieval_trace.append(f"Pounced! Confidence: {confidence:.2f}")
+        if self.termination_controller.should_terminate(confidence):
+            self._retrieval_trace.append(f"Early terminated! Confidence: {confidence:.2f}")
             return filtered_results[:top_k]
         else:
             self._retrieval_trace.append(f"Confidence too low: {confidence:.2f}")

@@ -7,11 +7,11 @@ __version__ = "1.0.0-alpha"
 __author__ = "NecoRAG Team"
 
 # 核心模块导出
-from src.whiskers import WhiskersEngine
+from src.perception import WhiskersEngine
 from src.memory import MemoryManager
 from src.retrieval import PounceRetriever
-from src.grooming import GroomingAgent
-from src.purr import PurrInterface
+from src.refinement import GroomingAgent
+from src.response import PurrInterface
 from src.dashboard import DashboardServer, ConfigManager
 
 __all__ = [

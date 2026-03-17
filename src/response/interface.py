@@ -1,21 +1,21 @@
 """
-Purr Interface - 交互接口主类
+Response Interface - 响应接口主类
 """
 
 from typing import Optional, List
 from src.memory.manager import MemoryManager
-from src.grooming.models import GroomingResult
-from src.purr.profile_manager import UserProfileManager
-from src.purr.tone_adapter import ToneAdapter
-from src.purr.detail_adapter import DetailLevelAdapter
-from src.purr.visualizer import ThinkingChainVisualizer
-from src.purr.models import UserProfile, Response
+from src.refinement.models import RefinementResult
+from src.response.profile_manager import UserProfileManager
+from src.response.tone_adapter import ToneAdapter
+from src.response.detail_adapter import DetailLevelAdapter
+from src.response.visualizer import ThinkingChainVisualizer
+from src.response.models import UserProfile, Response
 import uuid
 
 
-class PurrInterface:
+class ResponseInterface:
     """
-    呼噜交互接口
+    响应接口
     
     功能：
     - 情境自适应生成
@@ -32,7 +32,7 @@ class PurrInterface:
         default_detail_level: int = 2
     ):
         """
-        初始化交互接口
+        初始化响应接口
         
         Args:
             memory: 记忆管理器
@@ -55,7 +55,7 @@ class PurrInterface:
     def respond(
         self,
         query: str,
-        grooming_result: GroomingResult,
+        refinement_result: RefinementResult,
         session_id: Optional[str] = None,
         tone: Optional[str] = None,
         detail_level: Optional[int] = None
@@ -65,7 +65,7 @@ class PurrInterface:
         
         Args:
             query: 查询文本
-            grooming_result: 梳理结果
+            refinement_result: 精炼结果
             session_id: 会话 ID
             tone: 语气风格
             detail_level: 详细程度
@@ -86,11 +86,11 @@ class PurrInterface:
             detail_level = self._determine_detail_level(
                 query,
                 user_profile,
-                grooming_result
+                refinement_result
             )
         
         # 适配内容
-        content = grooming_result.answer
+        content = refinement_result.answer
         
         # 语气适配
         content = self.tone_adapter.adapt(content, tone)
@@ -102,7 +102,7 @@ class PurrInterface:
         # 生成思维链可视化
         thinking_chain = self._generate_thinking_chain(
             query,
-            grooming_result
+            refinement_result
         )
         
         # 创建响应
@@ -111,16 +111,16 @@ class PurrInterface:
             thinking_chain=thinking_chain,
             tone=tone,
             detail_level=detail_level,
-            citations=grooming_result.citations,
+            citations=refinement_result.citations,
             metadata={
-                "confidence": grooming_result.confidence,
-                "iterations": grooming_result.iterations,
+                "confidence": refinement_result.confidence,
+                "iterations": refinement_result.iterations,
                 "user_id": user_id
             }
         )
         
         # 更新用户画像
-        from src.purr.models import Interaction
+        from src.response.models import Interaction
         interaction = Interaction(
             interaction_id=str(uuid.uuid4()),
             user_id=user_id,
@@ -135,7 +135,7 @@ class PurrInterface:
         self,
         query: str,
         user_profile: UserProfile,
-        grooming_result: GroomingResult
+        refinement_result: RefinementResult
     ) -> int:
         """
         确定详细程度
@@ -143,7 +143,7 @@ class PurrInterface:
         Args:
             query: 查询文本
             user_profile: 用户画像
-            grooming_result: 梳理结果
+            refinement_result: 精炼结果
             
         Returns:
             int: 详细程度级别 (1-4)
@@ -158,7 +158,7 @@ class PurrInterface:
         base_level = level_map.get(user_profile.professional_level, 2)
         
         # 基于查询复杂度调整
-        if grooming_result.iterations > 2:
+        if refinement_result.iterations > 2:
             # 复杂查询，提高详细程度
             base_level = min(base_level + 1, 4)
         
@@ -167,14 +167,14 @@ class PurrInterface:
     def _generate_thinking_chain(
         self,
         query: str,
-        grooming_result: GroomingResult
+        refinement_result: RefinementResult
     ) -> str:
         """
         生成思维链可视化
         
         Args:
             query: 查询文本
-            grooming_result: 梳理结果
+            refinement_result: 精炼结果
             
         Returns:
             str: 可视化文本
@@ -183,24 +183,24 @@ class PurrInterface:
         retrieval_trace = [
             f"查询理解：{query}",
             "在语义记忆中检索相关内容",
-            f"找到 {len(grooming_result.citations)} 条相关证据"
+            f"找到 {len(refinement_result.citations)} 条相关证据"
         ]
         
         # 构建证据来源
         evidence = [
-            {"source": f"证据 {i+1}", "score": grooming_result.confidence}
-            for i in range(len(grooming_result.citations))
+            {"source": f"证据 {i+1}", "score": refinement_result.confidence}
+            for i in range(len(refinement_result.citations))
         ]
         
         # 构建推理过程
         reasoning_chain = [
-            f"置信度：{grooming_result.confidence:.2f}",
-            f"迭代次数：{grooming_result.iterations}"
+            f"置信度：{refinement_result.confidence:.2f}",
+            f"迭代次数：{refinement_result.iterations}"
         ]
         
-        if grooming_result.hallucination_report:
+        if refinement_result.hallucination_report:
             reasoning_chain.append(
-                f"幻觉检测：{'通过' if not grooming_result.hallucination_report.is_hallucination else '未通过'}"
+                f"幻觉检测：{'通过' if not refinement_result.hallucination_report.is_hallucination else '未通过'}"
             )
         
         # 生成可视化

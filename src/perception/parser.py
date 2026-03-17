@@ -5,7 +5,7 @@
 
 from typing import List, Optional
 from pathlib import Path
-from src.whiskers.models import ParsedDocument, Chunk, Table, Image
+from src.perception.models import ParsedDocument, Chunk, Table, Image
 
 
 class DocumentParser:

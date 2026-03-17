@@ -1,5 +1,5 @@
 """
-Grooming 数据模型
+Refinement 数据模型
 """
 
 from dataclasses import dataclass, field
@@ -35,8 +35,8 @@ class CritiqueReport:
 
 
 @dataclass
-class GroomingResult:
-    """梳理结果"""
+class RefinementResult:
+    """精炼结果"""
     query: str
     answer: str
     confidence: float

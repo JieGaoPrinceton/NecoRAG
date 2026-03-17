@@ -4,7 +4,7 @@ User Profile Manager - 用户画像管理器
 
 from typing import Dict, Optional, List
 from datetime import datetime
-from src.purr.models import UserProfile, Interaction
+from src.response.models import UserProfile, Interaction
 
 
 class UserProfileManager:

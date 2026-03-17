@@ -11,11 +11,11 @@ import json
 
 class ModuleType(Enum):
     """模块类型"""
-    WHISKERS = "whiskers"
+    PERCEPTION = "perception"
     MEMORY = "memory"
     RETRIEVAL = "retrieval"
-    GROOMING = "grooming"
-    PURR = "purr"
+    REFINEMENT = "refinement"
+    RESPONSE = "response"
 
 
 @dataclass
@@ -44,13 +44,13 @@ class ModuleConfig:
 
 
 @dataclass
-class WhiskersConfig(ModuleConfig):
-    """Whiskers Engine 配置"""
+class PerceptionConfig(ModuleConfig):
+    """Perception Engine 配置"""
     def __init__(self):
         super().__init__(
-            module_type=ModuleType.WHISKERS,
-            module_name="Whiskers Engine",
-            description="胡须感知引擎 - 多模态数据的高精度编码与情境标记",
+            module_type=ModuleType.PERCEPTION,
+            module_name="Perception Engine",
+            description="感知引擎 - 多模态数据的高精度编码与情境标记",
             parameters={
                 "chunk_size": 512,
                 "chunk_overlap": 50,
@@ -69,8 +69,8 @@ class MemoryConfig(ModuleConfig):
     def __init__(self):
         super().__init__(
             module_type=ModuleType.MEMORY,
-            module_name="Nine-Lives Memory",
-            description="九命记忆存储 - 分层存储与管理",
+            module_name="Hierarchical Memory",
+            description="层级记忆 - 分层存储与管理",
             parameters={
                 # L1 配置
                 "l1_ttl": 3600,
@@ -97,8 +97,8 @@ class RetrievalConfig(ModuleConfig):
     def __init__(self):
         super().__init__(
             module_type=ModuleType.RETRIEVAL,
-            module_name="Pounce Strategy",
-            description="扑击检索策略 - 智能化信息检索与重排序",
+            module_name="Adaptive Retrieval",
+            description="自适应检索 - 智能化信息检索与重排序",
             parameters={
                 "top_k": 10,
                 "min_score": 0.3,
@@ -108,7 +108,7 @@ class RetrievalConfig(ModuleConfig):
                 "novelty_weight": 0.3,
                 "diversity_weight": 0.2,
                 "redundancy_penalty": 0.4,
-                "pounce_threshold": 0.85,
+                "confidence_threshold": 0.85,
                 "min_gain": 0.05,
                 "max_iterations": 3,
             }
@@ -116,13 +116,13 @@ class RetrievalConfig(ModuleConfig):
 
 
 @dataclass
-class GroomingConfig(ModuleConfig):
-    """Grooming 配置"""
+class RefinementConfig(ModuleConfig):
+    """Refinement 配置"""
     def __init__(self):
         super().__init__(
-            module_type=ModuleType.GROOMING,
-            module_name="Grooming Agent",
-            description="梳理校正代理 - 知识固化、幻觉自检与记忆修剪",
+            module_type=ModuleType.REFINEMENT,
+            module_name="Refinement Agent",
+            description="精炼代理 - 知识固化、幻觉自检与记忆修剪",
             parameters={
                 "min_confidence": 0.7,
                 "max_iterations": 3,
@@ -138,13 +138,13 @@ class GroomingConfig(ModuleConfig):
 
 
 @dataclass
-class PurrConfig(ModuleConfig):
-    """Purr 配置"""
+class ResponseConfig(ModuleConfig):
+    """Response 配置"""
     def __init__(self):
         super().__init__(
-            module_type=ModuleType.PURR,
-            module_name="Purr Interface",
-            description="呼噜交互接口 - 情境自适应生成与可解释性输出",
+            module_type=ModuleType.RESPONSE,
+            module_name="Response Interface",
+            description="响应接口 - 情境自适应生成与可解释性输出",
             parameters={
                 "default_tone": "friendly",
                 "default_detail_level": 2,
@@ -169,11 +169,11 @@ class RAGProfile:
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     is_active: bool = False
-    whiskers_config: WhiskersConfig = field(default_factory=WhiskersConfig)
+    perception_config: PerceptionConfig = field(default_factory=PerceptionConfig)
     memory_config: MemoryConfig = field(default_factory=MemoryConfig)
     retrieval_config: RetrievalConfig = field(default_factory=RetrievalConfig)
-    grooming_config: GroomingConfig = field(default_factory=GroomingConfig)
-    purr_config: PurrConfig = field(default_factory=PurrConfig)
+    refinement_config: RefinementConfig = field(default_factory=RefinementConfig)
+    response_config: ResponseConfig = field(default_factory=ResponseConfig)
     
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典"""
@@ -184,11 +184,11 @@ class RAGProfile:
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "is_active": self.is_active,
-            "whiskers_config": self.whiskers_config.to_dict(),
+            "perception_config": self.perception_config.to_dict(),
             "memory_config": self.memory_config.to_dict(),
             "retrieval_config": self.retrieval_config.to_dict(),
-            "grooming_config": self.grooming_config.to_dict(),
-            "purr_config": self.purr_config.to_dict(),
+            "refinement_config": self.refinement_config.to_dict(),
+            "response_config": self.response_config.to_dict(),
         }
     
     @classmethod
@@ -201,11 +201,11 @@ class RAGProfile:
             created_at=datetime.fromisoformat(data['created_at']),
             updated_at=datetime.fromisoformat(data['updated_at']),
             is_active=data.get('is_active', False),
-            whiskers_config=WhiskersConfig.from_dict(data['whiskers_config']),
+            perception_config=PerceptionConfig.from_dict(data['perception_config']),
             memory_config=MemoryConfig.from_dict(data['memory_config']),
             retrieval_config=RetrievalConfig.from_dict(data['retrieval_config']),
-            grooming_config=GroomingConfig.from_dict(data['grooming_config']),
-            purr_config=PurrConfig.from_dict(data['purr_config']),
+            refinement_config=RefinementConfig.from_dict(data['refinement_config']),
+            response_config=ResponseConfig.from_dict(data['response_config']),
         )
     
     def to_json(self) -> str:
