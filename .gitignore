@@ -55,6 +55,9 @@ logs/
 configs/*.json
 !configs/.gitkeep
 
+# Environment
+.env
+
 # OS
 .DS_Store
 Thumbs.db
