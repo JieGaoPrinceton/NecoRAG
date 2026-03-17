@@ -3,7 +3,7 @@
 模拟生物记忆的巩固与遗忘
 """
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 from src.memory.models import MemoryItem
 

@@ -3,16 +3,50 @@ NecoRAG - Neuro-Cognitive Retrieval-Augmented Generation
 基于认知科学理论构建的下一代智能 RAG 框架
 """
 
-__version__ = "1.0.0-alpha"
+__version__ = "1.1.0-alpha"
 __author__ = "NecoRAG Team"
+
+# 统一入口
+from src.necorag import NecoRAG, create_rag
+
+# 核心抽象层
+from src.core import (
+    # 配置
+    NecoRAGConfig,
+    ConfigPresets,
+    LLMProvider,
+    VectorDBProvider,
+    GraphDBProvider,
+    # 数据协议
+    Document,
+    Chunk,
+    Embedding,
+    Memory,
+    Query,
+    Response,
+    RetrievalResult,
+    # LLM 客户端
+    BaseLLMClient,
+    MockLLMClient,
+    # 异常
+    NecoRAGError,
+)
 
 # 核心模块导出
 from src.perception import PerceptionEngine
 from src.memory import MemoryManager
-from src.retrieval import AdaptiveRetriever
+from src.retrieval import AdaptiveRetriever, HyDEEnhancer
 from src.refinement import RefinementAgent
 from src.response import ResponseInterface
-from src.dashboard import DashboardServer, ConfigManager
+
+# Dashboard 模块（可选，依赖 FastAPI）
+try:
+    from src.dashboard import DashboardServer, ConfigManager
+    _HAS_DASHBOARD = True
+except ImportError:
+    DashboardServer = None  # type: ignore
+    ConfigManager = None  # type: ignore
+    _HAS_DASHBOARD = False
 
 # 领域权重模块导出
 from src.domain import (
@@ -27,14 +61,43 @@ from src.domain import (
 )
 
 __all__ = [
+    # 统一入口
+    "NecoRAG",
+    "create_rag",
+    
+    # 配置
+    "NecoRAGConfig",
+    "ConfigPresets",
+    "LLMProvider",
+    "VectorDBProvider",
+    "GraphDBProvider",
+    
+    # 数据协议
+    "Document",
+    "Chunk",
+    "Embedding",
+    "Memory",
+    "Query",
+    "Response",
+    "RetrievalResult",
+    
+    # LLM 客户端
+    "BaseLLMClient",
+    "MockLLMClient",
+    
+    # 异常
+    "NecoRAGError",
+    
     # 核心模块
     "PerceptionEngine",
     "MemoryManager",
     "AdaptiveRetriever",
+    "HyDEEnhancer",
     "RefinementAgent",
     "ResponseInterface",
     "DashboardServer",
     "ConfigManager",
+    
     # 领域权重模块
     "DomainConfig",
     "DomainConfigManager",
