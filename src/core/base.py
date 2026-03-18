@@ -12,7 +12,8 @@ from .protocols import (
     Document, Chunk, EncodedChunk, Embedding,
     Memory, Entity, Relation,
     Query, RetrievalResult, Response,
-    GeneratedAnswer, CritiqueResult, HallucinationReport
+    GeneratedAnswer, CritiqueResult, HallucinationReport,
+    IntentType
 )
 
 
@@ -566,5 +567,183 @@ class BaseResponseAdapter(ABC):
             
         Returns:
             str: 适配后的内容
+        """
+        pass
+
+
+# ============== 意图分类层抽象 ==============
+
+@dataclass
+class IntentResult:
+    """意图分类结果数据类"""
+    primary_intent: IntentType
+    confidence: float
+    secondary_intents: List[tuple] = None  # List[Tuple[IntentType, float]]
+    keywords: List[str] = None
+    entities: List[str] = None
+    
+    def __post_init__(self):
+        if self.secondary_intents is None:
+            self.secondary_intents = []
+        if self.keywords is None:
+            self.keywords = []
+        if self.entities is None:
+            self.entities = []
+
+
+class BaseIntentClassifier(ABC):
+    """意图分类器抽象基类"""
+    
+    @abstractmethod
+    def classify(self, query: str) -> IntentResult:
+        """
+        对查询进行意图分类
+        
+        Args:
+            query: 用户查询文本
+            
+        Returns:
+            IntentResult: 意图分类结果
+        """
+        pass
+    
+    @abstractmethod
+    def batch_classify(self, queries: List[str]) -> List[IntentResult]:
+        """
+        批量意图分类
+        
+        Args:
+            queries: 查询列表
+            
+        Returns:
+            List[IntentResult]: 分类结果列表
+        """
+        pass
+    
+    @property
+    @abstractmethod
+    def backend(self) -> str:
+        """返回分类器后端名称"""
+        pass
+
+
+class BaseIntentRouter(ABC):
+    """意图路由器抽象基类"""
+    
+    @abstractmethod
+    def route(self, intent_result: IntentResult) -> Dict[str, Any]:
+        """
+        根据意图结果获取路由策略
+        
+        Args:
+            intent_result: 意图分类结果
+            
+        Returns:
+            Dict[str, Any]: 路由策略配置
+        """
+        pass
+    
+    @abstractmethod
+    def get_weight_factor(self, intent_result: IntentResult) -> float:
+        """
+        计算意图权重因子
+        
+        Args:
+            intent_result: 意图分类结果
+            
+        Returns:
+            float: 权重因子
+        """
+        pass
+
+
+# ============== 知识演化层抽象 ==============
+
+class BaseKnowledgeUpdater(ABC):
+    """
+    知识更新器抽象基类
+    
+    Abstract base class for knowledge updater implementations.
+    """
+    
+    @abstractmethod
+    def realtime_update(
+        self,
+        content: str,
+        source: str,
+        **kwargs
+    ) -> Optional[str]:
+        """
+        实时更新知识
+        
+        Args:
+            content: 知识内容
+            source: 知识来源
+            **kwargs: 额外参数
+            
+        Returns:
+            Optional[str]: 新记忆的 ID，如果失败则返回 None
+        """
+        pass
+    
+    @abstractmethod
+    def execute_batch_update(self, task_id: str) -> Any:
+        """
+        执行批量更新任务
+        
+        Args:
+            task_id: 任务 ID
+            
+        Returns:
+            Any: 更新结果
+        """
+        pass
+    
+    @abstractmethod
+    def on_query_completed(
+        self,
+        query: str,
+        answer: str,
+        evidence: List[str],
+        hit: bool,
+        **kwargs
+    ) -> None:
+        """
+        查询完成后的回调
+        
+        Args:
+            query: 查询文本
+            answer: 回答内容
+            evidence: 证据列表
+            hit: 是否命中
+            **kwargs: 额外参数
+        """
+        pass
+
+
+class BaseMetricsCalculator(ABC):
+    """
+    指标计算器抽象基类
+    
+    Abstract base class for metrics calculator implementations.
+    """
+    
+    @abstractmethod
+    def calculate_metrics(self) -> Any:
+        """
+        计算当前指标
+        
+        Returns:
+            Any: 指标对象
+        """
+        pass
+    
+    @abstractmethod
+    def generate_health_report(self) -> Any:
+        """
+        生成健康报告
+        
+        Returns:
+            Any: 健康报告对象
         """
         pass

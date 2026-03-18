@@ -60,6 +60,42 @@ from src.domain import (
     create_example_domain,
 )
 
+# 意图分类模块导出
+from src.intent import (
+    IntentType,
+    IntentResult,
+    IntentRoutingStrategy,
+    IntentConfig,
+    IntentClassifier,
+    IntentRouter,
+    SemanticAnalyzer,
+    quick_analyze,
+)
+
+# 知识演化模块导出
+from src.knowledge_evolution import (
+    # 枚举类型
+    UpdateMode,
+    UpdateStatus,
+    KnowledgeSource,
+    CandidateStatus,
+    # 数据类
+    KnowledgeCandidate,
+    UpdateTask,
+    ChangeLogEntry,
+    KnowledgeMetrics,
+    HealthReport,
+    # 配置
+    KnowledgeEvolutionConfig,
+    # 核心类
+    KnowledgeUpdater,
+    KnowledgeMetricsCalculator,
+    UpdateScheduler,
+    KnowledgeVisualizer,
+    # 便捷函数
+    create_knowledge_evolution,
+)
+
 __all__ = [
     # 统一入口
     "NecoRAG",
@@ -107,4 +143,31 @@ __all__ = [
     "TemporalWeightCalculator",
     "DomainRelevanceCalculator",
     "create_example_domain",
+    
+    # 意图分类模块
+    "IntentType",
+    "IntentResult",
+    "IntentRoutingStrategy",
+    "IntentConfig",
+    "IntentClassifier",
+    "IntentRouter",
+    "SemanticAnalyzer",
+    "quick_analyze",
+    
+    # 知识演化模块
+    "UpdateMode",
+    "UpdateStatus",
+    "KnowledgeSource",
+    "CandidateStatus",
+    "KnowledgeCandidate",
+    "UpdateTask",
+    "ChangeLogEntry",
+    "KnowledgeMetrics",
+    "HealthReport",
+    "KnowledgeEvolutionConfig",
+    "KnowledgeUpdater",
+    "KnowledgeMetricsCalculator",
+    "UpdateScheduler",
+    "KnowledgeVisualizer",
+    "create_knowledge_evolution",
 ]

@@ -40,6 +40,11 @@ class ModuleParametersUpdate(BaseModel):
     parameters: Dict[str, Any]
 
 
+class CandidateActionRequest(BaseModel):
+    """候选条目操作请求"""
+    reason: Optional[str] = None
+
+
 class DashboardServer:
     """
     Dashboard 服务器
@@ -88,8 +93,15 @@ class DashboardServer:
         # 注册路由
         self._setup_routes()
         
+        # NecoRAG 实例引用（用于知识演化 API）
+        self._necorag = None
+        
         # 统计信息
         self.stats = DashboardStats()
+    
+    def set_necorag(self, necorag):
+        """设置 NecoRAG 实例引用"""
+        self._necorag = necorag
     
     def _setup_routes(self):
         """设置路由"""
@@ -233,6 +245,85 @@ class DashboardServer:
             """重置统计信息"""
             self.stats = DashboardStats()
             return {"message": "Stats reset"}
+        
+        # ========== 知识演化 API ==========
+        
+        @self.app.get("/api/knowledge/metrics", response_model=Dict)
+        async def get_knowledge_metrics():
+            """获取知识库指标"""
+            if self._necorag is None:
+                return {"error": "NecoRAG not initialized"}
+            return self._necorag.get_knowledge_metrics()
+        
+        @self.app.get("/api/knowledge/health", response_model=Dict)
+        async def get_knowledge_health():
+            """获取健康报告"""
+            if self._necorag is None:
+                return {"error": "NecoRAG not initialized"}
+            return self._necorag.get_health_report()
+        
+        @self.app.get("/api/knowledge/dashboard", response_model=Dict)
+        async def get_knowledge_dashboard():
+            """获取仪表盘完整数据"""
+            if self._necorag is None:
+                return {"error": "NecoRAG not initialized"}
+            return self._necorag.get_knowledge_dashboard_data()
+        
+        @self.app.get("/api/knowledge/growth")
+        async def get_knowledge_growth(days: int = 30):
+            """获取增长趋势"""
+            if self._necorag is None:
+                return {"error": "NecoRAG not initialized"}
+            if self._necorag._knowledge_visualizer:
+                return self._necorag._knowledge_visualizer.get_growth_chart_data(days)
+            return {}
+        
+        @self.app.get("/api/knowledge/timeline")
+        async def get_knowledge_timeline(limit: int = 20):
+            """获取更新时间线"""
+            if self._necorag is None:
+                return {"error": "NecoRAG not initialized"}
+            if self._necorag._knowledge_visualizer:
+                return self._necorag._knowledge_visualizer.get_update_timeline(limit)
+            return []
+        
+        @self.app.get("/api/knowledge/candidates")
+        async def get_knowledge_candidates(limit: int = 50):
+            """获取待审核候选"""
+            if self._necorag is None:
+                return {"error": "NecoRAG not initialized"}
+            return self._necorag.get_pending_candidates(limit)
+        
+        @self.app.post("/api/knowledge/candidates/{candidate_id}/approve")
+        async def approve_knowledge_candidate(candidate_id: str):
+            """批准候选"""
+            if self._necorag is None:
+                raise HTTPException(status_code=500, detail="NecoRAG not initialized")
+            success = self._necorag.approve_candidate(candidate_id)
+            if not success:
+                raise HTTPException(status_code=404, detail="Candidate not found or already processed")
+            return {"message": "Candidate approved"}
+        
+        @self.app.post("/api/knowledge/candidates/{candidate_id}/reject")
+        async def reject_knowledge_candidate(
+            candidate_id: str,
+            request: CandidateActionRequest = None
+        ):
+            """拒绝候选"""
+            if self._necorag is None:
+                raise HTTPException(status_code=500, detail="NecoRAG not initialized")
+            reason = request.reason if request else ""
+            success = self._necorag.reject_candidate(candidate_id, reason)
+            if not success:
+                raise HTTPException(status_code=404, detail="Candidate not found or already processed")
+            return {"message": "Candidate rejected"}
+        
+        @self.app.get("/api/knowledge/gaps")
+        async def get_knowledge_gaps(min_frequency: int = 2):
+            """获取知识缺口"""
+            if self._necorag is None:
+                return {"error": "NecoRAG not initialized"}
+            return self._necorag.get_knowledge_gaps(min_frequency)
         
         # ========== Web UI ==========
         

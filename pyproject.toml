@@ -38,6 +38,30 @@ dev = [
     "mypy>=1.7.0",
 ]
 
+intent = [
+    "jieba>=0.42.1",
+]
+
+intent-ml = [
+    "jieba>=0.42.1",
+    "transformers>=4.30.0",
+    "torch>=2.0.0",
+]
+
+intent-fasttext = [
+    "jieba>=0.42.1",
+    "fasttext-wheel>=0.9.2",
+]
+
+scheduler = [
+    "apscheduler>=3.10.0",
+]
+
+scheduler-distributed = [
+    "celery>=5.3.0",
+    "redis>=4.5.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/NecoRAG/core"
 Documentation = "https://github.com/NecoRAG/core#readme"

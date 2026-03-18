@@ -227,6 +227,30 @@ class DomainWeightConfig(BaseConfig):
     evergreen_enabled: bool = True  # 是否启用常青知识
 
 
+@dataclass
+class KnowledgeEvolutionConfig(BaseConfig):
+    """知识库更新与演化配置"""
+    # 实时更新
+    enable_realtime_update: bool = True
+    realtime_quality_threshold: float = 0.6
+    auto_approve_threshold: float = 0.85
+    
+    # 定时更新
+    enable_scheduled_update: bool = True
+    batch_update_interval: int = 86400  # 24小时
+    
+    # 变更日志
+    enable_change_log: bool = True
+    enable_rollback: bool = True
+    
+    # 健康度阈值
+    health_warning_threshold: float = 60.0
+    health_critical_threshold: float = 40.0
+    
+    # 查询驱动知识积累
+    enable_query_driven_accumulation: bool = True
+
+
 # ============== 全局配置 ==============
 
 @dataclass
@@ -245,6 +269,7 @@ class NecoRAGConfig(BaseConfig):
     refinement: RefinementConfig = field(default_factory=RefinementConfig)
     response: ResponseConfig = field(default_factory=ResponseConfig)
     domain_weight: DomainWeightConfig = field(default_factory=DomainWeightConfig)
+    knowledge_evolution: KnowledgeEvolutionConfig = field(default_factory=KnowledgeEvolutionConfig)
     
     # 数据目录
     data_dir: str = "./data"
@@ -274,6 +299,7 @@ class NecoRAGConfig(BaseConfig):
             'refinement': RefinementConfig,
             'response': ResponseConfig,
             'domain_weight': DomainWeightConfig,
+            'knowledge_evolution': KnowledgeEvolutionConfig,
         }
         
         for key, config_class in config_classes.items():

@@ -293,3 +293,96 @@ class ValidationError(NecoRAGError):
             details=details,
             **kwargs
         )
+
+
+# ============== 知识演化相关异常 ==============
+
+class KnowledgeEvolutionError(NecoRAGError):
+    """知识演化错误基类"""
+    
+    def __init__(self, message: str, **kwargs):
+        super().__init__(message=message, code="KNOWLEDGE_EVOLUTION_ERROR", **kwargs)
+
+
+class UpdateError(KnowledgeEvolutionError):
+    """更新错误"""
+    
+    def __init__(
+        self,
+        message: str,
+        update_mode: Optional[str] = None,
+        **kwargs
+    ):
+        details = kwargs.pop("details", {})
+        details["update_mode"] = update_mode
+        super().__init__(
+            message=message,
+            details=details,
+            **kwargs
+        )
+        self.code = "UPDATE_ERROR"
+
+
+class CandidateError(KnowledgeEvolutionError):
+    """候选条目错误"""
+    
+    def __init__(
+        self,
+        message: str,
+        candidate_id: Optional[str] = None,
+        **kwargs
+    ):
+        details = kwargs.pop("details", {})
+        details["candidate_id"] = candidate_id
+        super().__init__(
+            message=message,
+            details=details,
+            **kwargs
+        )
+        self.code = "CANDIDATE_ERROR"
+
+
+class MetricsCalculationError(KnowledgeEvolutionError):
+    """指标计算错误"""
+    
+    def __init__(self, message: str, **kwargs):
+        super().__init__(message=message, **kwargs)
+        self.code = "METRICS_CALCULATION_ERROR"
+
+
+class SchedulerError(KnowledgeEvolutionError):
+    """调度器错误"""
+    
+    def __init__(
+        self,
+        message: str,
+        task_id: Optional[str] = None,
+        **kwargs
+    ):
+        details = kwargs.pop("details", {})
+        details["task_id"] = task_id
+        super().__init__(
+            message=message,
+            details=details,
+            **kwargs
+        )
+        self.code = "SCHEDULER_ERROR"
+
+
+class RollbackError(KnowledgeEvolutionError):
+    """回滚错误"""
+    
+    def __init__(
+        self,
+        message: str,
+        log_id: Optional[str] = None,
+        **kwargs
+    ):
+        details = kwargs.pop("details", {})
+        details["log_id"] = log_id
+        super().__init__(
+            message=message,
+            details=details,
+            **kwargs
+        )
+        self.code = "ROLLBACK_ERROR"

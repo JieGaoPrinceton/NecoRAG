@@ -37,7 +37,7 @@ class PerceptionEngine:
         self.parser = DocumentParser(enable_ocr=enable_ocr)
         self.chunker = ChunkStrategy(chunk_size, chunk_overlap)
         self.tagger = ContextualTagger()
-        self.encoder = VectorEncoder(model=model)
+        self.encoder = VectorEncoder(model_name=model)
     
     def parse_document(self, file_path: str) -> ParsedDocument:
         """

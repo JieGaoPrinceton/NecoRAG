@@ -183,3 +183,12 @@ class MemoryManager:
             self._memory_store.pop(memory_id, None)
         
         return len(to_forget)
+    
+    def count(self) -> int:
+        """
+        获取记忆条目总数
+        
+        Returns:
+            int: 条目总数
+        """
+        return len(self._memory_store)

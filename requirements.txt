@@ -40,6 +40,20 @@ pydantic>=2.5.0
 # spacy>=3.7.0
 # transformers>=4.35.0
 
+# Intent Classification (意图分类)
+jieba>=0.42.1  # 中文分词，用于关键词提取
+# 以下为可选深度学习依赖
+# transformers>=4.30.0  # Transformer 后端
+# torch>=2.0.0  # PyTorch
+# fasttext-wheel>=0.9.2  # FastText 后端
+# spacy>=3.5.0  # 实体识别
+# rasa[nlu]>=3.6.0  # Rasa NLU
+
+# Task Scheduling (任务调度 - Knowledge Evolution)
+# apscheduler>=3.10.0  # 定时任务调度
+# celery>=5.3.0  # 分布式任务队列
+# redis>=4.5.0  # Celery broker
+
 # Utilities
 aiohttp>=3.9.0
 pydantic>=2.5.0

@@ -61,6 +61,21 @@ class DetailLevel(Enum):
     COMPREHENSIVE = 4  # 全面
 
 
+class IntentType(Enum):
+    """
+    意图类型
+    
+    Query intent types for semantic analysis.
+    """
+    FACTUAL = "factual"           # 事实查询
+    COMPARATIVE = "comparative"   # 比较分析
+    REASONING = "reasoning"       # 推理演绎
+    EXPLANATION = "explanation"   # 概念解释
+    SUMMARIZATION = "summarization"  # 摘要总结
+    PROCEDURAL = "procedural"     # 操作指导
+    EXPLORATORY = "exploratory"   # 探索发散
+
+
 # ============== 文档相关 ==============
 
 @dataclass

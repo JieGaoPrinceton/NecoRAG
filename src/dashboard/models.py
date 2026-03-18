@@ -16,6 +16,7 @@ class ModuleType(Enum):
     RETRIEVAL = "retrieval"
     REFINEMENT = "refinement"
     RESPONSE = "response"
+    KNOWLEDGE_EVOLUTION = "knowledge_evolution"
 
 
 @dataclass
