@@ -14,6 +14,13 @@ from src.retrieval.models import RetrievalResult, QueryAnalysis
 from src.retrieval.hyde import HyDEEnhancer
 from src.retrieval.reranker import ReRanker
 from src.retrieval.fusion import FusionStrategy
+from src.retrieval.web_search import (
+    WebSearchEngine,
+    SearchResultValidator,
+    HumanConfirmationManager,
+    WebSearchResult,
+    WebSearchConfig
+)
 from src.core.base import BaseRetriever
 
 # 领域权重模块
@@ -161,6 +168,11 @@ class AdaptiveRetriever(BaseRetriever):
         self.weight_calculator: Optional["CompositeWeightCalculator"] = None
         self.query_enhancer: Optional["QueryRelevanceEnhancer"] = None
         
+        # 互联网搜索组件
+        self.web_search_engine: Optional[WebSearchEngine] = None
+        self.search_validator: Optional[SearchResultValidator] = None
+        self.confirmation_manager: Optional[HumanConfirmationManager] = None
+        
         if domain_config and DOMAIN_WEIGHT_AVAILABLE:
             self.weight_calculator = CompositeWeightCalculator(domain_config)
             self.query_enhancer = QueryRelevanceEnhancer(domain_config)
@@ -179,6 +191,35 @@ class AdaptiveRetriever(BaseRetriever):
         if DOMAIN_WEIGHT_AVAILABLE:
             self.weight_calculator = CompositeWeightCalculator(domain_config)
             self.query_enhancer = QueryRelevanceEnhancer(domain_config)
+    
+    def set_web_search_config(self, config: "RetrievalConfig") -> None:
+        """
+        设置互联网搜索配置
+        
+        Args:
+            config: 检索配置
+        """
+        if not config.enable_web_search:
+            return
+        
+        # 创建Web搜索配置
+        web_config = WebSearchConfig(
+            enable_web_search=config.enable_web_search,
+            search_engines=config.search_engines,
+            max_results=config.web_search_max_results,
+            timeout=30,
+            rate_limit=10
+        )
+        
+        # 初始化Web搜索组件
+        self.web_search_engine = WebSearchEngine(web_config)
+        self.search_validator = SearchResultValidator(
+            min_credibility=0.5,
+            min_relevance=0.3
+        )
+        self.confirmation_manager = HumanConfirmationManager(
+            confirmation_timeout=config.confirmation_timeout
+        )
     
     def retrieve(
         self,
@@ -455,3 +496,148 @@ class AdaptiveRetriever(BaseRetriever):
         """
         # 最小实现：返回空列表
         return []
+    
+    async def retrieve_async(
+        self,
+        query: str,
+        query_vector: Optional[np.ndarray] = None,
+        top_k: int = 10,
+        min_score: float = 0.3,
+        apply_domain_weight: bool = True,
+        web_search_config: Optional["RetrievalConfig"] = None
+    ) -> List[RetrievalResult]:
+        """
+        异步执行检索（支持互联网搜索回退）
+        
+        Args:
+            query: 查询文本
+            query_vector: 查询向量
+            top_k: 返回数量
+            min_score: 最低分数
+            apply_domain_weight: 是否应用领域权重
+            web_search_config: 互联网搜索配置
+            
+        Returns:
+            List[RetrievalResult]: 检索结果
+        """
+        # 首先执行标准检索
+        local_results = self.retrieve(
+            query=query,
+            query_vector=query_vector,
+            top_k=top_k,
+            min_score=min_score,
+            apply_domain_weight=apply_domain_weight
+        )
+        
+        # 如果启用了互联网搜索且回退条件满足
+        if (web_search_config and web_search_config.enable_web_search and
+            len(local_results) < web_search_config.web_search_min_results):
+            
+            # 执行互联网搜索
+            web_results = await self._perform_web_search_fallback(query, top_k, web_search_config)
+            
+            # 合并结果
+            combined_results = self._combine_results(local_results, web_results)
+            
+            # 重新排序和过滤
+            combined_results.sort(key=lambda x: x.score, reverse=True)
+            return combined_results[:top_k]
+        
+        return local_results[:top_k]
+    
+    async def _perform_web_search_fallback(
+        self, 
+        query: str, 
+        top_k: int,
+        config: Optional["RetrievalConfig"] = None
+    ) -> List[RetrievalResult]:
+        """
+        执行互联网搜索回退
+        
+        Args:
+            query: 查询文本
+            top_k: 返回数量
+            config: 检索配置
+            
+        Returns:
+            List[RetrievalResult]: 搜索结果转换为检索结果
+        """
+        if not self.web_search_engine:
+            return []
+        
+        try:
+            # 执行网络搜索
+            web_results = await self.web_search_engine.search(
+                query, 
+                max_results=config.web_search_max_results if config else 10
+            )
+            
+            # 验证和过滤结果
+            if self.search_validator:
+                web_results = self.search_validator.validate_and_filter(web_results)
+            
+            # 转换为检索结果格式
+            retrieval_results = []
+            for i, web_result in enumerate(web_results[:top_k]):
+                retrieval_result = RetrievalResult(
+                    memory_id=f"web_{i}_{hash(web_result.url)}",
+                    content=web_result.snippet,
+                    score=web_result.composite_score,
+                    source=f"web:{web_result.source}",
+                    metadata={
+                        "url": web_result.url,
+                        "title": web_result.title,
+                        "domain": web_result.domain,
+                        "credibility": web_result.credibility_score,
+                        "relevance": web_result.relevance_score,
+                        "search_timestamp": web_result.timestamp.isoformat()
+                    }
+                )
+                retrieval_results.append(retrieval_result)
+            
+            return retrieval_results
+            
+        except Exception as e:
+            logger.error(f"Web search fallback failed: {e}")
+            return []
+    
+    def _combine_results(
+        self, 
+        local_results: List[RetrievalResult], 
+        web_results: List[RetrievalResult]
+    ) -> List[RetrievalResult]:
+        """
+        合并本地和网络检索结果
+        
+        Args:
+            local_results: 本地检索结果
+            web_results: 网络检索结果
+            
+        Returns:
+            List[RetrievalResult]: 合并后的结果
+        """
+        # 为不同类型的结果设置不同的权重基础
+        combined = []
+        
+        # 本地结果保持原有分数
+        for result in local_results:
+            combined.append(result)
+        
+        # 网络结果适当调整分数
+        for result in web_results:
+            # 网络结果分数通常较低，但可以适当提升
+            adjusted_score = min(1.0, result.score * 1.2)  # 最多提升20%
+            result.score = adjusted_score
+            combined.append(result)
+        
+        # 去重（基于内容相似度）
+        seen_contents = set()
+        unique_results = []
+        
+        for result in combined:
+            content_hash = hash(result.content.lower().strip())
+            if content_hash not in seen_contents:
+                seen_contents.add(content_hash)
+                unique_results.append(result)
+        
+        return unique_results

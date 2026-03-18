@@ -3,7 +3,7 @@
 管理 RAG Profile 的存储、加载和应用
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from pathlib import Path
 import json
 from datetime import datetime

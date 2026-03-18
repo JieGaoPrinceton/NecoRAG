@@ -11,9 +11,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 from pathlib import Path
+from datetime import datetime
 
 from src.dashboard.config_manager import ConfigManager
 from src.dashboard.models import RAGProfile, DashboardStats
+from src.dashboard.debug import DebugWebSocketManager, DebugAPIRouter
+from src.dashboard.debug.api import set_websocket_manager
 
 
 # Pydantic 模型用于 API
@@ -73,6 +76,10 @@ class DashboardServer:
         self.host = host
         self.port = port
         self.config_manager = ConfigManager(config_dir)
+        
+        # 初始化调试组件
+        self.debug_ws_manager = DebugWebSocketManager(max_connections=100)
+        set_websocket_manager(self.debug_ws_manager)
         
         # 创建 FastAPI 应用
         self.app = FastAPI(
@@ -325,6 +332,42 @@ class DashboardServer:
                 return {"error": "NecoRAG not initialized"}
             return self._necorag.get_knowledge_gaps(min_frequency)
         
+        # ========== 调试面板 API ==========
+        
+        # 注册调试API路由
+        self.app.include_router(DebugAPIRouter)
+        
+        # 注册调试WebSocket端点
+        @self.app.websocket("/api/debug/ws/thinking-path/{session_id}")
+        async def debug_websocket_endpoint(websocket, session_id: str):
+            """调试WebSocket端点"""
+            if self.debug_ws_manager is None:
+                await websocket.close(code=1011, reason="WebSocket manager not initialized")
+                return
+            
+            client_id = f"client_{session_id}_{int(datetime.now().timestamp())}"
+            
+            # 建立连接
+            if not await self.debug_ws_manager.connect(websocket, client_id):
+                return
+            
+            try:
+                # 订阅会话更新
+                await self.debug_ws_manager.subscribe_session(client_id, session_id)
+                
+                # 监听客户端消息
+                while True:
+                    try:
+                        message = await websocket.receive_json()
+                        await self.debug_ws_manager.handle_client_message(client_id, message)
+                    except Exception:
+                        break
+                        
+            except Exception as e:
+                logger.error(f"Debug WebSocket error for client {client_id}: {e}")
+            finally:
+                await self.debug_ws_manager.disconnect(client_id)
+        
         # ========== Web UI ==========
         
         @self.app.get("/", response_class=HTMLResponse)
@@ -481,3 +524,13 @@ class DashboardServer:
             port=self.port,
             log_level="info"
         )
+
+
+def main():
+    """主函数 - 启动仪表板服务器"""
+    server = DashboardServer()
+    server.run()
+
+
+if __name__ == "__main__":
+    main()

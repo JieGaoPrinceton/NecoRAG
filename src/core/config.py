@@ -178,6 +178,18 @@ class RetrievalConfig(BaseConfig):
     enable_rerank: bool = True
     rerank_top_k: int = 20
     novelty_penalty: float = 0.1
+    
+    # 互联网搜索配置
+    enable_web_search: bool = True
+    web_search_min_results: int = 3
+    web_search_max_results: int = 10
+    web_search_confidence_threshold: float = 0.6
+    confirmation_timeout: int = 300  # 5分钟
+    search_engines: List[str] = None
+    
+    def __post_init__(self):
+        if self.search_engines is None:
+            self.search_engines = ["google", "bing"]
 
 
 # ============== 巩固层配置 ==============

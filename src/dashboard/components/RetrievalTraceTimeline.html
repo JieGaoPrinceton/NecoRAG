@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检索路径时间轴组件</title>
+    <style>
+        .timeline-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .timeline-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .timeline-stats {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .timeline-steps {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-steps::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
+        
+        .timeline-step {
+            position: relative;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .step-marker {
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #e9ecef;
+        }
+        
+        .step-marker.pending {
+            background: #ffc107;
+            box-shadow: 0 0 0 2px #ffc107;
+        }
+        
+        .step-marker.running {
+            background: #17a2b8;
+            box-shadow: 0 0 0 2px #17a2b8;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .step-marker.completed {
+            background: #28a745;
+            box-shadow: 0 0 0 2px #28a745;
+        }
+        
+        .step-marker.failed {
+            background: #dc3545;
+            box-shadow: 0 0 0 2px #dc3545;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .step-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .step-duration {
+            font-size: 14px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        .step-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .step-metrics {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .metric-tag {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .metric-tag.highlight {
+            background: #007bff;
+            color: white;
+        }
+        
+        .step-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 13px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #007bff;
+            color: #007bff;
+        }
+        
+        .btn-outline:hover {
+            background: #007bff;
+            color: white;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #17a2b8);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="timeline-container">
+        <div class="timeline-header">
+            <h2 class="timeline-title">检索路径时间轴</h2>
+            <div class="timeline-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalSteps">0</div>
+                    <div class="stat-label">总步骤</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="completedSteps">0</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalTime">0.0s</div>
+                    <div class="stat-label">总耗时</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="refreshTimeline()">刷新</button>
+            <button class="btn btn-outline" onclick="toggleAutoRefresh()">自动刷新</button>
+            <button class="btn btn-outline" onclick="exportTimeline()">导出</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div class="timeline-steps" id="timelineSteps">
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <p>暂无检索步骤数据</p>
+                <p style="font-size: 14px; margin-top: 10px;">开始一个查询来查看检索路径</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RetrievalTimeline {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId || 'timelineSteps');
+                this.steps = [];
+                this.autoRefresh = false;
+                this.refreshInterval = null;
+                this.sessionId = null;
+            }
+            
+            // 设置会话ID并开始监听
+            setSession(sessionId) {
+                this.sessionId = sessionId;
+                this.connectWebSocket();
+                this.loadTimelineData();
+            }
+            
+            // 连接WebSocket
+            connectWebSocket() {
+                if (!this.sessionId) return;
+                
+                const wsUrl = `ws://${window.location.host}/api/debug/ws/thinking-path/${this.sessionId}`;
+                this.ws = new WebSocket(wsUrl);
+                
+                this.ws.onopen = () => {
+                    console.log('WebSocket连接已建立');
+                };
+                
+                this.ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+                
+                this.ws.onclose = () => {
+                    console.log('WebSocket连接已关闭');
+                    // 尝试重连
+                    setTimeout(() => this.connectWebSocket(), 5000);
+                };
+                
+                this.ws.onerror = (error) => {
+                    console.error('WebSocket错误:', error);
+                };
+            }
+            
+            // 处理WebSocket消息
+            handleWebSocketMessage(data) {
+                switch (data.type) {
+                    case 'session_update':
+                        this.updateFromSession(data.data);
+                        break;
+                    case 'step_update':
+                        this.addStep(data.step_data);
+                        break;
+                    case 'performance_update':
+                        this.updatePerformance(data.metrics);
+                        break;
+                }
+            }
+            
+            // 从会话数据更新
+            updateFromSession(sessionData) {
+                this.steps = sessionData.retrieval_steps || [];
+                this.renderTimeline();
+                this.updateStats();
+            }
+            
+            // 添加新步骤
+            addStep(stepData) {
+                this.steps.push(stepData);
+                this.renderTimeline();
+                this.updateStats();
+            }
+            
+            // 更新性能指标
+            updatePerformance(metrics) {
+                // 更新进度条等UI元素
+                const progress = Math.min(100, (metrics.completed_steps / metrics.total_steps) * 100);
+                document.getElementById('progressFill').style.width = `${progress}%`;
+            }
+            
+            // 加载时间轴数据
+            async loadTimelineData() {
+                if (!this.sessionId) return;
+                
+                try {
+                    const response = await fetch(`/api/debug/sessions/${this.sessionId}`);
+                    const sessionData = await response.json();
+                    this.updateFromSession(sessionData);
+                } catch (error) {
+                    console.error('加载时间轴数据失败:', error);
+                }
+            }
+            
+            // 渲染时间轴
+            renderTimeline() {
+                if (this.steps.length === 0) {
+                    this.container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔍</div>
+                            <p>暂无检索步骤数据</p>
+                            <p style="font-size: 14px; margin-top: 10px;">等待检索步骤...</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const stepsHtml = this.steps.map(step => this.renderStep(step)).join('');
+                this.container.innerHTML = stepsHtml;
+            }
+            
+            // 渲染单个步骤
+            renderStep(step) {
+                const statusClass = step.status || 'pending';
+                const duration = step.duration ? step.duration.toFixed(3) + 's' : '进行中';
+                const metrics = this.formatMetrics(step.metrics);
+                
+                return `
+                    <div class="timeline-step" data-step-id="${step.step_id}">
+                        <div class="step-marker ${statusClass}"></div>
+                        <div class="step-header">
+                            <div class="step-name">${step.name}</div>
+                            <div class="step-duration">${duration}</div>
+                        </div>
+                        <div class="step-description">${step.description || '无描述'}</div>
+                        ${metrics.length > 0 ? `
+                            <div class="step-metrics">
+                                ${metrics.map(metric => `
+                                    <span class="metric-tag ${metric.highlight ? 'highlight' : ''}">
+                                        ${metric.label}: ${metric.value}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        ${step.output_data ? `
+                            <div class="step-details">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">结果数量:</span>
+                                        <span class="detail-value">${step.output_data.result_count || 0}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">平均分数:</span>
+                                        <span class="detail-value">${(step.output_data.avg_score || 0).toFixed(3)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            // 格式化指标
+            formatMetrics(metrics) {
+                if (!metrics) return [];
+                
+                const formatted = [];
+                
+                // 处理常见的性能指标
+                if (metrics.latency !== undefined) {
+                    formatted.push({
+                        label: '延迟',
+                        value: metrics.latency.toFixed(3) + 's',
+                        highlight: metrics.latency > 1.0
+                    });
+                }
+                
+                if (metrics.throughput !== undefined) {
+                    formatted.push({
+                        label: '吞吐量',
+                        value: metrics.throughput.toFixed(1) + ' req/s',
+                        highlight: metrics.throughput < 10
+                    });
+                }
+                
+                if (metrics.accuracy !== undefined) {
+                    formatted.push({
+                        label: '准确率',
+                        value: (metrics.accuracy * 100).toFixed(1) + '%',
+                        highlight: metrics.accuracy < 0.8
+                    });
+                }
+                
+                return formatted;
+            }
+            
+            // 更新统计信息
+            updateStats() {
+                const totalSteps = this.steps.length;
+                const completedSteps = this.steps.filter(s => s.status === 'completed').length;
+                const totalTime = this.steps.reduce((sum, step) => sum + (step.duration || 0), 0);
+                
+                document.getElementById('totalSteps').textContent = totalSteps;
+                document.getElementById('completedSteps').textContent = completedSteps;
+                document.getElementById('totalTime').textContent = totalTime.toFixed(3) + 's';
+                
+                // 更新进度条
+                const progress = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+            }
+            
+            // 刷新时间轴
+            refresh() {
+                this.loadTimelineData();
+            }
+            
+            // 切换自动刷新
+            toggleAutoRefresh() {
+                this.autoRefresh = !this.autoRefresh;
+                
+                if (this.autoRefresh) {
+                    this.refreshInterval = setInterval(() => {
+                        this.refresh();
+                    }, 3000); // 每3秒刷新一次
+                } else {
+                    if (this.refreshInterval) {
+                        clearInterval(this.refreshInterval);
+                        this.refreshInterval = null;
+                    }
+                }
+                
+                // 更新按钮文本
+                const button = event.target;
+                button.textContent = this.autoRefresh ? '停止刷新' : '自动刷新';
+            }
+            
+            // 导出时间轴数据
+            exportTimeline() {
+                const data = {
+                    sessionId: this.sessionId,
+                    steps: this.steps,
+                    exportTime: new Date().toISOString(),
+                    stats: {
+                        totalSteps: this.steps.length,
+                        completedSteps: this.steps.filter(s => s.status === 'completed').length,
+                        totalTime: this.steps.reduce((sum, step) => sum + (step.duration || 0), 0)
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `retrieval-timeline-${this.sessionId}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        // 全局函数供HTML调用
+        let timeline;
+        
+        function initTimeline() {
+            timeline = new RetrievalTimeline('timelineSteps');
+            // 这里可以从URL参数或其他地方获取sessionId
+            // timeline.setSession('your-session-id');
+        }
+        
+        function refreshTimeline() {
+            if (timeline) timeline.refresh();
+        }
+        
+        function toggleAutoRefresh() {
+            if (timeline) timeline.toggleAutoRefresh();
+        }
+        
+        function exportTimeline() {
+            if (timeline) timeline.exportTimeline();
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initTimeline);
+    </script>
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NecoRAG 调试面板</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .debug-panel-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* 头部工具栏 */
+        .debug-header {
+            background: var(--dark-bg);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger-color);
+        }
+
+        .status-indicator.connected {
+            background: var(--secondary-color);
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 300px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            background: var(--dark-bg);
+            color: white;
+            font-weight: 600;
+        }
+
+        .session-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .session-item:hover {
+            background: var(--light-bg);
+        }
+
+        .session-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .session-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .session-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .session-item.active .session-meta {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* 主视图区域 */
+        .main-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .view-tabs {
+            display: flex;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        /* 组件容器样式 */
+        .component-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .component-header {
+            padding: 1rem 1.5rem;
+            background: var(--dark-bg);
+            color: white;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .component-body {
+            padding: 1.5rem;
+        }
+
+        /* 控制按钮 */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-panel-container">
+        <!-- 头部工具栏 -->
+        <header class="debug-header">
+            <div class="header-title">
+                <span>🧠</span>
+                <span>NecoRAG 调试面板</span>
+            </div>
+            <div class="header-controls">
+                <div class="connection-status">
+                    <div class="status-indicator" id="connectionIndicator"></div>
+                    <span id="connectionStatus">未连接</span>
+                </div>
+                <button class="btn btn-primary" onclick="startNewSession()">新建会话</button>
+                <button class="btn btn-secondary" onclick="toggleAutoRefresh()">自动刷新</button>
+            </div>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 侧边栏 - 会话列表 -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-header">调试会话</div>
+                    <div class="session-list" id="sessionList">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <span>加载会话中...</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 主视图区域 -->
+            <main class="main-view">
+                <!-- 视图标签页 -->
+                <div class="view-tabs">
+                    <div class="tab active" onclick="switchTab('overview')">概览</div>
+                    <div class="tab" onclick="switchTab('retrieval')">检索路径</div>
+                    <div class="tab" onclick="switchTab('evidence')">证据来源</div>
+                    <div class="tab" onclick="switchTab('reasoning')">推理过程</div>
+                    <div class="tab" onclick="switchTab('performance')">性能指标</div>
+                </div>
+
+                <!-- 标签页内容 -->
+                <div class="tab-content">
+                    <!-- 概览视图 -->
+                    <div id="overview-view" class="tab-pane active">
+                        <div class="component-container">
+                            <div class="component-header">
+                                <span>会话概览</span>
+                                <div>
+                                    <button class="btn btn-secondary" onclick="refreshOverview()">刷新</button>
+                                </div>
+                            </div>
+                            <div class="component-body" id="overviewContent">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    <span>请选择一个调试会话</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 检索路径视图 -->
+                    <div id="retrieval-view" class="tab-pane" style="display: none;">
+                        <div class="component-container">
+                            <div class="component-header">
+                                <span>检索路径追踪</span>
+                                <div>
+                                    <button class="btn btn-secondary" onclick="refreshRetrieval()">刷新</button>
+                                </div>
+                            </div>
+                            <div class="component-body" id="retrievalContent">
+                                <div id="retrievalTimeline"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 证据来源视图 -->
+                    <div id="evidence-view" class="tab-pane" style="display: none;">
+                        <div class="component-container">
+                            <div class="component-header">
+                                <span>证据来源分析</span>
+                                <div>
+                                    <button class="btn btn-secondary" onclick="refreshEvidence()">刷新</button>
+                                </div>
+                            </div>
+                            <div class="component-body" id="evidenceContent">
+                                <div id="evidenceGrid"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 推理过程视图 -->
+                    <div id="reasoning-view" class="tab-pane" style="display: none;">
+                        <div class="component-container">
+                            <div class="component-header">
+                                <span>推理链路分析</span>
+                                <div>
+                                    <button class="btn btn-secondary" onclick="refreshReasoning()">刷新</button>
+                                </div>
+                            </div>
+                            <div class="component-body" id="reasoningContent">
+                                <div id="reasoningChart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 性能指标视图 -->
+                    <div id="performance-view" class="tab-pane" style="display: none;">
+                        <div class="component-container">
+                            <div class="component-header">
+                                <span>性能监控</span>
+                                <div>
+                                    <button class="btn btn-secondary" onclick="refreshPerformance()">刷新</button>
+                                </div>
+                            </div>
+                            <div class="component-body" id="performanceContent">
+                                <div id="performanceMetrics"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 引入组件集成器 -->
+    <script src="/components/ComponentIntegrator.js"></script>
+
+    <script>
+        // 全局变量
+        let currentSessionId = null;
+        let currentTab = 'overview';
+        let wsConnection = null;
+        let autoRefreshInterval = null;
+        let sessions = [];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSessions();
+            setupWebSocket();
+        });
+
+        // WebSocket连接管理
+        function setupWebSocket() {
+            const wsUrl = `ws://${window.location.host}/ws/debug`;
+            wsConnection = new WebSocket(wsUrl);
+            
+            wsConnection.onopen = function(event) {
+                console.log('WebSocket连接已建立');
+                updateConnectionStatus(true);
+            };
+            
+            wsConnection.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            wsConnection.onclose = function(event) {
+                console.log('WebSocket连接已关闭');
+                updateConnectionStatus(false);
+                // 尝试重连
+                setTimeout(setupWebSocket, 5000);
+            };
+            
+            wsConnection.onerror = function(error) {
+                console.error('WebSocket错误:', error);
+                updateConnectionStatus(false);
+            };
+        }
+
+        // 更新连接状态显示
+        function updateConnectionStatus(connected) {
+            const indicator = document.getElementById('connectionIndicator');
+            const statusText = document.getElementById('connectionStatus');
+            
+            if (connected) {
+                indicator.classList.add('connected');
+                statusText.textContent = '已连接';
+            } else {
+                indicator.classList.remove('connected');
+                statusText.textContent = '连接断开';
+            }
+        }
+
+        // 处理WebSocket消息
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'session_update':
+                    updateSessionDisplay(data.session);
+                    break;
+                case 'retrieval_step':
+                    updateRetrievalTimeline(data.step);
+                    break;
+                case 'evidence_added':
+                    updateEvidenceDisplay(data.evidence);
+                    break;
+                case 'reasoning_update':
+                    updateReasoningChart(data.reasoning);
+                    break;
+                case 'performance_update':
+                    updatePerformanceMetrics(data.metrics);
+                    break;
+            }
+        }
+
+        // 加载会话列表
+        async function loadSessions() {
+            try {
+                const response = await fetch('/api/debug/sessions');
+                sessions = await response.json();
+                renderSessionList();
+            } catch (error) {
+                console.error('加载会话失败:', error);
+                document.getElementById('sessionList').innerHTML = 
+                    '<div class="loading">加载失败，请刷新页面</div>';
+            }
+        }
+
+        // 渲染会话列表
+        function renderSessionList() {
+            const container = document.getElementById('sessionList');
+            if (sessions.length === 0) {
+                container.innerHTML = '<div class="loading">暂无调试会话</div>';
+                return;
+            }
+            
+            container.innerHTML = sessions.map(session => `
+                <div class="session-item ${session.session_id === currentSessionId ? 'active' : ''}" 
+                     onclick="selectSession('${session.session_id}')">
+                    <div class="session-title">${session.query || '未命名会话'}</div>
+                    <div class="session-meta">
+                        ${new Date(session.start_time).toLocaleString()} | 
+                        ${session.status}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 选择会话
+        async function selectSession(sessionId) {
+            currentSessionId = sessionId;
+            renderSessionList(); // 更新选中状态
+            
+            // 加载会话详情
+            await loadSessionDetail(sessionId);
+            
+            // 如果有WebSocket连接，订阅该会话
+            if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+                wsConnection.send(JSON.stringify({
+                    type: 'subscribe_session',
+                    session_id: sessionId
+                }));
+            }
+        }
+
+        // 加载会话详情
+        async function loadSessionDetail(sessionId) {
+            try {
+                const response = await fetch(`/api/debug/sessions/${sessionId}`);
+                const session = await response.json();
+                
+                // 更新各个视图
+                updateOverviewView(session);
+                updateRetrievalView(session);
+                updateEvidenceView(session);
+                updateReasoningView(session);
+                updatePerformanceView(session);
+                
+            } catch (error) {
+                console.error('加载会话详情失败:', error);
+            }
+        }
+
+        // 更新概览视图
+        function updateOverviewView(session) {
+            const content = document.getElementById('overviewContent');
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1rem; background: var(--light-bg); border-radius: 8px;">
+                        <h3 style="margin-bottom: 0.5rem; color: var(--primary-color);">会话信息</h3>
+                        <p><strong>查询:</strong> ${session.query}</p>
+                        <p><strong>开始时间:</strong> ${new Date(session.start_time).toLocaleString()}</p>
+                        <p><strong>状态:</strong> <span style="color: ${getStatusColor(session.status)}">${session.status}</span></p>
+                        ${session.end_time ? `<p><strong>结束时间:</strong> ${new Date(session.end_time).toLocaleString()}</p>` : ''}
+                    </div>
+                    
+                    <div style="padding: 1rem; background: var(--light-bg); border-radius: 8px;">
+                        <h3 style="margin-bottom: 0.5rem; color: var(--primary-color);">统计信息</h3>
+                        <p><strong>检索步骤:</strong> ${session.retrieval_trace?.length || 0}</p>
+                        <p><strong>证据数量:</strong> ${session.evidence_sources?.length || 0}</p>
+                        <p><strong>推理步骤:</strong> ${session.reasoning_chain?.length || 0}</p>
+                    </div>
+                    
+                    <div style="padding: 1rem; background: var(--light-bg); border-radius: 8px;">
+                        <h3 style="margin-bottom: 0.5rem; color: var(--primary-color);">性能指标</h3>
+                        ${Object.entries(session.performance_metrics || {}).map(([key, value]) => 
+                            `<p><strong>${key}:</strong> ${typeof value === 'number' ? value.toFixed(3) : value}</p>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 获取状态颜色
+        function getStatusColor(status) {
+            const colors = {
+                'running': '#f59e0b',
+                'completed': '#10b981',
+                'failed': '#ef4444'
+            };
+            return colors[status] || '#64748b';
+        }
+
+        // 更新检索视图
+        function updateRetrievalView(session) {
+            const timelineContainer = document.getElementById('retrievalTimeline');
+            timelineContainer.innerHTML = '<div id="retrieval-timeline-component"></div>';
+            
+            // 这里将加载外部的检索时间轴组件
+            loadRetrievalTimelineComponent(session.retrieval_trace || []);
+        }
+
+        // 更新证据视图
+        function updateEvidenceView(session) {
+            const gridContainer = document.getElementById('evidenceGrid');
+            gridContainer.innerHTML = '<div id="evidence-grid-component"></div>';
+            
+            // 这里将加载外部的证据网格组件
+            loadEvidenceGridComponent(session.evidence_sources || []);
+        }
+
+        // 更新推理视图
+        function updateReasoningView(session) {
+            const chartContainer = document.getElementById('reasoningChart');
+            chartContainer.innerHTML = '<div id="reasoning-chart-component"></div>';
+            
+            // 这里将加载外部的推理图表组件
+            loadReasoningChartComponent(session.reasoning_chain || []);
+        }
+
+        // 更新性能视图
+        function updatePerformanceView(session) {
+            const metricsContainer = document.getElementById('performanceMetrics');
+            metricsContainer.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    ${(session.performance_metrics ? Object.entries(session.performance_metrics) : [])
+                        .map(([key, value]) => `
+                            <div style="padding: 1rem; background: var(--light-bg); border-radius: 8px; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);">
+                                    ${typeof value === 'number' ? value.toFixed(3) : value}
+                                </div>
+                                <div style="margin-top: 0.5rem; color: var(--text-secondary);">${key}</div>
+                            </div>
+                        `).join('')}
+                </div>
+            `;
+        }
+
+        // 标签页切换
+        function switchTab(tabName) {
+            // 更新标签页激活状态
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 显示对应内容
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+            document.getElementById(`${tabName}-view`).style.display = 'block';
+            
+            currentTab = tabName;
+            
+            // 如果有选中的会话，刷新当前视图
+            if (currentSessionId) {
+                refreshCurrentView();
+            }
+        }
+
+        // 刷新当前视图
+        function refreshCurrentView() {
+            switch(currentTab) {
+                case 'overview':
+                    refreshOverview();
+                    break;
+                case 'retrieval':
+                    refreshRetrieval();
+                    break;
+                case 'evidence':
+                    refreshEvidence();
+                    break;
+                case 'reasoning':
+                    refreshReasoning();
+                    break;
+                case 'performance':
+                    refreshPerformance();
+                    break;
+            }
+        }
+
+        // 各种刷新函数
+        function refreshOverview() { if (currentSessionId) loadSessionDetail(currentSessionId); }
+        function refreshRetrieval() { if (currentSessionId) loadSessionDetail(currentSessionId); }
+        function refreshEvidence() { if (currentSessionId) loadSessionDetail(currentSessionId); }
+        function refreshReasoning() { if (currentSessionId) loadSessionDetail(currentSessionId); }
+        function refreshPerformance() { if (currentSessionId) loadSessionDetail(currentSessionId); }
+
+        // 新建会话
+        async function startNewSession() {
+            try {
+                const query = prompt('请输入调试查询:');
+                if (!query) return;
+                
+                const response = await fetch('/api/debug/sessions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                const session = await response.json();
+                sessions.unshift(session);
+                renderSessionList();
+                selectSession(session.session_id);
+                
+            } catch (error) {
+                console.error('创建会话失败:', error);
+                alert('创建会话失败，请重试');
+            }
+        }
+
+        // 切换自动刷新
+        function toggleAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                event.target.textContent = '自动刷新';
+                event.target.classList.remove('btn-danger');
+            } else {
+                autoRefreshInterval = setInterval(() => {
+                    if (currentSessionId) {
+                        loadSessionDetail(currentSessionId);
+                    }
+                }, 5000);
+                event.target.textContent = '停止刷新';
+                event.target.classList.add('btn-danger');
+            }
+        }
+
+        // 加载外部组件的实际实现
+        async function loadRetrievalTimelineComponent(traceData) {
+            try {
+                await componentIntegrator.loadComponent(
+                    'retrieval-timeline', 
+                    'retrieval-timeline-component', 
+                    traceData
+                );
+            } catch (error) {
+                console.error('加载检索时间轴组件失败:', error);
+                document.getElementById('retrieval-timeline-component').innerHTML = 
+                    '<div class="loading">组件加载失败</div>';
+            }
+        }
+
+        async function loadEvidenceGridComponent(evidenceData) {
+            try {
+                await componentIntegrator.loadComponent(
+                    'evidence-grid', 
+                    'evidence-grid-component', 
+                    evidenceData
+                );
+            } catch (error) {
+                console.error('加载证据网格组件失败:', error);
+                document.getElementById('evidence-grid-component').innerHTML = 
+                    '<div class="loading">组件加载失败</div>';
+            }
+        }
+
+        async function loadReasoningChartComponent(reasoningData) {
+            try {
+                await componentIntegrator.loadComponent(
+                    'reasoning-chart', 
+                    'reasoning-chart-component', 
+                    reasoningData
+                );
+            } catch (error) {
+                console.error('加载推理图表组件失败:', error);
+                document.getElementById('reasoning-chart-component').innerHTML = 
+                    '<div class="loading">组件加载失败</div>';
+            }
+        }
+
+        // 更新会话显示（来自WebSocket）
+        function updateSessionDisplay(session) {
+            // 更新本地会话数据
+            const index = sessions.findIndex(s => s.session_id === session.session_id);
+            if (index !== -1) {
+                sessions[index] = session;
+            } else {
+                sessions.unshift(session);
+            }
+            
+            renderSessionList();
+            
+            // 如果是当前会话，更新显示
+            if (session.session_id === currentSessionId) {
+                updateOverviewView(session);
+            }
+        }
+
+        // 更新检索时间轴（来自WebSocket）
+        function updateRetrievalTimeline(step) {
+            const component = componentIntegrator.loadedComponents.get('retrieval-timeline');
+            if (component) {
+                // 添加新步骤到现有数据
+                component.data.push(step);
+                component.update(component.data);
+            }
+        }
+
+        // 更新证据显示（来自WebSocket）
+        function updateEvidenceDisplay(evidence) {
+            const component = componentIntegrator.loadedComponents.get('evidence-grid');
+            if (component) {
+                // 添加新证据到现有数据
+                component.data.push(evidence);
+                component.update(component.data);
+            }
+        }
+
+        // 更新推理图表（来自WebSocket）
+        function updateReasoningChart(reasoning) {
+            const component = componentIntegrator.loadedComponents.get('reasoning-chart');
+            if (component) {
+                // 添加新推理步骤到现有数据
+                component.data.push(reasoning);
+                component.update(component.data);
+            }
+        }
+
+        // 更新性能指标（来自WebSocket）
+        function updatePerformanceMetrics(metrics) {
+            // 更新性能指标显示
+            const metricsContainer = document.getElementById('performanceMetrics');
+            if (metricsContainer && currentSessionId) {
+                loadSessionDetail(currentSessionId); // 重新加载会话详情以获取最新指标
+            }
+        }
+
+        // 查看证据详情
+        function viewEvidenceDetail(evidenceId) {
+            alert(`查看证据详情: ${evidenceId}`);
+            // 这里可以打开模态框显示详细信息
+        }
+
+        // 固定证据
+        function pinEvidence(evidenceId) {
+            console.log(`固定证据: ${evidenceId}`);
+            // 这里可以实现证据固定功能
+        }
+
+        // 按来源过滤
+        function filterBySource(source) {
+            const component = componentIntegrator.loadedComponents.get('evidence-grid');
+            if (component) {
+                // 实现过滤逻辑
+                console.log(`按来源过滤: ${source}`);
+            }
+        }
+
+        // 按质量过滤
+        function filterByQuality(quality) {
+            const component = componentIntegrator.loadedComponents.get('evidence-grid');
+            if (component) {
+                // 实现过滤逻辑
+                console.log(`按质量过滤: ${quality}`);
+            }
+        }
+
+        // 更改排序字段
+        function changeSortField(field) {
+            const component = componentIntegrator.loadedComponents.get('evidence-grid');
+            if (component) {
+                component.sortField = field;
+                component.update(component.data);
+            }
+        }
+
+        // 切换排序顺序
+        function toggleSortOrder() {
+            const component = componentIntegrator.loadedComponents.get('evidence-grid');
+            if (component) {
+                component.sortOrder = component.sortOrder === 'asc' ? 'desc' : 'asc';
+                const button = document.getElementById('sortOrder');
+                button.textContent = component.sortOrder === 'asc' ? '↑' : '↓';
+                component.update(component.data);
+            }
+        }
+
+        // 切换图表类型
+        function switchChartType(chartType) {
+            const component = componentIntegrator.loadedComponents.get('reasoning-chart');
+            if (component) {
+                // 实现图表类型切换
+                console.log(`切换图表类型: ${chartType}`);
+                
+                // 更新按钮状态
+                document.querySelectorAll('.chart-type-selector button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

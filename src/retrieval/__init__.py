@@ -8,11 +8,25 @@ from src.retrieval.hyde import HyDEEnhancer
 from src.retrieval.reranker import ReRanker
 from src.retrieval.fusion import FusionStrategy
 from src.retrieval.models import RetrievalResult
+from src.retrieval.web_search import (
+    WebSearchEngine,
+    SearchResultValidator, 
+    HumanConfirmationManager,
+    WebSearchResult,
+    ConfirmationRequest,
+    ConfirmationStatus
+)
 
 __all__ = [
     "AdaptiveRetriever",
     "HyDEEnhancer",
-    "ReRanker",
+    "ReRanker", 
     "FusionStrategy",
     "RetrievalResult",
+    "WebSearchEngine",
+    "SearchResultValidator",
+    "HumanConfirmationManager", 
+    "WebSearchResult",
+    "ConfirmationRequest",
+    "ConfirmationStatus"
 ]
