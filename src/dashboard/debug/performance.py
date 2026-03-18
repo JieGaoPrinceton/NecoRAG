@@ -163,26 +163,70 @@ class PerformanceMonitor:
                 # 收集系统指标
                 current_time = datetime.now()
                 cpu_percent = psutil.cpu_percent(interval=None)
+                cpu_cores = psutil.cpu_count()
                 memory = psutil.virtual_memory()
+                disk = psutil.disk_usage('/')
                 disk_io = psutil.disk_io_counters()
                 net_io = psutil.net_io_counters()
+                
+                # 获取负载平均值（Unix/Linux系统）
+                try:
+                    load_avg = psutil.getloadavg()
+                    load_1min, load_5min, load_15min = load_avg
+                except AttributeError:
+                    # Windows系统不支持getloadavg
+                    load_1min = load_5min = load_15min = 0.0
+                
+                # 获取进程相关信息
+                current_process = psutil.Process()
+                thread_count = current_process.num_threads()
+                file_descriptors = current_process.num_fds() if hasattr(current_process, 'num_fds') else 0
+                
+                # 获取系统进程总数
+                process_count = len(psutil.pids())
+                
+                # 获取交换分区信息
+                try:
+                    swap = psutil.swap_memory()
+                    swap_percent = swap.percent
+                    swap_used = swap.used
+                except Exception:
+                    swap_percent = 0.0
+                    swap_used = 0
                 
                 # 计算IO差异
                 disk_read_diff = disk_io.read_bytes - last_disk_io.read_bytes
                 disk_write_diff = disk_io.write_bytes - last_disk_io.write_bytes
                 net_sent_diff = net_io.bytes_sent - last_net_io.bytes_sent
                 net_recv_diff = net_io.bytes_recv - last_net_io.bytes_recv
+                packets_sent_diff = net_io.packets_sent - last_net_io.packets_sent
+                packets_recv_diff = net_io.packets_recv - last_net_io.packets_recv
                 
                 # 创建性能指标对象
                 metrics = PerformanceMetrics(
                     timestamp=current_time,
                     cpu_percent=cpu_percent,
+                    cpu_cores=cpu_cores,
                     memory_percent=memory.percent,
+                    memory_total=memory.total,
+                    memory_available=memory.available,
                     disk_io_read=disk_read_diff,
                     disk_io_write=disk_write_diff,
+                    disk_usage_percent=disk.percent,
+                    disk_free_space=disk.free,
                     network_bytes_sent=net_sent_diff,
                     network_bytes_recv=net_recv_diff,
-                    active_connections=len(psutil.net_connections())
+                    network_packets_sent=packets_sent_diff,
+                    network_packets_recv=packets_recv_diff,
+                    active_connections=len(psutil.net_connections()),
+                    load_average_1min=load_1min,
+                    load_average_5min=load_5min,
+                    load_average_15min=load_15min,
+                    thread_count=thread_count,
+                    process_count=process_count,
+                    file_descriptor_count=file_descriptors,
+                    swap_percent=swap_percent,
+                    swap_used=swap_used
                 )
                 
                 self.current_metrics = metrics

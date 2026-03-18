@@ -14,6 +14,11 @@ from .performance import (
     performance_monitor, error_handler, performance_optimizer,
     monitor_performance, handle_errors
 )
+from .enhanced_error_handler import (
+    IntelligentErrorHandler, EnhancedErrorInfo,
+    ErrorSeverity, ErrorCategory, enhanced_error_handling,
+    enhanced_error_handler
+)
 from .connection import ConnectionManager, ConnectionHealthMonitor, ConnectionState, ConnectionStatus, ConnectionType
 from .tuning import ParameterStore, InMemoryParameterStore, ParameterOptimizer, ParameterConfig, ParameterValue, ExperimentConfig, ExperimentResult, ParameterType, OptimizationStrategy
 from .path_analyzer import PathAnalyzer as DebugPathAnalyzer, PathSegment, PathAnalysisResult, Bottleneck, PathSegmentType, BottleneckType
@@ -35,5 +40,11 @@ __all__ = [
     "InMemoryParameterStore",
     "DebugPathAnalyzer",
     "ABTestingFramework",
-    "RecommendationEngine"
+    "RecommendationEngine",
+    "IntelligentErrorHandler",
+    "EnhancedErrorInfo",
+    "ErrorSeverity",
+    "ErrorCategory",
+    "enhanced_error_handling",
+    "enhanced_error_handler"
 ]
