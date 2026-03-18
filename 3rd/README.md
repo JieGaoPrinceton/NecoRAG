@@ -14,7 +14,7 @@
 ### 文档结构
 
 ```
-design/3rd/
+3rd/
 ├── README.md                    # 本文档（索引）
 ├── third_party_systems.md       # 第三方系统详解（主文档）
 ├── selection_guide.md           # 技术选型指南
@@ -158,23 +158,23 @@ docker exec -it qdrant bash
 ## 🔗 与其他文档的关联
 
 ### 主架构文档
-- [../architecture_framework.md](../architecture_framework.md) - NecoRAG 整体架构框架
+- [../design/architecture_framework.md](../design/architecture_framework.md) - NecoRAG 整体架构框架
   - 五层认知架构设计
   - 数据流转流程
   - 技术栈全景图
 
 ### 设计文档
-- [../design.md](../design.md) - NecoRAG 技术框架设计任务书
+- [../design/design.md](../design/design.md) - NecoRAG 技术框架设计任务书
   - 认知科学基础理论
   - 核心功能设计
   - 开发路线图
 
 ### 模块文档
-- `../../src/perception/README.md` - 感知层设计
-- `../../src/memory/README.md` - 记忆层设计
-- `../../src/retrieval/README.md` - 检索层设计
-- `../../src/refinement/README.md` - 巩固层设计
-- `../../src/response/README.md` - 交互层设计
+- `../src/perception/README.md` - 感知层设计
+- `../src/memory/README.md` - 记忆层设计
+- `../src/retrieval/README.md` - 检索层设计
+- `../src/refinement/README.md` - 巩固层设计
+- `../src/response/README.md` - 交互层设计
 
 ---
 
@@ -184,40 +184,40 @@ docker exec -it qdrant bash
 
 | 系统 | 用途 | 推荐方案 | 文档章节 |
 |-----|------|---------|---------|
-| **Ollama** | LLM 推理 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#1-ollama 推荐--本地部署) |
-| **vLLM** | 高性能推理 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#12-vllm 高性能--生产环境) |
-| **BGE-M3** | 向量化 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#2-bge-m3 向量化服务) |
-| **BGE-Reranker** | 重排序 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#3-bge-reranker-v2 重排序服务) |
-| **Rasa NLU** | 意图识别 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#4-rasa-nlu 意图识别) |
-| **PaddleOCR** | OCR | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#6-ocr 服务可选) |
+| **Ollama** | LLM 推理 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#1-ollama-推荐--本地部署) |
+| **vLLM** | 高性能推理 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#12-vllm-高性能--生产环境) |
+| **BGE-M3** | 向量化 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#2-bge-m3-向量化服务) |
+| **BGE-Reranker** | 重排序 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#3-bge-reranker-v2-重排序服务) |
+| **Rasa NLU** | 意图识别 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#4-rasa-nlu-意图识别) |
+| **PaddleOCR** | OCR | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#6-ocr-服务可选) |
 
 ### 数据存储（3 个）
 
 | 系统 | 用途 | 推荐方案 | 文档章节 |
 |-----|------|---------|---------|
-| **Redis** | L1 工作记忆 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#1-redis---l1 工作记忆) |
-| **Qdrant** | L2 语义记忆 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#2-qdrant---l2 语义记忆) |
-| **Neo4j** | L3 情景图谱 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#3-neo4j---l3 情景图谱) |
+| **Redis** | L1 工作记忆 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#1-redis---l1-工作记忆) |
+| **Qdrant** | L2 语义记忆 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#2-qdrant---l2-语义记忆) |
+| **Neo4j** | L3 情景图谱 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#3-neo4j---l3-情景图谱) |
 
 ### 文档处理（1 个）
 
 | 系统 | 用途 | 推荐方案 | 文档章节 |
 |-----|------|---------|---------|
-| **RAGFlow** | 深度文档解析 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#ragflow 深度文档解析) |
+| **RAGFlow** | 深度文档解析 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#ragflow-深度文档解析) |
 
 ### 中间件（2 个）
 
 | 系统 | 用途 | 推荐方案 | 文档章节 |
 |-----|------|---------|---------|
-| **APScheduler** | 定时任务调度 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#apscheduler 定时任务) |
-| **Celery** | 分布式任务队列 | ⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#celery 分布式任务队列可选) |
+| **APScheduler** | 定时任务调度 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#apscheduler-定时任务) |
+| **Celery** | 分布式任务队列 | ⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#celery-分布式任务队列可选) |
 
 ### 监控运维（2 个）
 
 | 系统 | 用途 | 推荐方案 | 文档章节 |
 |-----|------|---------|---------|
-| **Prometheus** | 指标采集 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#prometheus 指标采集) |
-| **Grafana** | 可视化面板 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#grafana 可视化面板) |
+| **Prometheus** | 指标采集 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#prometheus-指标采集) |
+| **Grafana** | 可视化面板 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#grafana-可视化面板) |
 
 ---
 
