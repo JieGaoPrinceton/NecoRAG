@@ -31,7 +31,7 @@
 
 | 文档 | 说明 |
 |------|------|
-| [Dashboard 使用指南](../DASHBOARD_GUIDE.md) | Dashboard 详细使用说明 |
+| [Dashboard 使用指南](../src/dashboard/USAGE_GUIDE.md) | Dashboard 详细使用说明 |
 | [完整使用示例](../example_usage.py) | Python 代码示例 |
 | [导入测试](../test_imports.py) | 模块导入测试 |
 

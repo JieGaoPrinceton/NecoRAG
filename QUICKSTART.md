@@ -289,7 +289,7 @@ config_manager.export_profile(
 
 ### Dashboard 详细指南
 
-- [Dashboard 使用指南](DASHBOARD_GUIDE.md)
+- [Dashboard 使用指南](src/dashboard/USAGE_GUIDE.md)
 - [Dashboard API 文档](necorag/dashboard/README.md)
 
 ### 项目架构

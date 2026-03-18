@@ -235,7 +235,7 @@ python start_dashboard.py
 - [Dashboard](necorag/dashboard/README.md)
 
 ### 指南文档
-- [Dashboard 使用指南](DASHBOARD_GUIDE.md)
+- [Dashboard 使用指南](src/dashboard/USAGE_GUIDE.md)
 - [项目创建总结](PROJECT_SUMMARY.md)
 
 ---

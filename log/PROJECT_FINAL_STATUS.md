@@ -112,7 +112,7 @@ src/dashboard/static/
 ### 技术文档
 - **[使用指南](docs/wiki/调试面板系统/使用指南.md)** - 详细的用户手册
 - **[API参考](docs/wiki/调试面板系统/API参考.md)** - 完整的API文档
-- **[项目总结](DEBUG_PANEL_SUMMARY.md)** - 技术架构和成果展示
+- **[项目总结](src/dashboard/debug/README.md)** - 技术架构和成果展示
 
 ### 示例代码
 - **[快速入门示例](example/debug_panel_demo.py)** - 基础功能演示
