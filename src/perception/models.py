@@ -7,20 +7,13 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import numpy as np
 
-
-@dataclass
-class Chunk:
-    """文本块"""
-    content: str
-    index: int
-    start_char: int
-    end_char: int
-    metadata: Dict[str, Any] = field(default_factory=dict)
+# 从统一协议层导入公共数据类
+from src.core.protocols import Chunk, ChunkType, EncodedChunk, ContextTag
 
 
 @dataclass
 class ContextTags:
-    """情境标签"""
+    """情境标签（模块特有版本，与 ContextTag 略有不同）"""
     time_tag: Optional[str] = None  # 时间标签
     sentiment_tag: Optional[str] = None  # 情感标签
     importance_score: float = 0.5  # 重要性评分 (0-1)
@@ -28,8 +21,8 @@ class ContextTags:
 
 
 @dataclass
-class EncodedChunk:
-    """编码后的文本块"""
+class LocalEncodedChunk:
+    """编码后的文本块（模块特有版本，使用 np.ndarray）"""
     content: str
     chunk_id: str
     dense_vector: np.ndarray  # 稠密向量
@@ -61,7 +54,7 @@ class ParsedDocument:
     """解析后的文档"""
     file_path: str
     content: str
-    chunks: List[Chunk]
+    chunks: List[Chunk]  # 使用导入的 Chunk
     tables: List[Table] = field(default_factory=list)
     images: List[Image] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)

@@ -1,8 +1,10 @@
 """
 Adaptive Retriever - 自适应检索器
-实现智能化的"早停机制"和领域权重计算
+实现智能化的“早停机制”和领域权重计算
 """
 
+import logging
+import time
 from typing import List, Optional, Tuple
 from datetime import datetime
 import numpy as np
@@ -12,6 +14,7 @@ from src.retrieval.models import RetrievalResult, QueryAnalysis
 from src.retrieval.hyde import HyDEEnhancer
 from src.retrieval.reranker import ReRanker
 from src.retrieval.fusion import FusionStrategy
+from src.core.base import BaseRetriever
 
 # 领域权重模块
 try:
@@ -25,6 +28,9 @@ try:
     DOMAIN_WEIGHT_AVAILABLE = True
 except ImportError:
     DOMAIN_WEIGHT_AVAILABLE = False
+
+
+logger = logging.getLogger(__name__)
 
 
 class EarlyTerminationController:
@@ -119,7 +125,7 @@ class EarlyTerminationController:
             return self.threshold
 
 
-class AdaptiveRetriever:
+class AdaptiveRetriever(BaseRetriever):
     """
     自适应检索器
     
@@ -195,6 +201,8 @@ class AdaptiveRetriever:
         Returns:
             List[RetrievalResult]: 检索结果
         """
+        _start = time.time()
+        logger.info(f"Retrieval started: query='{query[:30]}...', top_k={top_k}")
         self._retrieval_trace = []
         
         # 0. 查询增强（识别领域关键字）
@@ -247,9 +255,15 @@ class AdaptiveRetriever:
         
         if self.termination_controller.should_terminate(confidence):
             self._retrieval_trace.append(f"Early terminated! Confidence: {confidence:.2f}")
+            _elapsed = time.time() - _start
+            logger.info(f"Retrieval completed: {len(filtered_results[:top_k])} results in {_elapsed:.3f}s (early terminated)")
+            logger.debug(f"Retrieval trace: {self._retrieval_trace}")
             return filtered_results[:top_k]
         else:
             self._retrieval_trace.append(f"Confidence too low: {confidence:.2f}")
+            _elapsed = time.time() - _start
+            logger.info(f"Retrieval completed: {len(filtered_results[:top_k])} results in {_elapsed:.3f}s")
+            logger.debug(f"Retrieval trace: {self._retrieval_trace}")
             return filtered_results[:top_k]
     
     def _apply_domain_weights(
@@ -319,7 +333,9 @@ class AdaptiveRetriever:
         Returns:
             List[RetrievalResult]: 检索结果
         """
+        logger.info(f"HyDE retrieval started: query='{query[:30]}...'")
         if self.hyde is None:
+            logger.debug("HyDE not enabled, falling back to standard retrieval")
             return self.retrieve(query, top_k=top_k)
         
         # 生成假设文档
@@ -345,6 +361,7 @@ class AdaptiveRetriever:
         Returns:
             List[RetrievalResult]: 检索结果
         """
+        logger.info(f"Multi-hop retrieval: entity='{entity}', hops={hops}")
         # 从图谱进行多跳查询
         paths = self.memory.episodic_graph.multi_hop_query(entity, hops)
         
@@ -360,6 +377,7 @@ class AdaptiveRetriever:
             results.append(result)
         
         self._retrieval_trace.append(f"Multi-hop ({hops}): {len(results)} paths")
+        logger.debug(f"Multi-hop retrieval found {len(results)} paths")
         return results
     
     def get_retrieval_trace(self) -> List[str]:

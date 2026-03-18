@@ -4,12 +4,17 @@ Perception Engine - 感知引擎主类
 """
 
 from typing import List, Optional
+import logging
+import time
 from src.perception.parser import DocumentParser
 from src.perception.chunker import ChunkStrategy
 from src.perception.tagger import ContextualTagger
 from src.perception.encoder import VectorEncoder
 from src.perception.models import ParsedDocument, EncodedChunk, Chunk
 import uuid
+
+
+logger = logging.getLogger(__name__)
 
 
 class PerceptionEngine:
@@ -79,7 +84,14 @@ class PerceptionEngine:
         Returns:
             ParsedDocument: 解析后的文档
         """
-        return self.parser.parse(file_path)
+        logger.info(f"Parsing document: {file_path}")
+        try:
+            result = self.parser.parse(file_path)
+            logger.info(f"Document parsed successfully: {len(result.chunks)} chunks")
+            return result
+        except Exception as e:
+            logger.error(f"Failed to parse document {file_path}: {e}", exc_info=True)
+            raise
     
     def process(self, parsed_doc: ParsedDocument) -> List[EncodedChunk]:
         """
@@ -91,7 +103,10 @@ class PerceptionEngine:
         Returns:
             List[EncodedChunk]: 编码后的文本块列表
         """
+        _start = time.time()
         encoded_chunks = []
+        
+        logger.debug(f"Processing {len(parsed_doc.chunks)} chunks from {parsed_doc.file_path}")
         
         for chunk in parsed_doc.chunks:
             # 编码
@@ -111,11 +126,14 @@ class PerceptionEngine:
                 metadata={
                     **chunk.metadata,
                     "source_file": parsed_doc.file_path,
-                    "chunk_index": chunk.index
+                    "chunk_index": chunk.position
                 }
             )
             
             encoded_chunks.append(encoded_chunk)
+        
+        _elapsed = time.time() - _start
+        logger.debug(f"Encoding completed: {len(encoded_chunks)} chunks in {_elapsed:.3f}s")
         
         return encoded_chunks
     
@@ -160,7 +178,10 @@ class PerceptionEngine:
         """
         # 使用统一入口进行分块，根据配置选择策略
         effective_strategy = strategy or self.chunk_strategy
+        logger.info(f"Processing text with strategy: {effective_strategy}")
         chunks = self.chunker.chunk(text, strategy=effective_strategy)
+        
+        logger.info(f"Text chunked into {len(chunks)} chunks")
         
         # 创建临时文档
         parsed_doc = ParsedDocument(

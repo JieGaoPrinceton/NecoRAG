@@ -76,6 +76,7 @@ class NecoRAG:
             config: 配置对象（可选）
             llm_client: LLM 客户端（可选）
         """
+        logger.info("Initializing NecoRAG...")
         self.config = config or ConfigPresets.development()
         self._llm_client = llm_client
         self._initialized = False
@@ -231,6 +232,7 @@ class NecoRAG:
             "errors": []
         }
         
+        logger.info(f"Starting document ingestion: {len(files)} files")
         for file_path in files:
             try:
                 chunks = self.ingest_file(file_path)
@@ -239,11 +241,12 @@ class NecoRAG:
             except Exception as e:
                 results["failed"] += 1
                 results["errors"].append({"file": str(file_path), "error": str(e)})
-                logger.error(f"Failed to ingest {file_path}: {e}")
+                logger.error(f"Failed to ingest {file_path}: {e}", exc_info=True)
         
         self._stats["documents_ingested"] += results["processed"]
         self._stats["total_chunks"] += results["chunks_created"]
         
+        logger.info(f"Ingestion completed: {results['processed']} files processed, {results['chunks_created']} chunks created")
         return results
     
     def ingest_file(self, file_path: Union[str, Path]) -> int:
@@ -262,7 +265,7 @@ class NecoRAG:
             raise FileNotFoundError(f"File not found: {file_path}")
         
         # 感知层处理
-        encoded_chunks = self._perception.process(str(file_path))
+        encoded_chunks = self._perception.process_file(str(file_path))
         
         # 存储到记忆层
         for chunk in encoded_chunks:
@@ -287,7 +290,7 @@ class NecoRAG:
             int: 创建的分块数量
         """
         # 感知层处理
-        encoded_chunks = self._perception.process_text(text, metadata or {})
+        encoded_chunks = self._perception.process_text(text)
         
         # 存储到记忆层
         for chunk in encoded_chunks:
@@ -371,6 +374,10 @@ class NecoRAG:
         Returns:
             Response: 响应对象
         """
+        import time
+        _start_time = time.time()
+        logger.info(f"Query started: '{question[:50]}...' user_id={user_id}")
+        
         # 意图分析和路由
         intent_result = None
         if use_intent_routing and self._intent_analyzer:
@@ -403,8 +410,8 @@ class NecoRAG:
         
         # 答案精炼
         if use_refinement and self._refinement:
-            refinement_result = self._refinement.refine(question, evidence)
-            content = refinement_result.content
+            refinement_result = self._refinement.process(question, evidence)
+            content = refinement_result.answer
             confidence = refinement_result.confidence
         else:
             # 简单拼接
@@ -412,10 +419,17 @@ class NecoRAG:
             confidence = 0.7 if evidence else 0.0
         
         # 响应适配
-        response = self._response.generate(
-            content=content,
-            user_id=user_id,
-            sources=results
+        from src.refinement.models import RefinementResult as _RR
+        _refinement_result = _RR(
+            query=question,
+            answer=content,
+            confidence=confidence,
+            citations=[r.content[:50] for r in results]
+        )
+        response = self._response.respond(
+            query=question,
+            refinement_result=_refinement_result,
+            session_id=user_id
         )
         
         self._stats["queries_processed"] += 1
@@ -444,6 +458,10 @@ class NecoRAG:
                 hit=hit,
                 satisfaction=confidence
             )
+        
+        _elapsed = time.time() - _start_time
+        logger.info(f"Query completed: {len(results)} results, confidence={confidence:.2f}")
+        logger.debug(f"Query processing took {_elapsed:.3f}s")
         
         return Response(
             query_id=query.query_id,

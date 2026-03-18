@@ -6,9 +6,10 @@
 from typing import List, Optional
 from pathlib import Path
 from src.perception.models import ParsedDocument, Chunk, Table, Image
+from src.core.base import BaseParser
 
 
-class DocumentParser:
+class DocumentParser(BaseParser):
     """
     文档解析器
     
@@ -104,7 +105,7 @@ class DocumentParser:
             chunk_content = content[i:i + chunk_size]
             chunks.append(Chunk(
                 content=chunk_content,
-                index=len(chunks),
+                position=len(chunks),
                 start_char=i,
                 end_char=min(i + chunk_size, len(content))
             ))

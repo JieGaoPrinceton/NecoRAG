@@ -8,7 +8,9 @@ from src.perception.parser import DocumentParser
 from src.perception.chunker import ChunkStrategy
 from src.perception.tagger import ContextualTagger
 from src.perception.encoder import VectorEncoder
-from src.perception.models import ParsedDocument, EncodedChunk, Chunk
+from src.perception.models import ParsedDocument, LocalEncodedChunk
+# 从统一协议层重导出公共类型
+from src.core.protocols import Chunk, EncodedChunk, ChunkType
 
 __all__ = [
     "PerceptionEngine",
@@ -18,5 +20,7 @@ __all__ = [
     "VectorEncoder",
     "ParsedDocument",
     "EncodedChunk",
+    "LocalEncodedChunk",  # 模块特有版本
     "Chunk",
+    "ChunkType",
 ]

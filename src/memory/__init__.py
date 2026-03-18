@@ -8,7 +8,9 @@ from src.memory.working_memory import WorkingMemory
 from src.memory.semantic_memory import SemanticMemory
 from src.memory.episodic_graph import EpisodicGraph
 from src.memory.decay import MemoryDecay
-from src.memory.models import MemoryItem, MemoryLayer
+from src.memory.models import MemoryItem, GraphPath, Intent
+# 从统一协议层重导出公共类型
+from src.core.protocols import MemoryLayer, Entity, Relation, Memory
 
 __all__ = [
     "MemoryManager",
@@ -18,4 +20,9 @@ __all__ = [
     "MemoryDecay",
     "MemoryItem",
     "MemoryLayer",
+    "Memory",
+    "Entity",
+    "Relation",
+    "GraphPath",
+    "Intent",
 ]

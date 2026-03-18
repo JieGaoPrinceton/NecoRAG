@@ -6,9 +6,10 @@
 import re
 from typing import List, Optional, Tuple
 from src.perception.models import Chunk
+from src.core.base import BaseChunker
 
 
-class ChunkStrategy:
+class ChunkStrategy(BaseChunker):
     """
     分块策略
     
@@ -128,7 +129,7 @@ class ChunkStrategy:
         for i, (text, start, end) in enumerate(chunk_data):
             chunks.append(Chunk(
                 content=text,
-                index=i,
+                position=i,
                 start_char=start,
                 end_char=end,
                 metadata={
@@ -169,7 +170,7 @@ class ChunkStrategy:
                 
                 chunks.append(Chunk(
                     content=sentence.strip(),
-                    index=i,
+                    position=i,
                     start_char=start,
                     end_char=end,
                     metadata={
@@ -202,7 +203,7 @@ class ChunkStrategy:
                 start = content.find(para, current_pos)
                 chunks.append(Chunk(
                     content=para.strip(),
-                    index=i,
+                    position=i,
                     start_char=start,
                     end_char=start + len(para),
                     metadata={
@@ -235,7 +236,7 @@ class ChunkStrategy:
             if chunk_content.strip():
                 chunks.append(Chunk(
                     content=chunk_content,
-                    index=len(chunks),
+                    position=len(chunks),
                     start_char=i,
                     end_char=min(i + chunk_size, len(content)),
                     metadata={

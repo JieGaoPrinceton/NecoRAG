@@ -2,7 +2,7 @@
 Adaptive Learning Engine - 自适应学习引擎统一入口
 
 协调反馈收集、偏好预测、策略优化、集体智慧四个子系统，
-实现"越用越智能"的核心体验。
+实现“越用越智能”的核心体验。
 """
 
 import logging
@@ -21,12 +21,13 @@ from .feedback import FeedbackCollector
 from .strategy_optimizer import StrategyOptimizer
 from .preference_predictor import PreferencePredictor
 from .collective import CollectiveIntelligence
+from src.core.base import BaseAdaptiveLearner
 
 
 logger = logging.getLogger(__name__)
 
 
-class AdaptiveLearningEngine:
+class AdaptiveLearningEngine(BaseAdaptiveLearner):
     """
     自适应学习引擎 - 统一协调器
     
@@ -204,6 +205,7 @@ class AdaptiveLearningEngine:
             user_id: 用户ID
             feedback: 用户反馈对象
         """
+        logger.info(f"Processing user feedback: user={user_id}, type={feedback.feedback_type.value}")
         # 添加用户ID到元数据
         feedback.metadata["user_id"] = user_id
         
@@ -233,6 +235,7 @@ class AdaptiveLearningEngine:
                 satisfaction=satisfaction,
                 hit=feedback.metadata.get("hit", True)
             )
+            logger.debug(f"Strategy optimizer updated: strategy={strategy_used}")
         
         logger.debug(
             f"Processed user feedback: user={user_id}, "
@@ -289,6 +292,7 @@ class AdaptiveLearningEngine:
         Returns:
             Dict: 个性化配置
         """
+        logger.debug(f"Getting personalized config: user={user_id}, query_type={query_type}")
         config = {
             "user_id": user_id,
             "query_type": query_type,
@@ -388,6 +392,7 @@ class AdaptiveLearningEngine:
             insights = self._collective_intelligence.generate_insights()
             result["insights_generated"] = len(insights)
             result["insights"] = [i.to_dict() for i in insights[:5]]
+            logger.debug(f"Collective intelligence updated: {len(insights)} insights generated")
         
         # 清理旧反馈
         if self._feedback_collector:
@@ -513,6 +518,58 @@ class AdaptiveLearningEngine:
             correction_text=correction_text,
             metadata=metadata
         )
+    
+    # ============== BaseAdaptiveLearner 抽象方法实现 ==============
+    
+    def learn(self, feedback: Any) -> None:
+        """
+        从反馈中学习 (实现 BaseAdaptiveLearner 抽象方法)
+        
+        Args:
+            feedback: 用户反馈数据 (UserFeedback 或包含 user_id 和 feedback 的字典)
+        """
+        if isinstance(feedback, UserFeedback):
+            user_id = feedback.metadata.get("user_id", "anonymous")
+            self.on_user_feedback(user_id, feedback)
+        elif isinstance(feedback, dict):
+            user_id = feedback.get("user_id", "anonymous")
+            if "feedback" in feedback and isinstance(feedback["feedback"], UserFeedback):
+                self.on_user_feedback(user_id, feedback["feedback"])
+            else:
+                # 尝试从字典构建反馈
+                user_feedback = self.create_feedback(
+                    query=feedback.get("query", ""),
+                    feedback_type=feedback.get("feedback_type", "positive"),
+                    score=feedback.get("score", 0.5),
+                    comment=feedback.get("comment", ""),
+                )
+                self.on_user_feedback(user_id, user_feedback)
+        else:
+            logger.warning(f"Unknown feedback type: {type(feedback)}")
+    
+    def predict(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        基于学习预测 (实现 BaseAdaptiveLearner 抽象方法)
+        
+        Args:
+            context: 上下文信息，应包含 user_id 和可选的 query_type
+            
+        Returns:
+            Dict[str, Any]: 预测结果（个性化配置）
+        """
+        user_id = context.get("user_id", "anonymous")
+        query_type = context.get("query_type", "")
+        return self.get_personalized_config(user_id, query_type)
+    
+    def get_metrics(self) -> Dict[str, Any]:
+        """
+        获取学习指标 (实现 BaseAdaptiveLearner 抽象方法)
+        
+        Returns:
+            Dict[str, Any]: 学习指标数据
+        """
+        metrics = self.get_learning_metrics()
+        return metrics.to_dict()
 
 
 def create_adaptive_engine(

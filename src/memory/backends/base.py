@@ -2,12 +2,19 @@
 存储后端抽象基类
 
 定义向量存储和图存储的统一接口。
+此模块的基类继承自 core.base，并提供更具体的存储层接口。
 """
 
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
+
+# 从核心抽象层导入基类
+from src.core.base import (
+    BaseVectorStore as CoreBaseVectorStore,
+    BaseGraphStore as CoreBaseGraphStore
+)
 
 
 @dataclass
@@ -51,8 +58,12 @@ class GraphEdge:
     created_at: datetime = field(default_factory=datetime.now)
 
 
-class BaseVectorStore(ABC):
-    """向量存储抽象基类"""
+class BaseVectorStore(CoreBaseVectorStore):
+    """
+    向量存储抽象基类
+    
+    继承自 core.base.BaseVectorStore，提供更具体的存储层接口。
+    """
     
     @abstractmethod
     def upsert(self, records: List[VectorRecord]) -> List[str]:
@@ -137,7 +148,13 @@ class BaseVectorStore(ABC):
 
 
 class BaseGraphStore(ABC):
-    """图存储抽象基类"""
+    """
+    图存储抽象基类
+    
+    提供存储层的图存储接口。
+    注：本类使用 Node/Edge 术语，与 core.base.BaseGraphStore 的 Entity/Relation 术语不同，
+    两者服务于不同的抽象层次。
+    """
     
     @abstractmethod
     def add_node(self, node: GraphNode) -> str:

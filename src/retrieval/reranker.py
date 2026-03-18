@@ -3,11 +3,12 @@ ReRanker - 重排序器
 基于 BGE-Reranker 和新颖性惩罚
 """
 
-from typing import List
+from typing import List, Optional
 from src.retrieval.models import RetrievalResult
+from src.core.base import BaseReranker
 
 
-class ReRanker:
+class ReRanker(BaseReranker):
     """
     重排序器
     
@@ -41,7 +42,8 @@ class ReRanker:
     def rerank(
         self,
         query: str,
-        results: List[RetrievalResult]
+        results: List[RetrievalResult],
+        top_k: Optional[int] = None
     ) -> List[RetrievalResult]:
         """
         重排序检索结果
@@ -49,6 +51,7 @@ class ReRanker:
         Args:
             query: 查询文本
             results: 检索结果
+            top_k: 返回数量（可选）
             
         Returns:
             List[RetrievalResult]: 重排序后的结果
@@ -66,6 +69,10 @@ class ReRanker:
         
         # 按分数排序
         results.sort(key=lambda x: x.score, reverse=True)
+        
+        # 如果指定了 top_k，截取结果
+        if top_k is not None:
+            results = results[:top_k]
         
         return results
     

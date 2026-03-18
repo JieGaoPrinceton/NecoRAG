@@ -15,12 +15,13 @@ from .models import (
     KnowledgeCandidate, UpdateTask, ChangeLogEntry, QueryRecord
 )
 from .config import KnowledgeEvolutionConfig
+from src.core.base import BaseKnowledgeUpdater
 
 
 logger = logging.getLogger(__name__)
 
 
-class KnowledgeUpdater:
+class KnowledgeUpdater(BaseKnowledgeUpdater):
     """
     知识库更新管理器
     
@@ -376,6 +377,7 @@ class KnowledgeUpdater:
         Returns:
             Optional[str]: 新记忆的 ID，如果未通过质量检查则返回 None
         """
+        logger.info(f"Realtime update started: source={source.value}, layer={target_layer}")
         if not self.config.enable_realtime_update:
             logger.debug("Realtime update disabled, adding to candidate pool")
             candidate = self.add_candidate(content, source, target_layer, metadata)
@@ -392,13 +394,14 @@ class KnowledgeUpdater:
         
         # 质量检查
         if candidate.composite_score < self.config.realtime_quality_threshold:
-            logger.debug(f"Realtime update rejected: score {candidate.composite_score} < {self.config.realtime_quality_threshold}")
+            logger.debug(f"Realtime update rejected: score {candidate.composite_score:.2f} < {self.config.realtime_quality_threshold}")
             self._candidate_pool.append(candidate)
             return None
         
         # 直接入库
         candidate.status = CandidateStatus.AUTO_APPROVED
         candidate.reviewed_at = datetime.now()
+        logger.info(f"Realtime update committed: score={candidate.composite_score:.2f}")
         return self._commit_candidate(candidate)
     
     # ============== 定时批量更新 ==============
@@ -418,6 +421,7 @@ class KnowledgeUpdater:
         Returns:
             UpdateTask: 创建的更新任务
         """
+        logger.info(f"Creating batch update task: {description}")
         task = UpdateTask(
             mode=UpdateMode.SCHEDULED_BATCH,
             description=description,
@@ -447,8 +451,10 @@ class KnowledgeUpdater:
         Returns:
             UpdateTask: 更新后的任务状态
         """
+        logger.info(f"Executing batch update task: {task_id}")
         task = self._get_task(task_id)
         if task is None:
+            logger.error(f"Task not found: {task_id}")
             raise ValueError(f"Task not found: {task_id}")
         
         if task.status != UpdateStatus.PENDING:
@@ -480,13 +486,13 @@ class KnowledgeUpdater:
             task.completed_at = datetime.now()
             self._stats["batch_updates"] += 1
             
-            logger.info(f"Batch update completed: {task.items_processed}/{task.items_total}")
+            logger.info(f"Batch update completed: {task.items_processed}/{task.items_total} processed, {task.items_failed} failed")
             
         except Exception as e:
             task.status = UpdateStatus.FAILED
             task.error_message = str(e)
             task.completed_at = datetime.now()
-            logger.error(f"Batch update failed: {e}")
+            logger.error(f"Batch update failed: {e}", exc_info=True)
         
         return task
     
@@ -505,6 +511,7 @@ class KnowledgeUpdater:
         Returns:
             int: 成功更新的数量
         """
+        logger.info(f"Incremental L2 update started: {len(items)} items")
         updated = 0
         for item in items:
             try:
@@ -520,8 +527,9 @@ class KnowledgeUpdater:
                     self._commit_candidate(candidate)
                     updated += 1
             except Exception as e:
-                logger.error(f"Failed to update L2 item: {e}")
+                logger.error(f"Failed to update L2 item: {e}", exc_info=True)
         
+        logger.info(f"Incremental L2 update completed: {updated}/{len(items)} updated")
         return updated
     
     def incremental_update_l3(
@@ -539,6 +547,7 @@ class KnowledgeUpdater:
         Returns:
             int: 成功更新的数量
         """
+        logger.info(f"Incremental L3 update started: {len(entities)} entities, {len(relations)} relations")
         updated = 0
         
         # 更新实体
@@ -571,8 +580,9 @@ class KnowledgeUpdater:
                     self._add_change_log(log_entry)
                 updated += 1
             except Exception as e:
-                logger.error(f"Failed to update L3 relation: {e}")
+                logger.error(f"Failed to update L3 relation: {e}", exc_info=True)
         
+        logger.info(f"Incremental L3 update completed: {updated} items updated")
         return updated
     
     # ============== 变更日志 ==============

@@ -5,7 +5,7 @@
 支持依赖注入 LLM 客户端以便替换不同的向量化实现。
 """
 
-from typing import Dict, List, Tuple, Optional, TYPE_CHECKING
+from typing import Dict, List, Tuple, Optional, TYPE_CHECKING, Any
 import re
 
 # 尝试导入 numpy，如果不可用则使用纯 Python 实现
@@ -16,12 +16,13 @@ except ImportError:
     HAS_NUMPY = False
 
 from src.perception.models import Chunk
+from src.core.base import BaseEncoder
 
 if TYPE_CHECKING:
     from src.core.llm import BaseLLMClient
 
 
-class VectorEncoder:
+class VectorEncoder(BaseEncoder):
     """
     向量编码器
     

@@ -12,12 +12,13 @@ import math
 
 from .models import KnowledgeMetrics, HealthReport, QueryRecord, GrowthTrend
 from .config import KnowledgeEvolutionConfig
+from src.core.base import BaseMetricsCalculator
 
 
 logger = logging.getLogger(__name__)
 
 
-class KnowledgeMetricsCalculator:
+class KnowledgeMetricsCalculator(BaseMetricsCalculator):
     """
     知识库量化指标计算器
     

@@ -7,12 +7,13 @@ Generator - 答案生成器
 from typing import List, Dict, Any, Optional, TYPE_CHECKING
 
 from src.refinement.models import GeneratedAnswer
+from src.core.base import BaseGenerator
 
 if TYPE_CHECKING:
     from src.core.llm import BaseLLMClient
 
 
-class Generator:
+class Generator(BaseGenerator):
     """
     答案生成器
     

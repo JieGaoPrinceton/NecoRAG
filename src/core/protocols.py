@@ -107,6 +107,10 @@ class Chunk:
     position: int = 0  # 在文档中的位置
     metadata: Dict[str, Any] = field(default_factory=dict)
     
+    # 字符位置信息（来自 perception/models.py 合并）
+    start_char: Optional[int] = None
+    end_char: Optional[int] = None
+    
     # 上下文信息
     prev_chunk_id: Optional[str] = None
     next_chunk_id: Optional[str] = None
@@ -268,6 +272,7 @@ class Response:
     thinking_chain: List[Dict[str, Any]] = field(default_factory=list)
     tone: ResponseTone = ResponseTone.PROFESSIONAL
     detail_level: DetailLevel = DetailLevel.STANDARD
+    citations: List[str] = field(default_factory=list)  # 来自 response/models.py 合并
     metadata: Dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.now)
 
@@ -284,6 +289,9 @@ class UserProfile:
     preferred_tone: ResponseTone = ResponseTone.PROFESSIONAL
     preferred_detail: DetailLevel = DetailLevel.STANDARD
     interests: List[str] = field(default_factory=list)
+    preferred_domains: List[str] = field(default_factory=list)  # 来自 response/models.py 合并
+    query_history: List[str] = field(default_factory=list)  # 来自 response/models.py 合并
     interaction_count: int = 0
+    metadata: Dict[str, Any] = field(default_factory=dict)  # 来自 response/models.py 合并
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)

@@ -3,11 +3,12 @@
 为每个 Chunk 自动打标，模拟猫胡须对环境微变化的感知
 """
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from src.perception.models import Chunk, ContextTags
+from src.core.base import BaseTagger
 
 
-class ContextualTagger:
+class ContextualTagger(BaseTagger):
     """
     情境标签生成器
     
@@ -45,6 +46,24 @@ class ContextualTagger:
             importance_score=self.generate_importance_tag(chunk),
             topic_tags=self.generate_topic_tags(chunk)
         )
+    
+    def tag(self, chunk: Chunk) -> Dict[str, Any]:
+        """
+        为分块生成情境标签（抽象基类接口实现）
+        
+        Args:
+            chunk: 分块对象
+            
+        Returns:
+            Dict[str, Any]: 标签字典
+        """
+        tags = self.generate_tags(chunk)
+        return {
+            "time_tag": tags.time_tag,
+            "sentiment_tag": tags.sentiment_tag,
+            "importance_score": tags.importance_score,
+            "topic_tags": tags.topic_tags
+        }
     
     def generate_time_tag(self, chunk: Chunk) -> str:
         """

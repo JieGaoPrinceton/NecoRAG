@@ -2,6 +2,7 @@
 Refinement Agent - 精炼代理主类
 """
 
+import logging
 from typing import List, Optional
 from src.memory.manager import MemoryManager
 from src.refinement.generator import Generator
@@ -11,6 +12,9 @@ from src.refinement.hallucination import HallucinationDetector
 from src.refinement.consolidator import KnowledgeConsolidator
 from src.refinement.pruner import MemoryPruner
 from src.refinement.models import RefinementResult, HallucinationReport
+
+
+logger = logging.getLogger(__name__)
 
 
 class RefinementAgent:
@@ -75,16 +79,20 @@ class RefinementAgent:
         Returns:
             RefinementResult: 精炼结果
         """
+        logger.info(f"Refinement started: query='{query[:30]}...', evidence_count={len(evidence)}")
         iteration = 0
         current_evidence = evidence.copy()
         
         # 生成初始答案
+        logger.debug("Generator: generating initial answer")
         answer = self.generator.generate(query, current_evidence, context)
         
         while iteration < self.max_iterations:
             iteration += 1
+            logger.debug(f"Iteration {iteration}/{self.max_iterations}")
             
             # 批判评估
+            logger.debug("Critic: evaluating answer")
             critique = self.critic.critique(answer, current_evidence)
             
             # 幻觉检测
@@ -92,10 +100,12 @@ class RefinementAgent:
                 answer.content,
                 current_evidence
             )
+            logger.info(f"Hallucination detection: is_hallucination={hallucination_report.is_hallucination}")
             
             # 检查是否通过
             if critique.is_valid and not hallucination_report.is_hallucination:
                 # 通过验证，返回结果
+                logger.info(f"Refinement completed: {iteration} iterations, confidence={answer.confidence:.2f}")
                 return RefinementResult(
                     query=query,
                     answer=answer.content,
@@ -107,6 +117,7 @@ class RefinementAgent:
             
             # 未通过，修正答案
             if not critique.is_valid:
+                logger.debug("Refiner: correcting answer based on critique")
                 answer = self.refiner.refine(
                     answer,
                     critique,
@@ -116,8 +127,10 @@ class RefinementAgent:
             # 如果检测到幻觉，降低置信度
             if hallucination_report.is_hallucination:
                 answer.confidence *= 0.8
+                logger.debug(f"Confidence reduced due to hallucination: {answer.confidence:.2f}")
         
         # 达到最大迭代次数，返回当前结果
+        logger.info(f"Max iterations reached: confidence={answer.confidence:.2f}")
         return RefinementResult(
             query=query,
             answer=answer.content if answer.confidence >= self.min_confidence else "抱歉，我无法提供可靠的答案。",

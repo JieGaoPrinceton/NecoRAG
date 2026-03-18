@@ -1,54 +1,31 @@
-"""
-LLM 客户端抽象基类
+"""LLM 客户端扩展基类
 
-从 core.base 重新导出，并提供额外的工具函数。
+从 core.base 继承基础 LLM 客户端抽象, 并提供默认实现和工具函数。
+消除重复定义, 统一到 core.base 作为抽象来源。
 """
 
-from abc import ABC, abstractmethod
 from typing import List, AsyncIterator, Optional, Dict, Any
 
+# 从核心抽象层导入基类（唯一的抽象定义来源）
+from src.core.base import (
+    BaseLLMClient as _CoreBaseLLMClient,
+    BaseAsyncLLMClient as _CoreBaseAsyncLLMClient
+)
 
-class BaseLLMClient(ABC):
-    """LLM 客户端抽象基类（同步版本）"""
+
+class BaseLLMClient(_CoreBaseLLMClient):
+    """
+    LLM 客户端扩展基类（同步版本）
     
-    @abstractmethod
-    def generate(
-        self,
-        prompt: str,
-        max_tokens: int = 1024,
-        temperature: float = 0.7,
-        **kwargs
-    ) -> str:
-        """
-        生成文本
-        
-        Args:
-            prompt: 提示词
-            max_tokens: 最大token数
-            temperature: 温度参数
-            **kwargs: 额外参数
-            
-        Returns:
-            str: 生成的文本
-        """
-        pass
-    
-    @abstractmethod
-    def embed(self, text: str) -> List[float]:
-        """
-        文本向量化
-        
-        Args:
-            text: 文本内容
-            
-        Returns:
-            List[float]: 向量
-        """
-        pass
+    继承自 core.base.BaseLLMClient，提供默认实现和工具方法。
+    子类需要实现：generate, embed, model_name, embedding_dimension
+    """
     
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
         """
         批量文本向量化（默认实现：逐个调用）
+        
+        覆盖父类的抽象方法，提供默认实现。
         
         Args:
             texts: 文本列表
@@ -57,18 +34,6 @@ class BaseLLMClient(ABC):
             List[List[float]]: 向量列表
         """
         return [self.embed(text) for text in texts]
-    
-    @property
-    @abstractmethod
-    def model_name(self) -> str:
-        """返回模型名称"""
-        pass
-    
-    @property
-    @abstractmethod
-    def embedding_dimension(self) -> int:
-        """返回嵌入向量维度"""
-        pass
     
     def count_tokens(self, text: str) -> int:
         """
@@ -84,19 +49,13 @@ class BaseLLMClient(ABC):
         return max(1, len(text) // 3)
 
 
-class BaseAsyncLLMClient(ABC):
-    """LLM 客户端抽象基类（异步版本）"""
+class BaseAsyncLLMClient(_CoreBaseAsyncLLMClient):
+    """
+    LLM 客户端扩展基类（异步版本）
     
-    @abstractmethod
-    async def generate(
-        self,
-        prompt: str,
-        max_tokens: int = 1024,
-        temperature: float = 0.7,
-        **kwargs
-    ) -> str:
-        """异步生成文本"""
-        pass
+    继承自 core.base.BaseAsyncLLMClient，提供默认实现。
+    子类需要实现：generate, embed
+    """
     
     async def generate_stream(
         self,
@@ -105,32 +64,17 @@ class BaseAsyncLLMClient(ABC):
     ) -> AsyncIterator[str]:
         """
         流式生成文本（默认实现：一次性返回）
+        
+        覆盖父类的抽象方法，提供默认实现。
         """
         result = await self.generate(prompt, **kwargs)
         yield result
     
-    @abstractmethod
-    async def embed(self, text: str) -> List[float]:
-        """异步文本向量化"""
-        pass
-    
     async def embed_batch(self, texts: List[str]) -> List[List[float]]:
-        """批量异步向量化"""
+        """批量异步向量化（默认实现）"""
         import asyncio
         tasks = [self.embed(text) for text in texts]
         return await asyncio.gather(*tasks)
-    
-    @property
-    @abstractmethod
-    def model_name(self) -> str:
-        """返回模型名称"""
-        pass
-    
-    @property
-    @abstractmethod
-    def embedding_dimension(self) -> int:
-        """返回嵌入向量维度"""
-        pass
 
 
 # 工具函数

@@ -3,6 +3,7 @@ Memory Manager - 记忆管理器
 统一管理三层记忆
 """
 
+import logging
 from typing import List, Optional
 from src.perception.models import EncodedChunk
 from src.memory.working_memory import WorkingMemory
@@ -11,6 +12,9 @@ from src.memory.episodic_graph import EpisodicGraph
 from src.memory.decay import MemoryDecay
 from src.memory.models import MemoryItem, MemoryLayer, Entity, Relation
 import uuid
+
+
+logger = logging.getLogger(__name__)
 
 
 class MemoryManager:
@@ -56,60 +60,66 @@ class MemoryManager:
             str: 记忆 ID
         """
         memory_id = str(uuid.uuid4())
+        logger.info(f"Storing memory: {memory_id}")
         
-        # 创建记忆项
-        memory_item = MemoryItem(
-            memory_id=memory_id,
-            content=chunk.content,
-            layer=MemoryLayer.L2_SEMANTIC,
-            vector=chunk.dense_vector,
-            metadata={
-                "sparse_vector": chunk.sparse_vector,
-                "entities": chunk.entities,
-                "context_tags": chunk.context_tags,
-                **chunk.metadata
-            }
-        )
-        
-        # 存储到 L2 语义记忆
-        self.semantic_memory.store_vectors([memory_item])
-        
-        # 存储实体到 L3 图谱
-        for entity_triple in chunk.entities:
-            if len(entity_triple) == 3:
-                subject, relation, obj = entity_triple
-                
-                # 创建实体
-                subject_entity = Entity(
-                    entity_id=str(uuid.uuid4()),
-                    name=subject,
-                    entity_type="unknown"
-                )
-                obj_entity = Entity(
-                    entity_id=str(uuid.uuid4()),
-                    name=obj,
-                    entity_type="unknown"
-                )
-                
-                self.episodic_graph.add_entity(subject_entity)
-                self.episodic_graph.add_entity(obj_entity)
-                
-                # 创建关系
-                rel = Relation(
-                    source_id=subject_entity.entity_id,
-                    target_id=obj_entity.entity_id,
-                    relation_type=relation
-                )
-                self.episodic_graph.add_relation(
-                    subject_entity.entity_id,
-                    obj_entity.entity_id,
-                    rel
-                )
-        
-        # 统一存储
-        self._memory_store[memory_id] = memory_item
-        
-        return memory_id
+        try:
+            # 创建记忆项
+            memory_item = MemoryItem(
+                memory_id=memory_id,
+                content=chunk.content,
+                layer=MemoryLayer.L2_SEMANTIC,
+                vector=chunk.dense_vector,
+                metadata={
+                    "sparse_vector": chunk.sparse_vector,
+                    "entities": chunk.entities,
+                    "context_tags": chunk.context_tags,
+                    **chunk.metadata
+                }
+            )
+            
+            # 存储到 L2 语义记忆
+            self.semantic_memory.store_vectors([memory_item])
+            
+            # 存储实体到 L3 图谱
+            for entity_triple in chunk.entities:
+                if len(entity_triple) == 3:
+                    subject, relation, obj = entity_triple
+                    
+                    # 创建实体
+                    subject_entity = Entity(
+                        entity_id=str(uuid.uuid4()),
+                        name=subject,
+                        entity_type="unknown"
+                    )
+                    obj_entity = Entity(
+                        entity_id=str(uuid.uuid4()),
+                        name=obj,
+                        entity_type="unknown"
+                    )
+                    
+                    self.episodic_graph.add_entity(subject_entity)
+                    self.episodic_graph.add_entity(obj_entity)
+                    
+                    # 创建关系
+                    rel = Relation(
+                        source_id=subject_entity.entity_id,
+                        target_id=obj_entity.entity_id,
+                        relation_type=relation
+                    )
+                    self.episodic_graph.add_relation(
+                        subject_entity.entity_id,
+                        obj_entity.entity_id,
+                        rel
+                    )
+            
+            # 统一存储
+            self._memory_store[memory_id] = memory_item
+            
+            logger.debug(f"Memory stored successfully: {memory_id}, entities: {len(chunk.entities)}")
+            return memory_id
+        except Exception as e:
+            logger.error(f"Failed to store memory: {e}", exc_info=True)
+            raise
     
     def retrieve(
         self,
@@ -130,6 +140,7 @@ class MemoryManager:
         Returns:
             List[MemoryItem]: 检索结果
         """
+        logger.info(f"Retrieving memories: query='{query[:30]}...', top_k={top_k}")
         layers = layers or [MemoryLayer.L1_WORKING, MemoryLayer.L2_SEMANTIC]
         results = []
         
@@ -144,6 +155,7 @@ class MemoryManager:
                     self.decay.reinforce(memory_item)
                     results.append(memory_item)
         
+        logger.info(f"Retrieved {len(results)} memories")
         return results
     
     def consolidate(self) -> None:
@@ -153,9 +165,11 @@ class MemoryManager:
         - L1 高频数据 → L2 持久化
         - 低频数据 → 归档
         """
+        logger.info("Starting memory consolidation")
         # 应用衰减
         memories = list(self._memory_store.values())
         self.decay.apply_decay(memories)
+        logger.debug(f"Decay applied to {len(memories)} memories")
         
         # 识别需要归档的记忆
         to_archive = self.decay.archive_low_weight(memories)
@@ -164,6 +178,8 @@ class MemoryManager:
         for memory_id in to_archive:
             self.semantic_memory.delete(memory_id)
             self._memory_store.pop(memory_id, None)
+        
+        logger.info(f"Consolidation completed: {len(to_archive)} memories archived")
     
     def forget(self, threshold: float = 0.05) -> int:
         """
@@ -182,6 +198,7 @@ class MemoryManager:
             self.semantic_memory.delete(memory_id)
             self._memory_store.pop(memory_id, None)
         
+        logger.info(f"Forgot {len(to_forget)} low-value memories")
         return len(to_forget)
     
     def count(self) -> int:

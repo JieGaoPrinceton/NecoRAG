@@ -11,12 +11,13 @@ import logging
 
 from .models import IntentType, IntentResult
 from .config import IntentConfig
+from src.core.base import BaseIntentClassifier
 
 
 logger = logging.getLogger(__name__)
 
 
-class IntentClassifier:
+class IntentClassifier(BaseIntentClassifier):
     """
     意图分类器
     
@@ -470,6 +471,11 @@ class IntentClassifier:
     
     def get_backend(self) -> str:
         """获取当前使用的分类后端"""
+        return self._backend
+    
+    @property
+    def backend(self) -> str:
+        """返回分类器后端名称 (实现 BaseIntentClassifier 抽象属性)"""
         return self._backend
     
     def set_backend(self, backend: str):

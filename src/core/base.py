@@ -16,6 +16,16 @@ from .protocols import (
     IntentType
 )
 
+# 为了支持实现类使用的不同数据类型，使用 TYPE_CHECKING 和 Union
+from typing import TYPE_CHECKING, Union
+if TYPE_CHECKING:
+    from src.refinement.models import (
+        GeneratedAnswer as RefinementGeneratedAnswer,
+        CritiqueReport,
+        HallucinationReport as RefinementHallucinationReport,
+    )
+    from src.intent.models import IntentResult, IntentRoutingStrategy
+
 
 # ============== 感知层抽象 ==============
 
@@ -23,7 +33,7 @@ class BaseParser(ABC):
     """文档解析器抽象基类"""
     
     @abstractmethod
-    def parse(self, file_path: str) -> Document:
+    def parse(self, file_path: str) -> Any:
         """
         解析文档
         
@@ -31,23 +41,22 @@ class BaseParser(ABC):
             file_path: 文件路径
             
         Returns:
-            Document: 解析后的文档对象
+            Any: 解析后的文档对象（Document 或其子类）
         """
         pass
     
-    @abstractmethod
-    def parse_content(self, content: str, doc_type: str = "text") -> Document:
+    def parse_content(self, content: str, doc_type: str = "text") -> Any:
         """
-        解析文本内容
+        解析文本内容（可选实现）
         
         Args:
             content: 文本内容
             doc_type: 文档类型
             
         Returns:
-            Document: 解析后的文档对象
+            Any: 解析后的文档对象
         """
-        pass
+        raise NotImplementedError("parse_content is optional")
     
     def supports(self, file_extension: str) -> bool:
         """检查是否支持该文件类型"""
@@ -58,12 +67,13 @@ class BaseChunker(ABC):
     """文本分块器抽象基类"""
     
     @abstractmethod
-    def chunk(self, document: Document) -> List[Chunk]:
+    def chunk(self, content: str, **kwargs) -> List[Chunk]:
         """
-        将文档分割成多个块
+        将文本分割成多个块
         
         Args:
-            document: 文档对象
+            content: 文本内容
+            **kwargs: 额外参数（如 strategy 等）
             
         Returns:
             List[Chunk]: 分块列表
@@ -71,23 +81,31 @@ class BaseChunker(ABC):
         pass
     
     @property
-    @abstractmethod
     def chunk_size(self) -> int:
-        """返回分块大小"""
-        pass
+        """返回分块大小（子类应覆盖）"""
+        return getattr(self, '_chunk_size', 512)
+    
+    @chunk_size.setter
+    def chunk_size(self, value: int) -> None:
+        """设置分块大小"""
+        self._chunk_size = value
     
     @property
-    @abstractmethod
     def chunk_overlap(self) -> int:
-        """返回分块重叠大小"""
-        pass
+        """返回分块重叠大小（子类应覆盖）"""
+        return getattr(self, '_chunk_overlap', 50)
+    
+    @chunk_overlap.setter
+    def chunk_overlap(self, value: int) -> None:
+        """设置分块重叠大小"""
+        self._chunk_overlap = value
 
 
 class BaseEncoder(ABC):
     """向量编码器抽象基类"""
     
     @abstractmethod
-    def encode(self, text: str) -> Embedding:
+    def encode(self, text: str) -> Any:
         """
         编码文本为向量
         
@@ -95,22 +113,21 @@ class BaseEncoder(ABC):
             text: 文本内容
             
         Returns:
-            Embedding: 向量对象
+            Any: 向量表示（可以是 Embedding、List[float] 或多类型元组）
         """
         pass
     
-    @abstractmethod
-    def encode_batch(self, texts: List[str]) -> List[Embedding]:
+    def encode_batch(self, texts: List[str]) -> List[Any]:
         """
-        批量编码文本
+        批量编码文本（默认实现，子类可覆盖优化）
         
         Args:
             texts: 文本列表
             
         Returns:
-            List[Embedding]: 向量列表
+            List[Any]: 向量列表
         """
-        pass
+        return [self.encode(text) for text in texts]
     
     @property
     @abstractmethod
@@ -249,6 +266,36 @@ class BaseVectorStore(ABC):
             int: 删除数量
         """
         pass
+    
+    def get(self, ids: List[str]) -> List[Optional[Any]]:
+        """
+        批量获取向量记录（来自 backends/base.py 合并）
+        
+        Args:
+            ids: 记录ID列表
+            
+        Returns:
+            List[Optional[Any]]: 记录列表（不存在返回None）
+        """
+        raise NotImplementedError("get() not implemented")
+    
+    def count(self) -> int:
+        """返回记录总数（来自 backends/base.py 合并）"""
+        raise NotImplementedError("count() not implemented")
+    
+    def clear(self) -> int:
+        """
+        清空所有记录（来自 backends/base.py 合并）
+        
+        Returns:
+            int: 删除的记录数
+        """
+        raise NotImplementedError("clear() not implemented")
+    
+    @property
+    def dimension(self) -> int:
+        """返回向量维度（来自 backends/base.py 合并）"""
+        raise NotImplementedError("dimension not implemented")
 
 
 class BaseGraphStore(ABC):
@@ -312,6 +359,38 @@ class BaseGraphStore(ABC):
             List[Entity]: 遍历到的实体列表
         """
         pass
+    
+    def delete_entity(self, entity_id: str) -> bool:
+        """
+        删除实体（及相关关系）（来自 backends/base.py 合并）
+        
+        Args:
+            entity_id: 实体ID
+            
+        Returns:
+            bool: 是否成功
+        """
+        raise NotImplementedError("delete_entity() not implemented")
+    
+    def delete_relation(self, relation_id: str) -> bool:
+        """
+        删除关系（来自 backends/base.py 合并）
+        
+        Args:
+            relation_id: 关系ID
+            
+        Returns:
+            bool: 是否成功
+        """
+        raise NotImplementedError("delete_relation() not implemented")
+    
+    def entity_count(self) -> int:
+        """返回实体总数（来自 backends/base.py 合并）"""
+        raise NotImplementedError("entity_count() not implemented")
+    
+    def relation_count(self) -> int:
+        """返回关系总数（来自 backends/base.py 合并）"""
+        raise NotImplementedError("relation_count() not implemented")
 
 
 # ============== 检索层抽象 ==============
@@ -322,15 +401,17 @@ class BaseRetriever(ABC):
     @abstractmethod
     def retrieve(
         self,
-        query: Query,
-        top_k: int = 10
+        query: str,
+        top_k: int = 10,
+        **kwargs
     ) -> List[RetrievalResult]:
         """
         检索
         
         Args:
-            query: 查询对象
+            query: 查询文本
             top_k: 返回数量
+            **kwargs: 额外参数
             
         Returns:
             List[RetrievalResult]: 检索结果列表
@@ -354,7 +435,7 @@ class BaseReranker(ABC):
         Args:
             query: 查询文本
             results: 待排序结果
-            top_k: 返回数量
+            top_k: 返回数量（可选）
             
         Returns:
             List[RetrievalResult]: 重排后的结果
@@ -394,18 +475,18 @@ class BaseCritic(ABC):
     @abstractmethod
     def critique(
         self,
-        answer: GeneratedAnswer,
+        answer: Any,
         evidence: List[str]
-    ) -> CritiqueResult:
+    ) -> Any:
         """
         批判评估
         
         Args:
-            answer: 待评估答案
+            answer: 待评估答案 (GeneratedAnswer 或兼容类型)
             evidence: 证据列表
             
         Returns:
-            CritiqueResult: 批判结果
+            Any: 批判结果 (CritiqueResult 或 CritiqueReport)
         """
         pass
 
@@ -416,20 +497,20 @@ class BaseRefiner(ABC):
     @abstractmethod
     def refine(
         self,
-        answer: GeneratedAnswer,
-        critique: CritiqueResult,
-        evidence: List[str]
-    ) -> GeneratedAnswer:
+        answer: Any,
+        critique: Any,
+        additional_evidence: Optional[List[str]] = None
+    ) -> Any:
         """
         修正答案
         
         Args:
-            answer: 原始答案
-            critique: 批判结果
-            evidence: 证据列表
+            answer: 原始答案 (GeneratedAnswer 或兼容类型)
+            critique: 批判结果 (CritiqueResult 或 CritiqueReport)
+            additional_evidence: 补充证据列表
             
         Returns:
-            GeneratedAnswer: 修正后的答案
+            Any: 修正后的答案
         """
         pass
 
@@ -440,18 +521,18 @@ class BaseHallucinationDetector(ABC):
     @abstractmethod
     def detect(
         self,
-        answer: GeneratedAnswer,
+        answer: Any,
         evidence: List[str]
-    ) -> HallucinationReport:
+    ) -> Any:
         """
         检测幻觉
         
         Args:
-            answer: 待检测答案
+            answer: 待检测答案 (str 或 GeneratedAnswer)
             evidence: 证据列表
             
         Returns:
-            HallucinationReport: 检测报告
+            Any: 检测报告 (HallucinationReport)
         """
         pass
 
@@ -573,29 +654,15 @@ class BaseResponseAdapter(ABC):
 
 # ============== 意图分类层抽象 ==============
 
-@dataclass
-class IntentResult:
-    """意图分类结果数据类"""
-    primary_intent: IntentType
-    confidence: float
-    secondary_intents: List[tuple] = None  # List[Tuple[IntentType, float]]
-    keywords: List[str] = None
-    entities: List[str] = None
-    
-    def __post_init__(self):
-        if self.secondary_intents is None:
-            self.secondary_intents = []
-        if self.keywords is None:
-            self.keywords = []
-        if self.entities is None:
-            self.entities = []
+# IntentResult 定义在 src/intent/models.py 中
+# 这里为了向后兼容保留类型别名引用
 
 
 class BaseIntentClassifier(ABC):
     """意图分类器抽象基类"""
     
     @abstractmethod
-    def classify(self, query: str) -> IntentResult:
+    def classify(self, query: str) -> Any:
         """
         对查询进行意图分类
         
@@ -603,12 +670,12 @@ class BaseIntentClassifier(ABC):
             query: 用户查询文本
             
         Returns:
-            IntentResult: 意图分类结果
+            Any: 意图分类结果 (IntentResult)
         """
         pass
     
     @abstractmethod
-    def batch_classify(self, queries: List[str]) -> List[IntentResult]:
+    def batch_classify(self, queries: List[str]) -> List[Any]:
         """
         批量意图分类
         
@@ -616,7 +683,7 @@ class BaseIntentClassifier(ABC):
             queries: 查询列表
             
         Returns:
-            List[IntentResult]: 分类结果列表
+            List[Any]: 分类结果列表
         """
         pass
     
@@ -631,20 +698,20 @@ class BaseIntentRouter(ABC):
     """意图路由器抽象基类"""
     
     @abstractmethod
-    def route(self, intent_result: IntentResult) -> Dict[str, Any]:
+    def route(self, intent_result: Any) -> Any:
         """
         根据意图结果获取路由策略
         
         Args:
-            intent_result: 意图分类结果
+            intent_result: 意图分类结果 (IntentResult)
             
         Returns:
-            Dict[str, Any]: 路由策略配置
+            Any: 路由策略 (IntentRoutingStrategy 或 Dict)
         """
         pass
     
     @abstractmethod
-    def get_weight_factor(self, intent_result: IntentResult) -> float:
+    def get_weight_factor(self, intent_result: Any) -> float:
         """
         计算意图权重因子
         
@@ -670,16 +737,18 @@ class BaseKnowledgeUpdater(ABC):
     def realtime_update(
         self,
         content: str,
-        source: str,
-        **kwargs
+        source: Any,
+        target_layer: str = "L1",
+        metadata: Optional[Dict[str, Any]] = None
     ) -> Optional[str]:
         """
         实时更新知识
         
         Args:
             content: 知识内容
-            source: 知识来源
-            **kwargs: 额外参数
+            source: 知识来源 (str 或 KnowledgeSource 枚举)
+            target_layer: 目标层级
+            metadata: 元数据
             
         Returns:
             Optional[str]: 新记忆的 ID，如果失败则返回 None
@@ -695,7 +764,7 @@ class BaseKnowledgeUpdater(ABC):
             task_id: 任务 ID
             
         Returns:
-            Any: 更新结果
+            Any: 更新结果 (UpdateTask)
         """
         pass
     
@@ -706,7 +775,9 @@ class BaseKnowledgeUpdater(ABC):
         answer: str,
         evidence: List[str],
         hit: bool,
-        **kwargs
+        confidence: float = 0.0,
+        latency_ms: float = 0.0,
+        metadata: Optional[Dict[str, Any]] = None
     ) -> None:
         """
         查询完成后的回调
@@ -716,7 +787,9 @@ class BaseKnowledgeUpdater(ABC):
             answer: 回答内容
             evidence: 证据列表
             hit: 是否命中
-            **kwargs: 额外参数
+            confidence: 回答置信度
+            latency_ms: 响应延迟
+            metadata: 额外元数据
         """
         pass
 
@@ -729,12 +802,15 @@ class BaseMetricsCalculator(ABC):
     """
     
     @abstractmethod
-    def calculate_metrics(self) -> Any:
+    def calculate_metrics(self, force_refresh: bool = False) -> Any:
         """
         计算当前指标
         
+        Args:
+            force_refresh: 是否强制刷新缓存
+            
         Returns:
-            Any: 指标对象
+            Any: 指标对象 (KnowledgeMetrics)
         """
         pass
     
@@ -744,7 +820,7 @@ class BaseMetricsCalculator(ABC):
         生成健康报告
         
         Returns:
-            Any: 健康报告对象
+            Any: 健康报告对象 (HealthReport)
         """
         pass
 

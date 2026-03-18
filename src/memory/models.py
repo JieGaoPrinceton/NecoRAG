@@ -5,15 +5,10 @@ Memory 数据模型
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 from datetime import datetime
-from enum import Enum
 import numpy as np
 
-
-class MemoryLayer(Enum):
-    """记忆层级"""
-    L1_WORKING = "L1"  # 工作记忆
-    L2_SEMANTIC = "L2"  # 语义记忆
-    L3_EPISODIC = "L3"  # 情景图谱
+# 从统一协议层导入公共数据类
+from src.core.protocols import MemoryLayer, Entity, Relation
 
 
 @dataclass
@@ -31,29 +26,10 @@ class MemoryItem:
 
 
 @dataclass
-class Entity:
-    """实体"""
-    entity_id: str
-    name: str
-    entity_type: str
-    properties: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class Relation:
-    """关系"""
-    source_id: str
-    target_id: str
-    relation_type: str
-    strength: float = 1.0  # 关系强度
-    properties: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
 class GraphPath:
     """图谱路径"""
     nodes: List[str]
-    edges: List[Relation]
+    edges: List[Relation]  # 使用导入的 Relation
     total_strength: float
 
 

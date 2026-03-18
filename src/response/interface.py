@@ -2,6 +2,7 @@
 Response Interface - 响应接口主类
 """
 
+import logging
 from typing import Optional, List
 from src.memory.manager import MemoryManager
 from src.refinement.models import RefinementResult
@@ -11,6 +12,9 @@ from src.response.detail_adapter import DetailLevelAdapter
 from src.response.visualizer import ThinkingChainVisualizer
 from src.response.models import UserProfile, Response
 import uuid
+
+
+logger = logging.getLogger(__name__)
 
 
 class ResponseInterface:
@@ -73,13 +77,15 @@ class ResponseInterface:
         Returns:
             Response: 响应对象
         """
+        logger.info(f"Response generation started: session_id={session_id}")
         # 获取用户画像
         user_id = session_id or "anonymous"
         user_profile = self.profile_manager.get_profile(user_id)
+        logger.debug(f"User profile applied: level={user_profile.knowledge_level}, style={user_profile.preferred_tone}")
         
         # 确定语气
         if tone is None:
-            tone = user_profile.interaction_style
+            tone = user_profile.preferred_tone.value if hasattr(user_profile.preferred_tone, 'value') else str(user_profile.preferred_tone)
         
         # 确定详细程度
         if detail_level is None:
@@ -88,6 +94,7 @@ class ResponseInterface:
                 user_profile,
                 refinement_result
             )
+        logger.debug(f"Detail level adaptation: level={detail_level}")
         
         # 适配内容
         content = refinement_result.answer
@@ -129,6 +136,7 @@ class ResponseInterface:
         )
         self.profile_manager.update_profile(user_id, interaction)
         
+        logger.info(f"Response generation completed: tone={tone}, detail_level={detail_level}")
         return response
     
     def _determine_detail_level(
@@ -155,7 +163,7 @@ class ResponseInterface:
             "expert": 1
         }
         
-        base_level = level_map.get(user_profile.professional_level, 2)
+        base_level = level_map.get(user_profile.knowledge_level, 2)
         
         # 基于查询复杂度调整
         if refinement_result.iterations > 2:

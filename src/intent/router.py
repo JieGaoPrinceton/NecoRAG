@@ -9,12 +9,13 @@ import logging
 
 from .models import IntentType, IntentResult, IntentRoutingStrategy
 from .config import IntentConfig
+from src.core.base import BaseIntentRouter
 
 
 logger = logging.getLogger(__name__)
 
 
-class IntentRouter:
+class IntentRouter(BaseIntentRouter):
     """
     意图路由器
     
