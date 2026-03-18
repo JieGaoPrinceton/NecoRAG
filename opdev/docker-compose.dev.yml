@@ -1,0 +1,15 @@
+# 开发环境配置 - 仅启动后台服务
+# 使用方式：cd opdev && docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  necorag:
+    profiles:
+      - app  # 开发时默认不启动应用容器，开发者本地运行
+  
+  ollama:
+    profiles:
+      - llm  # LLM 按需启动
+  
+  grafana:
+    profiles:
+      - monitoring  # 监控按需启动

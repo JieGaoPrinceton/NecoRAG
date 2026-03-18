@@ -1,0 +1,163 @@
+# NecoRAG 后台服务统一编排
+# 使用方式：cd opdev && docker compose up -d
+
+services:
+  # === L1 工作记忆层 ===
+  redis:
+    image: redis:7-alpine
+    container_name: necorag-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+      - ./configs/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - necorag-net
+
+  # === L2 语义记忆层 ===
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: necorag-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_HTTP_PORT:-6334}:6334"
+      - "${QDRANT_GRPC_PORT:-6333}:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+      - qdrant_snapshots:/qdrant/snapshots
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6333
+      - QDRANT__SERVICE__HTTP_PORT=6334
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:6334/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - necorag-net
+
+  # === L3 情景图谱层 ===
+  neo4j:
+    image: neo4j:5-community
+    container_name: necorag-neo4j
+    restart: unless-stopped
+    ports:
+      - "${NEO4J_HTTP_PORT:-7474}:7474"
+      - "${NEO4J_BOLT_PORT:-7687}:7687"
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_plugins:/plugins
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-necorag2026}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_server_memory_heap_initial__size=256m
+      - NEO4J_server_memory_heap_max__size=512m
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7474/"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - necorag-net
+
+  # === LLM 推理引擎 ===
+  ollama:
+    image: ollama/ollama:latest
+    container_name: necorag-ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # GPU 支持（取消注释以启用）
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - necorag-net
+
+  # === 监控可视化 ===
+  grafana:
+    image: grafana/grafana:latest
+    container_name: necorag-grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-necorag2026}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - redis
+    networks:
+      - necorag-net
+
+  # === NecoRAG 应用 ===
+  necorag:
+    build:
+      context: ..
+      dockerfile: opdev/Dockerfile
+    container_name: necorag-app
+    restart: unless-stopped
+    ports:
+      - "${NECORAG_PORT:-8000}:8000"
+    volumes:
+      - ../configs:/app/configs
+      - necorag_data:/app/data
+    environment:
+      - NECORAG_LLM_PROVIDER=${LLM_PROVIDER:-mock}
+      - NECORAG_LLM_API_BASE=http://ollama:11434
+      - NECORAG_VECTOR_DB=qdrant
+      - NECORAG_VECTOR_DB_URL=http://qdrant:6334
+      - NECORAG_GRAPH_DB=neo4j
+      - NECORAG_GRAPH_DB_URL=bolt://neo4j:7687
+      - REDIS_URL=redis://redis:6379
+      - NECORAG_DEBUG=${NECORAG_DEBUG:-false}
+    depends_on:
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    networks:
+      - necorag-net
+
+volumes:
+  redis_data:
+  qdrant_data:
+  qdrant_snapshots:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_plugins:
+  ollama_data:
+  grafana_data:
+  necorag_data:
+
+networks:
+  necorag-net:
+    driver: bridge
+    name: necorag-network

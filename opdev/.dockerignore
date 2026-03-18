@@ -1,0 +1,30 @@
+# Python
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# Git
+.git
+.gitignore
+
+# Docs
+*.md
+docs/
+design/
+logo/
+
+# Qoder
+.qoder/
+
+# 环境
+.env
+*.egg-info
+dist/
+build/
