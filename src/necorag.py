@@ -92,9 +92,9 @@ class NecoRAG:
         # 初始化各层组件
         self._perception = PerceptionEngine()
         self._memory = MemoryManager(decay_rate=self.config.memory.decay_rate)
-        self._retrieval = AdaptiveRetriever(memory_manager=self._memory)
-        self._refinement = RefinementAgent(llm_client=self._llm_client)
-        self._response = ResponseInterface()
+        self._retrieval = AdaptiveRetriever(memory=self._memory)
+        self._refinement = RefinementAgent(memory=self._memory)
+        self._response = ResponseInterface(memory=self._memory)
         self._hyde = HyDEEnhancer(llm_client=self._llm_client)
         
         self._initialized = True
@@ -181,7 +181,7 @@ class NecoRAG:
             raise FileNotFoundError(f"File not found: {file_path}")
         
         # 感知层处理
-        encoded_chunks = self._perception.process(str(file_path))
+        encoded_chunks = self._perception.process_file(str(file_path))
         
         # 存储到记忆层
         for chunk in encoded_chunks:
@@ -206,7 +206,7 @@ class NecoRAG:
             int: 创建的分块数量
         """
         # 感知层处理
-        encoded_chunks = self._perception.process_text(text, metadata or {})
+        encoded_chunks = self._perception.process_text(text)
         
         # 存储到记忆层
         for chunk in encoded_chunks:
@@ -280,26 +280,19 @@ class NecoRAG:
         
         # 答案精炼
         if use_refinement and self._refinement:
-            refinement_result = self._refinement.refine(question, evidence)
-            content = refinement_result.content
+            refinement_result = self._refinement.process(question, evidence)
+            content = refinement_result.answer
             confidence = refinement_result.confidence
         else:
             # 简单拼接
             content = self._simple_answer(question, evidence)
             confidence = 0.7 if evidence else 0.0
         
-        # 响应适配
-        response = self._response.generate(
-            content=content,
-            user_id=user_id,
-            sources=results
-        )
-        
         self._stats["queries_processed"] += 1
         
         return Response(
             query_id=query.query_id,
-            content=response.content,
+            content=content,
             confidence=confidence,
             sources=[RetrievalResult(
                 memory_id=r.memory_id,
@@ -350,7 +343,7 @@ class NecoRAG:
         """获取统计信息"""
         return {
             **self._stats,
-            "memory_count": self._memory.count() if self._memory else 0,
+            "memory_count": len(self._memory._memory_store) if self._memory else 0,
             "config": {
                 "llm_provider": self.config.llm.provider.value,
                 "model": self.config.llm.model_name,
@@ -362,7 +355,7 @@ class NecoRAG:
         if self._memory:
             # 重新初始化记忆管理器
             self._memory = MemoryManager(decay_rate=self.config.memory.decay_rate)
-            self._retrieval = AdaptiveRetriever(memory_manager=self._memory)
+            self._retrieval = AdaptiveRetriever(memory=self._memory)
         
         self._stats = {
             "documents_ingested": 0,

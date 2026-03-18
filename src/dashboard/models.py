@@ -38,6 +38,17 @@ class ModuleConfig:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'ModuleConfig':
         """从字典创建"""
+        # 子类 (PerceptionConfig 等) 使用无参构造，只需恢复参数和状态
+        if cls is not ModuleConfig:
+            instance = cls()
+            if 'parameters' in data:
+                instance.parameters = data['parameters']
+            if 'enabled' in data:
+                instance.enabled = data['enabled']
+            if 'last_updated' in data:
+                instance.last_updated = datetime.fromisoformat(data['last_updated'])
+            return instance
+        data = dict(data)
         data['module_type'] = ModuleType(data['module_type'])
         data['last_updated'] = datetime.fromisoformat(data['last_updated'])
         return cls(**data)

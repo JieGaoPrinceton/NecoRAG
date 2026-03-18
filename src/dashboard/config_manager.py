@@ -3,7 +3,7 @@
 管理 RAG Profile 的存储、加载和应用
 """
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from pathlib import Path
 import json
 from datetime import datetime
@@ -181,7 +181,7 @@ class ConfigManager:
         # 删除文件
         profile_file = self.config_dir / f"{profile_id}.json"
         if profile_file.exists():
-            profile_file.delete()
+            profile_file.unlink()
         
         # 从缓存移除
         del self._profiles[profile_id]

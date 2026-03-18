@@ -45,7 +45,11 @@ Repository = "https://github.com/NecoRAG/core.git"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["necorag*"]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
 
 [tool.black]
 line-length = 100
