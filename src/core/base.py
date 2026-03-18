@@ -747,3 +747,46 @@ class BaseMetricsCalculator(ABC):
             Any: 健康报告对象
         """
         pass
+
+
+# ============== 自适应学习层抽象 ==============
+
+class BaseAdaptiveLearner(ABC):
+    """
+    自适应学习器抽象基类
+    
+    Abstract base class for adaptive learning implementations.
+    """
+    
+    @abstractmethod
+    def learn(self, feedback: Any) -> None:
+        """
+        从反馈中学习
+        
+        Args:
+            feedback: 用户反馈数据
+        """
+        pass
+    
+    @abstractmethod
+    def predict(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        基于学习预测
+        
+        Args:
+            context: 上下文信息
+            
+        Returns:
+            Dict[str, Any]: 预测结果
+        """
+        pass
+    
+    @abstractmethod
+    def get_metrics(self) -> Dict[str, Any]:
+        """
+        获取学习指标
+        
+        Returns:
+            Dict[str, Any]: 学习指标数据
+        """
+        pass

@@ -386,3 +386,69 @@ class RollbackError(KnowledgeEvolutionError):
             **kwargs
         )
         self.code = "ROLLBACK_ERROR"
+
+
+# ============== 自适应学习相关异常 ==============
+
+class AdaptiveLearningError(NecoRAGError):
+    """自适应学习错误基类"""
+    
+    def __init__(self, message: str, **kwargs):
+        super().__init__(message=message, code="ADAPTIVE_LEARNING_ERROR", **kwargs)
+
+
+class FeedbackError(AdaptiveLearningError):
+    """反馈处理错误"""
+    
+    def __init__(
+        self,
+        message: str,
+        feedback_id: Optional[str] = None,
+        **kwargs
+    ):
+        details = kwargs.pop("details", {})
+        details["feedback_id"] = feedback_id
+        super().__init__(
+            message=message,
+            details=details,
+            **kwargs
+        )
+        self.code = "FEEDBACK_ERROR"
+
+
+class StrategyOptimizationError(AdaptiveLearningError):
+    """策略优化错误"""
+    
+    def __init__(
+        self,
+        message: str,
+        strategy_name: Optional[str] = None,
+        **kwargs
+    ):
+        details = kwargs.pop("details", {})
+        details["strategy_name"] = strategy_name
+        super().__init__(
+            message=message,
+            details=details,
+            **kwargs
+        )
+        self.code = "STRATEGY_OPTIMIZATION_ERROR"
+
+
+class PreferencePredictionError(AdaptiveLearningError):
+    """偏好预测错误"""
+    
+    def __init__(
+        self,
+        message: str,
+        user_id: Optional[str] = None,
+        **kwargs
+    ):
+        details = kwargs.pop("details", {})
+        details["user_id"] = user_id
+        super().__init__(
+            message=message,
+            details=details,
+            **kwargs
+        )
+        self.code = "PREFERENCE_PREDICTION_ERROR"

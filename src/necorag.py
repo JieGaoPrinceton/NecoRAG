@@ -29,6 +29,12 @@ from src.knowledge_evolution import (
     KnowledgeVisualizer,
     KnowledgeSource,
 )
+from src.adaptive import (
+    AdaptiveLearningConfig,
+    AdaptiveLearningEngine,
+    UserFeedback,
+    FeedbackType,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -89,6 +95,9 @@ class NecoRAG:
         self._knowledge_scheduler: Optional[UpdateScheduler] = None
         self._knowledge_visualizer: Optional[KnowledgeVisualizer] = None
         
+        # 自适应学习引擎（延迟初始化）
+        self._adaptive_engine: Optional[AdaptiveLearningEngine] = None
+        
         # 统计信息
         self._stats = {
             "documents_ingested": 0,
@@ -116,6 +125,9 @@ class NecoRAG:
         
         # 初始化知识演化组件
         self._init_knowledge_evolution()
+        
+        # 初始化自适应学习引擎
+        self._init_adaptive_learning()
         
         self._initialized = True
         logger.info("NecoRAG initialized successfully")
@@ -157,6 +169,17 @@ class NecoRAG:
         
         # 设置默认调度任务
         self._knowledge_scheduler.setup_default_tasks()
+    
+    def _init_adaptive_learning(self):
+        """初始化自适应学习引擎"""
+        # 使用配置中的 adaptive_learning 或默认配置
+        if self.config.adaptive_learning:
+            adaptive_config = self.config.adaptive_learning
+        else:
+            adaptive_config = AdaptiveLearningConfig.default()
+        
+        self._adaptive_engine = AdaptiveLearningEngine(config=adaptive_config)
+        logger.info("Adaptive learning engine initialized")
     
     def _create_llm_client(self) -> BaseLLMClient:
         """根据配置创建 LLM 客户端"""
@@ -406,6 +429,21 @@ class NecoRAG:
             hit=hit,
             confidence=confidence
         )
+        
+        # 自适应学习回调
+        if self._adaptive_engine:
+            strategy_used = "hybrid_search"  # 默认策略
+            query_type_str = intent_result.primary_intent.value if intent_result else "general"
+            self._adaptive_engine.on_query_completed(
+                user_id=user_id or "anonymous",
+                query=question,
+                response_id=query.query_id,
+                strategy_used=strategy_used,
+                query_type=query_type_str,
+                latency_ms=0,  # 可以添加计时逻辑
+                hit=hit,
+                satisfaction=confidence
+            )
         
         return Response(
             query_id=query.query_id,
@@ -663,6 +701,126 @@ class NecoRAG:
         if self._knowledge_scheduler:
             self._knowledge_scheduler.stop()
             logger.info("Knowledge evolution scheduler stopped")
+    
+    # ============== 自适应学习 API ==============
+    
+    def submit_feedback(
+        self,
+        user_id: str,
+        query: str,
+        feedback_type: str = "positive",
+        score: float = 0.5,
+        comment: str = "",
+        **metadata
+    ) -> bool:
+        """
+        提交用户反馈
+        
+        Args:
+            user_id: 用户ID
+            query: 查询内容
+            feedback_type: 反馈类型 (positive/negative/correction/supplement/irrelevant)
+            score: 评分 (0-1)
+            comment: 评论
+            **metadata: 额外元数据
+            
+        Returns:
+            bool: 是否成功
+        """
+        if self._adaptive_engine is None:
+            logger.warning("Adaptive learning engine not initialized")
+            return False
+        
+        feedback = self._adaptive_engine.create_feedback(
+            query=query,
+            feedback_type=feedback_type,
+            score=score,
+            comment=comment,
+            **metadata
+        )
+        self._adaptive_engine.on_user_feedback(user_id, feedback)
+        return True
+    
+    def get_personalized_config(self, user_id: str, query_type: str = "") -> Dict[str, Any]:
+        """
+        获取个性化配置
+        
+        Args:
+            user_id: 用户ID
+            query_type: 查询类型
+            
+        Returns:
+            Dict: 个性化配置
+        """
+        if self._adaptive_engine is None:
+            return {}
+        
+        return self._adaptive_engine.get_personalized_config(user_id, query_type)
+    
+    def get_learning_metrics(self) -> Dict[str, Any]:
+        """
+        获取自适应学习指标
+        
+        Returns:
+            Dict: 学习指标数据
+        """
+        if self._adaptive_engine is None:
+            return {}
+        
+        metrics = self._adaptive_engine.get_learning_metrics()
+        return metrics.to_dict()
+    
+    def get_community_insights(self) -> List[Dict[str, Any]]:
+        """
+        获取集体智慧洞察
+        
+        Returns:
+            List[Dict]: 洞察列表
+        """
+        if self._adaptive_engine is None or self._adaptive_engine.collective_intelligence is None:
+            return []
+        
+        insights = self._adaptive_engine.collective_intelligence.get_insights()
+        return [i.to_dict() for i in insights]
+    
+    def get_adaptive_dashboard_data(self) -> Dict[str, Any]:
+        """
+        获取自适应学习仪表盘数据
+        
+        Returns:
+            Dict: 仪表盘数据
+        """
+        if self._adaptive_engine is None:
+            return {}
+        
+        return self._adaptive_engine.get_dashboard_data()
+    
+    def get_user_learning_status(self, user_id: str) -> Dict[str, Any]:
+        """
+        获取用户学习状态
+        
+        Args:
+            user_id: 用户ID
+            
+        Returns:
+            Dict: 用户学习状态
+        """
+        if self._adaptive_engine is None:
+            return {}
+        
+        return self._adaptive_engine.get_user_learning_status(user_id)
+    
+    def run_periodic_optimization(self) -> Dict[str, Any]:
+        """
+        执行周期性优化
+        
+        Returns:
+            Dict: 优化结果
+        """
+        if self._adaptive_engine is None:
+            return {}
+        
+        return self._adaptive_engine.periodic_optimization()
     
     def clear(self):
         """清空知识库"""

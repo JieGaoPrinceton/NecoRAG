@@ -96,6 +96,29 @@ from src.knowledge_evolution import (
     create_knowledge_evolution,
 )
 
+# 自适应学习模块导出
+from src.adaptive import (
+    # 枚举类型
+    FeedbackType,
+    FeedbackSignal,
+    # 数据类
+    UserFeedback,
+    StrategyPerformance,
+    UserLearningProfile,
+    CommunityInsight,
+    AdaptiveLearningMetrics,
+    # 配置
+    AdaptiveLearningConfig,
+    # 核心类
+    FeedbackCollector,
+    StrategyOptimizer,
+    PreferencePredictor,
+    CollectiveIntelligence,
+    AdaptiveLearningEngine,
+    # 便捷函数
+    create_adaptive_engine,
+)
+
 __all__ = [
     # 统一入口
     "NecoRAG",
@@ -170,4 +193,20 @@ __all__ = [
     "UpdateScheduler",
     "KnowledgeVisualizer",
     "create_knowledge_evolution",
+    
+    # 自适应学习模块
+    "FeedbackType",
+    "FeedbackSignal",
+    "UserFeedback",
+    "StrategyPerformance",
+    "UserLearningProfile",
+    "CommunityInsight",
+    "AdaptiveLearningMetrics",
+    "AdaptiveLearningConfig",
+    "FeedbackCollector",
+    "StrategyOptimizer",
+    "PreferencePredictor",
+    "CollectiveIntelligence",
+    "AdaptiveLearningEngine",
+    "create_adaptive_engine",
 ]

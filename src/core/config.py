@@ -105,10 +105,19 @@ class LLMConfig(BaseConfig):
 @dataclass
 class PerceptionConfig(BaseConfig):
     """感知层配置"""
-    # 分块配置
+    # 分块配置（基础）
     chunk_size: int = 512
     chunk_overlap: int = 50
-    chunk_strategy: str = "semantic"  # fixed, semantic, structural
+    chunk_strategy: str = "semantic"  # fixed, semantic, structural, elastic, sentence
+    
+    # 弹性切割配置（新增）
+    min_chunk_size: int = 1024          # 最小块大小（字符），避免碎片化
+    target_chunk_size: int = 2048       # 目标块大小（字符），理想切割大小
+    max_chunk_size: int = 5120          # 最大块大小（字符），超过则强制切割
+    enable_elastic_chunking: bool = True  # 是否启用弹性切割
+    semantic_boundaries: List[str] = field(
+        default_factory=lambda: ["paragraph", "sentence", "clause"]
+    )  # 语义边界优先级
     
     # 标签配置
     enable_time_tag: bool = True
@@ -270,6 +279,9 @@ class NecoRAGConfig(BaseConfig):
     response: ResponseConfig = field(default_factory=ResponseConfig)
     domain_weight: DomainWeightConfig = field(default_factory=DomainWeightConfig)
     knowledge_evolution: KnowledgeEvolutionConfig = field(default_factory=KnowledgeEvolutionConfig)
+    
+    # 自适应学习配置（延迟导入避免循环）
+    adaptive_learning: Optional[Any] = None  # AdaptiveLearningConfig
     
     # 数据目录
     data_dir: str = "./data"

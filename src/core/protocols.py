@@ -29,6 +29,8 @@ class ChunkType(Enum):
     FIXED = "fixed"           # 固定大小分块
     SEMANTIC = "semantic"     # 语义分块
     STRUCTURAL = "structural" # 结构化分块
+    ELASTIC = "elastic"       # 弹性分块（智能调整块大小）
+    SENTENCE = "sentence"     # 句子级分块
 
 
 class MemoryLayer(Enum):

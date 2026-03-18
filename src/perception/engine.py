@@ -1,5 +1,6 @@
 """
 Perception Engine - 感知引擎主类
+支持弹性文档切割和多种分块策略
 """
 
 from typing import List, Optional
@@ -16,6 +17,7 @@ class PerceptionEngine:
     Perception Engine - 感知引擎
     
     多模态数据的高精度编码与情境标记
+    支持弹性切割、语义切割、固定大小切割等多种模式
     """
     
     def __init__(
@@ -23,21 +25,49 @@ class PerceptionEngine:
         model: str = "BGE-M3",
         chunk_size: int = 512,
         chunk_overlap: int = 50,
-        enable_ocr: bool = True
+        enable_ocr: bool = True,
+        # 弹性切割配置参数
+        min_chunk_size: int = 1024,
+        target_chunk_size: int = 2048,
+        max_chunk_size: int = 5120,
+        enable_elastic_chunking: bool = True,
+        chunk_strategy: str = "elastic",
+        semantic_boundaries: Optional[List[str]] = None
     ):
         """
         初始化引擎
         
         Args:
             model: 向量化模型
-            chunk_size: 分块大小
-            chunk_overlap: 分块重叠
+            chunk_size: 基础分块大小（兼容模式）
+            chunk_overlap: 分块重叠长度
             enable_ocr: 是否启用 OCR
+            min_chunk_size: 弹性切割最小块大小
+            target_chunk_size: 弹性切割目标块大小
+            max_chunk_size: 弹性切割最大块大小
+            enable_elastic_chunking: 是否启用弹性切割
+            chunk_strategy: 默认切割策略 (elastic, semantic, fixed, structural, sentence)
+            semantic_boundaries: 语义边界优先级
         """
         self.parser = DocumentParser(enable_ocr=enable_ocr)
-        self.chunker = ChunkStrategy(chunk_size, chunk_overlap)
+        
+        # 初始化分块策略，传入弹性切割配置
+        self.chunker = ChunkStrategy(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            min_chunk_size=min_chunk_size,
+            target_chunk_size=target_chunk_size,
+            max_chunk_size=max_chunk_size,
+            enable_elastic=enable_elastic_chunking,
+            semantic_boundaries=semantic_boundaries
+        )
+        
         self.tagger = ContextualTagger()
         self.encoder = VectorEncoder(model_name=model)
+        
+        # 保存默认切割策略
+        self.chunk_strategy = chunk_strategy
+        self.enable_elastic_chunking = enable_elastic_chunking
     
     def parse_document(self, file_path: str) -> ParsedDocument:
         """
@@ -105,18 +135,32 @@ class PerceptionEngine:
         # 处理并编码
         return self.process(parsed_doc)
     
-    def process_text(self, text: str) -> List[EncodedChunk]:
+    def process_text(
+        self, 
+        text: str, 
+        strategy: Optional[str] = None
+    ) -> List[EncodedChunk]:
         """
         处理纯文本
         
+        使用统一入口进行分块，支持多种切割策略。
+        
         Args:
             text: 文本内容
+            strategy: 切割策略（可选）
+                - "elastic": 弹性切割（智能调整块大小）
+                - "semantic": 语义切割（按段落）
+                - "fixed": 固定大小切割
+                - "structural": 结构化切割
+                - "sentence": 句子级切割
+                - None: 使用默认策略
             
         Returns:
             List[EncodedChunk]: 编码后的文本块列表
         """
-        # 分块
-        chunks = self.chunker.chunk_by_fixed_size(text)
+        # 使用统一入口进行分块，根据配置选择策略
+        effective_strategy = strategy or self.chunk_strategy
+        chunks = self.chunker.chunk(text, strategy=effective_strategy)
         
         # 创建临时文档
         parsed_doc = ParsedDocument(
