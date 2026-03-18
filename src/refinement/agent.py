@@ -46,7 +46,7 @@ class RefinementAgent:
         self.min_confidence = min_confidence
         
         # 初始化子组件
-        self.generator = Generator(llm_model)
+        self.generator = Generator()
         self.critic = Critic(llm_model)
         self.refiner = Refiner(llm_model)
         self.hallucination_detector = HallucinationDetector()
