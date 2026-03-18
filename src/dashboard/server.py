@@ -402,6 +402,15 @@ class DashboardServer:
             else:
                 return self._get_simple_ui()
         
+        @self.app.get("/knowledge-health", response_class=HTMLResponse)
+        async def get_knowledge_health_dashboard():
+            """返回知识库健康仪表盘 UI"""
+            html_file = Path(__file__).parent / "components" / "KnowledgeHealthDashboard.html"
+            if html_file.exists():
+                return HTMLResponse(content=html_file.read_text(encoding='utf-8'))
+            else:
+                raise HTTPException(status_code=404, detail="Knowledge Health Dashboard not found")
+        
         # 静态文件服务
         static_dir = Path(__file__).parent / "static"
         if static_dir.exists():

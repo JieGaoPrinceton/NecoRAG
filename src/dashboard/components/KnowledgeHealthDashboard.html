@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库健康仪表盘 - NecoRAG Dashboard</title>
+    <style>
+        :root {
+            /* 主色调 */
+            --primary-blue: #667eea;
+            --primary-purple: #764ba2;
+            --success-green: #4CAF50;
+            --warning-yellow: #FFC107;
+            --danger-red: #F44336;
+            --info-orange: #FF9800;
+            --neutral-gray: #9E9E9E;
+            --light-bg: #F5F5F5;
+            
+            /* 卡片样式 */
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-radius: 12px;
+            --card-hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .header {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 主内容区 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .card-header {
+            border-bottom: 2px solid var(--light-bg);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* 关键指标卡 */
+        .metrics-cards {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .metric-card.success {
+            border-left-color: var(--success-green);
+        }
+
+        .metric-card.warning {
+            border-left-color: var(--warning-yellow);
+        }
+
+        .metric-card.danger {
+            border-left-color: var(--danger-red);
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .metric-trend {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .trend-up {
+            color: var(--success-green);
+        }
+
+        .trend-down {
+            color: var(--danger-red);
+        }
+
+        /* 健康分数仪表盘 */
+        .health-gauge-card {
+            grid-column: span 4;
+            text-align: center;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            margin: 20px auto;
+        }
+
+        .gauge-background {
+            fill: none;
+            stroke: var(--light-bg);
+            stroke-width: 20;
+        }
+
+        .gauge-arc {
+            fill: none;
+            stroke: var(--success-green);
+            stroke-width: 20;
+            stroke-linecap: round;
+            transform: rotate(180deg);
+            transform-origin: center;
+            transition: stroke-dashoffset 1s ease-out;
+        }
+
+        .gauge-center-text {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .gauge-score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .gauge-level {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 增长趋势图 */
+        .growth-chart-card {
+            grid-column: span 8;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chart-time-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--neutral-gray);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .chart-time-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* 领域热力图和雷达图 */
+        .domain-heatmap-card {
+            grid-column: span 6;
+        }
+
+        .radar-chart-card {
+            grid-column: span 6;
+        }
+
+        .domain-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .domain-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .domain-item:hover {
+            background: var(--light-bg);
+        }
+
+        .domain-name {
+            width: 120px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .domain-bar-container {
+            flex: 1;
+            height: 20px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+
+        .domain-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-purple));
+            border-radius: 10px;
+            transition: width 0.5s ease-out;
+        }
+
+        .domain-percentage {
+            width: 50px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 雷达图容器 */
+        .radar-chart-container {
+            position: relative;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 更新时间线 */
+        .timeline-card {
+            grid-column: span 12;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--neutral-gray);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+            padding-left: 20px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary-blue);
+        }
+
+        .timeline-dot.realtime {
+            border-color: var(--primary-blue);
+        }
+
+        .timeline-dot.scheduled {
+            border-color: var(--success-green);
+        }
+
+        .timeline-dot.event {
+            border-color: var(--info-orange);
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content {
+            background: var(--light-bg);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .timeline-description {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .timeline-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .stat-badge {
+            background: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* 加载动画 */
+        .skeleton {
+            background: linear-gradient(90deg, var(--light-bg) 25%, #e0e0e0 50%, var(--light-bg) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .health-gauge-card {
+                grid-column: span 6;
+            }
+            
+            .growth-chart-card {
+                grid-column: span 6;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .health-gauge-card,
+            .growth-chart-card,
+            .domain-heatmap-card,
+            .radar-chart-card {
+                grid-column: span 1;
+            }
+        }
+
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>
+                <span>📊</span>
+                知识库健康仪表盘
+            </h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="refreshData()">🔄 刷新</button>
+                <button class="btn btn-primary" onclick="exportReport()">📥 导出报告</button>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-grid">
+            <!-- 关键指标卡 -->
+            <div class="metrics-cards">
+                <div class="metric-card success">
+                    <div class="metric-value" id="total-knowledge">0</div>
+                    <div class="metric-label">总知识量</div>
+                    <div class="metric-trend trend-up">↑ 持续增长</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="today-growth">+0</div>
+                    <div class="metric-label">今日新增</div>
+                    <div class="metric-trend trend-up">↑ 活跃更新</div>
+                </div>
+                <div class="metric-card warning">
+                    <div class="metric-value" id="avg-freshness">0 天</div>
+                    <div class="metric-label">平均新鲜度</div>
+                    <div class="metric-trend trend-down">↓ 需要更新</div>
+                </div>
+            </div>
+
+            <!-- 健康分数仪表盘 -->
+            <div class="card health-gauge-card">
+                <div class="card-header">
+                    <h2>综合健康度</h2>
+                    <div class="tooltip">ⓘ
+                        <span class="tooltip-text">基于新鲜度、覆盖度、连通性、准确性综合计算</span>
+                    </div>
+                </div>
+                <div class="gauge-container">
+                    <svg width="200" height="100" viewBox="0 0 200 100">
+                        <path class="gauge-background" d="M 10,90 A 80,80 0 0,1 190,90"/>
+                        <path class="gauge-arc" id="health-arc" d="M 10,90 A 80,80 0 0,1 190,90" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                    </svg>
+                    <div class="gauge-center-text">
+                        <div class="gauge-score" id="health-score">0</div>
+                        <div class="gauge-level" id="health-level">计算中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 增长趋势图 -->
+            <div class="card growth-chart-card">
+                <div class="card-header">
+                    <h2>知识增长趋势</h2>
+                    <div class="chart-controls">
+                        <button class="chart-time-btn" onclick="setGrowthPeriod(7)">7 天</button>
+                        <button class="chart-time-btn active" onclick="setGrowthPeriod(30)">30 天</button>
+                        <button class="chart-time-btn" onclick="setGrowthPeriod(90)">90 天</button>
+                    </div>
+                </div>
+                <div class="chart-container" id="growth-chart">
+                    <!-- 使用 SVG 绘制简单图表 -->
+                    <svg width="100%" height="100%" id="growth-chart-svg">
+                        <!-- 动态生成 -->
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 领域覆盖热力图 -->
+            <div class="card domain-heatmap-card">
+                <div class="card-header">
+                    <h2>领域覆盖热力图</h2>
+                </div>
+                <div class="domain-list" id="domain-list">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 知识衰减雷达图 -->
+            <div class="card radar-chart-card">
+                <div class="card-header">
+                    <h2>知识质量雷达</h2>
+                </div>
+                <div class="radar-chart-container">
+                    <svg width="280" height="280" id="radar-chart">
+                        <!-- 动态生成 -->
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 更新时间线 -->
+            <div class="card timeline-card">
+                <div class="card-header">
+                    <h2>更新时间线</h2>
+                    <button class="btn btn-primary" onclick="loadMoreTimeline()">查看更多</button>
+                </div>
+                <div class="timeline" id="update-timeline">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API 基础地址
+        const API_BASE = window.location.origin;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            // 每 5 秒自动刷新
+            setInterval(loadDashboardData, 5000);
+        });
+
+        // 加载仪表盘数据
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/knowledge/dashboard`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('NecoRAG not initialized');
+                    return;
+                }
+
+                updateMetricsCards(data.summary);
+                updateHealthGauge(data.health);
+                updateGrowthChart(data.growth_trend);
+                updateDomainHeatmap(data.layer_distribution);
+                updateRadarChart(data.decay_radar);
+                updateTimeline(data.update_timeline);
+            } catch (error) {
+                console.error('加载数据失败:', error);
+            }
+        }
+
+        // 更新指标卡
+        function updateMetricsCards(summary) {
+            animateValue('total-knowledge', summary.total_entries || 0);
+            document.getElementById('today-growth').textContent = '+' + (summary.today_new || 0);
+            document.getElementById('avg-freshness').textContent = (summary.avg_age_days || 0) + '天';
+        }
+
+        // 更新健康仪表盘
+        function updateHealthGauge(health) {
+            const score = health.score || 0;
+            const arc = document.getElementById('health-arc');
+            const scoreEl = document.getElementById('health-score');
+            const levelEl = document.getElementById('health-level');
+            
+            // 动画更新分数
+            animateValue('health-score', score);
+            
+            // 更新仪表盘
+            const circumference = 251.2; // π * r * 2 / 2 (半圆)
+            const offset = circumference - (score / 100) * circumference;
+            arc.style.strokeDashoffset = offset;
+            
+            // 更新颜色和等级
+            let color, level;
+            if (score >= 80) {
+                color = '#4CAF50';
+                level = '健康';
+            } else if (score >= 60) {
+                color = '#FFC107';
+                level = '一般';
+            } else if (score >= 40) {
+                color = '#FF9800';
+                level = '预警';
+            } else {
+                color = '#F44336';
+                level = '严重';
+            }
+            
+            arc.style.stroke = color;
+            levelEl.textContent = level;
+            levelEl.style.color = color;
+        }
+
+        // 更新增长趋势图
+        function updateGrowthChart(growthData) {
+            const svg = document.getElementById('growth-chart-svg');
+            const data = growthData.data || [];
+            
+            if (data.length === 0) return;
+            
+            // 简化版折线图绘制
+            const width = svg.clientWidth;
+            const height = svg.clientHeight;
+            const padding = 40;
+            
+            const maxValue = Math.max(...data.map(d => d.value));
+            const stepX = (width - padding * 2) / (data.length - 1);
+            const stepY = (height - padding * 2) / maxValue;
+            
+            // 生成路径
+            let pathD = `M ${padding},${height - padding}`;
+            data.forEach((point, index) => {
+                const x = padding + index * stepX;
+                const y = height - padding - point.value * stepY;
+                pathD += ` L ${x},${y}`;
+            });
+            
+            // 填充区域
+            let areaD = pathD + ` L ${padding + (data.length - 1) * stepX},${height - padding} Z`;
+            
+            svg.innerHTML = `
+                <defs>
+                    <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:#667eea;stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+                <path d="${areaD}" fill="url(#areaGradient)" />
+                <path d="${pathD}" fill="none" stroke="#667eea" stroke-width="2" />
+                ${data.map((point, index) => `
+                    <circle cx="${padding + index * stepX}" cy="${height - padding - point.value * stepY}" r="4" fill="#667eea" />
+                `).join('')}
+            `;
+        }
+
+        // 设置增长周期
+        function setGrowthPeriod(days) {
+            document.querySelectorAll('.chart-time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            loadGrowthData(days);
+        }
+
+        // 加载增长数据
+        async function loadGrowthData(days) {
+            try {
+                const response = await fetch(`${API_BASE}/api/knowledge/growth?days=${days}`);
+                const data = await response.json();
+                updateGrowthChart(data);
+            } catch (error) {
+                console.error('加载增长数据失败:', error);
+            }
+        }
+
+        // 更新领域热力图
+        function updateDomainHeatmap(domainData) {
+            const container = document.getElementById('domain-list');
+            const domains = domainData.domains || [];
+            
+            container.innerHTML = domains.map(domain => `
+                <div class="domain-item">
+                    <div class="domain-name">${domain.name}</div>
+                    <div class="domain-bar-container">
+                        <div class="domain-bar" style="width: ${domain.coverage}%"></div>
+                    </div>
+                    <div class="domain-percentage">${domain.coverage.toFixed(1)}%</div>
+                </div>
+            `).join('');
+        }
+
+        // 更新雷达图
+        function updateRadarChart(radarData) {
+            const svg = document.getElementById('radar-chart');
+            const dimensions = radarData.dimensions || [];
+            
+            if (dimensions.length === 0) return;
+            
+            const centerX = 140;
+            const centerY = 140;
+            const radius = 100;
+            const angleStep = (Math.PI * 2) / dimensions.length;
+            
+            // 绘制背景网格
+            let gridHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const r = (radius / 5) * i;
+                const points = dimensions.map((_, idx) => {
+                    const angle = angleStep * idx - Math.PI / 2;
+                    const x = centerX + r * Math.cos(angle);
+                    const y = centerY + r * Math.sin(angle);
+                    return `${x},${y}`;
+                }).join(' ');
+                
+                gridHTML += `<polygon points="${points}" fill="none" stroke="#e0e0e0" stroke-width="1" />`;
+            }
+            
+            // 绘制轴线
+            let axisHTML = '';
+            dimensions.forEach((dim, idx) => {
+                const angle = angleStep * idx - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                axisHTML += `<line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" stroke="#e0e0e0" stroke-width="1" />`;
+                
+                // 标签
+                const labelX = centerX + (radius + 20) * Math.cos(angle);
+                const labelY = centerY + (radius + 20) * Math.sin(angle);
+                axisHTML += `<text x="${labelX}" y="${labelY}" text-anchor="middle" dominant-baseline="middle" font-size="12">${dim.name}</text>`;
+            });
+            
+            // 绘制数据多边形
+            const dataPoints = dimensions.map((dim, idx) => {
+                const angle = angleStep * idx - Math.PI / 2;
+                const r = (radius * dim.score) / 5;
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+                return `${x},${y}`;
+            }).join(' ');
+            
+            svg.innerHTML = `
+                ${gridHTML}
+                ${axisHTML}
+                <polygon points="${dataPoints}" fill="rgba(102, 126, 234, 0.3)" stroke="#667eea" stroke-width="2" />
+            `;
+        }
+
+        // 更新时间线
+        function updateTimeline(timelineData) {
+            const container = document.getElementById('update-timeline');
+            const events = timelineData.events || [];
+            
+            container.innerHTML = events.map(event => {
+                let dotClass = 'realtime';
+                if (event.type === 'scheduled') dotClass = 'scheduled';
+                else if (event.type === 'event') dotClass = 'event';
+                
+                return `
+                    <div class="timeline-item">
+                        <div class="timeline-dot ${dotClass}"></div>
+                        <div class="timeline-time">${formatTime(event.timestamp)}</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">${event.title}</div>
+                            <div class="timeline-description">${event.description}</div>
+                            ${event.stats ? `
+                                <div class="timeline-stats">
+                                    ${event.stats.added ? `<span class="stat-badge" style="color: #4CAF50">+${event.stats.added}</span>` : ''}
+                                    ${event.stats.modified ? `<span class="stat-badge" style="color: #FFC107">~${event.stats.modified}</span>` : ''}
+                                    ${event.stats.deleted ? `<span class="stat-badge" style="color: #F44336">-${event.stats.deleted}</span>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 格式化时间
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return '刚刚';
+            if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        // 数字动画
+        function animateValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            const start = parseInt(element.textContent.replace(/[^0-9]/g, '')) || 0;
+            const duration = 1500;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                
+                const current = Math.floor(start + (value - start) * easeOutQuart);
+                
+                if (elementId === 'total-knowledge') {
+                    element.textContent = current.toLocaleString();
+                } else if (elementId === 'health-score') {
+                    element.textContent = current;
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // 刷新数据
+        function refreshData() {
+            loadDashboardData();
+        }
+
+        // 导出报告
+        function exportReport() {
+            alert('报告导出功能开发中...');
+        }
+
+        // 加载更多时间线
+        function loadMoreTimeline() {
+            alert('加载更多历史功能开发中...');
+        }
+    </script>
+</body>
+</html>
