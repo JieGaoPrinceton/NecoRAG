@@ -434,4 +434,7 @@ config_manager.import_profile(
 
 *Let's make AI think like a brain, and act like a cat.*
 
+**NecoRAG v1.7.0-alpha** | 最后更新：2026-03-19  
+[查看完整文档](README.md) | [Wiki 知识库](docs/wiki/README.md) | [示例代码](example/)
+
 </div>
