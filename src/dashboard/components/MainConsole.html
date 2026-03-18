@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NecoRAG 调试控制台</title>
+    <link rel="stylesheet" href="/static/css/nc-design-system.css">
+    <style>
+        /* 主界面特有样式 */
+        .nc-app-layout {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--nc-background);
+        }
+        
+        .nc-sidebar {
+            width: 280px;
+            background-color: var(--nc-surface);
+            border-right: 1px solid var(--nc-border);
+            transition: all var(--nc-transition-normal);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+        
+        .nc-sidebar-mobile {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            height: 100vh;
+            box-shadow: var(--nc-shadow-xl);
+        }
+        
+        .nc-sidebar-mobile-open {
+            left: 0;
+        }
+        
+        .nc-sidebar-expanded {
+            width: 280px;
+        }
+        
+        .nc-sidebar-collapsed {
+            width: 60px;
+        }
+        
+        .nc-sidebar-header {
+            padding: var(--nc-spacing-lg);
+            border-bottom: 1px solid var(--nc-border);
+            background-color: var(--nc-primary-600);
+            color: white;
+        }
+        
+        .nc-sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .nc-nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--nc-spacing-md);
+            padding: var(--nc-spacing-md) var(--nc-spacing-lg);
+            text-decoration: none;
+            color: var(--nc-text-secondary);
+            transition: all var(--nc-transition-fast);
+            border-left: 3px solid transparent;
+        }
+        
+        .nc-nav-item:hover {
+            background-color: var(--nc-gray-100);
+            color: var(--nc-text-primary);
+        }
+        
+        .nc-nav-item.active {
+            background-color: var(--nc-primary-50);
+            color: var(--nc-primary-700);
+            border-left-color: var(--nc-primary-500);
+        }
+        
+        .nc-nav-item-icon {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .nc-nav-item-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .nc-main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: all var(--nc-transition-normal);
+        }
+        
+        .nc-main-content-full {
+            margin-left: 0;
+        }
+        
+        .nc-header {
+            padding: var(--nc-spacing-md) var(--nc-spacing-lg);
+            background-color: var(--nc-surface);
+            border-bottom: 1px solid var(--nc-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nc-header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--nc-text-primary);
+        }
+        
+        .nc-header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--nc-spacing-md);
+        }
+        
+        .nc-content-area {
+            flex: 1;
+            padding: var(--nc-spacing-lg);
+            overflow-y: auto;
+        }
+        
+        .nc-dashboard-grid {
+            display: grid;
+            gap: var(--nc-spacing-lg);
+            margin-bottom: var(--nc-spacing-lg);
+        }
+        
+        .nc-dashboard-grid.cols-1 { grid-template-columns: 1fr; }
+        .nc-dashboard-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .nc-dashboard-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .nc-dashboard-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        .nc-widget {
+            background-color: var(--nc-surface);
+            border-radius: var(--nc-radius-xl);
+            box-shadow: var(--nc-shadow-sm);
+            overflow: hidden;
+            transition: all var(--nc-transition-normal);
+        }
+        
+        .nc-widget:hover {
+            box-shadow: var(--nc-shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .nc-widget-header {
+            padding: var(--nc-spacing-lg);
+            border-bottom: 1px solid var(--nc-border);
+            background-color: var(--nc-gray-50);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nc-widget-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--nc-text-primary);
+        }
+        
+        .nc-widget-actions {
+            display: flex;
+            gap: var(--nc-spacing-sm);
+        }
+        
+        .nc-widget-body {
+            padding: var(--nc-spacing-lg);
+        }
+        
+        .nc-stat-grid {
+            display: grid;
+            gap: var(--nc-spacing-md);
+        }
+        
+        .nc-stat-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .nc-stat-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .nc-stat-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        .nc-stat-card {
+            text-align: center;
+            padding: var(--nc-spacing-lg);
+            background-color: var(--nc-gray-50);
+            border-radius: var(--nc-radius-lg);
+        }
+        
+        .nc-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--nc-primary-600);
+            margin-bottom: var(--nc-spacing-xs);
+        }
+        
+        .nc-stat-label {
+            font-size: 0.875rem;
+            color: var(--nc-text-secondary);
+            font-weight: 500;
+        }
+        
+        .nc-mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--nc-text-primary);
+            cursor: pointer;
+            padding: var(--nc-spacing-sm);
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 767px) {
+            .nc-mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nc-sidebar {
+                width: 280px;
+            }
+            
+            .nc-content-area {
+                padding: var(--nc-spacing-md);
+            }
+            
+            .nc-dashboard-grid.cols-2,
+            .nc-dashboard-grid.cols-3,
+            .nc-dashboard-grid.cols-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            .nc-stat-grid.cols-2,
+            .nc-stat-grid.cols-3,
+            .nc-stat-grid.cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nc-header {
+                padding: var(--nc-spacing-sm);
+            }
+            
+            .nc-content-area {
+                padding: var(--nc-spacing-sm);
+            }
+            
+            .nc-widget-header,
+            .nc-widget-body {
+                padding: var(--nc-spacing-md);
+            }
+        }
+        
+        /* 平板适配 */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .nc-dashboard-grid.cols-3,
+            .nc-dashboard-grid.cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nc-stat-grid.cols-3,
+            .nc-stat-grid.cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* 暗色主题 */
+        .theme-dark .nc-sidebar {
+            background-color: var(--nc-gray-800);
+            border-right-color: var(--nc-gray-700);
+        }
+        
+        .theme-dark .nc-sidebar-header {
+            background-color: var(--nc-primary-700);
+        }
+        
+        .theme-dark .nc-nav-item:hover {
+            background-color: var(--nc-gray-700);
+        }
+        
+        .theme-dark .nc-nav-item.active {
+            background-color: var(--nc-gray-700);
+            color: var(--nc-primary-400);
+        }
+        
+        .theme-dark .nc-header {
+            background-color: var(--nc-gray-800);
+            border-bottom-color: var(--nc-gray-700);
+        }
+        
+        .theme-dark .nc-widget {
+            background-color: var(--nc-gray-800);
+        }
+        
+        .theme-dark .nc-widget-header {
+            background-color: var(--nc-gray-700);
+            border-bottom-color: var(--nc-gray-600);
+        }
+        
+        .theme-dark .nc-stat-card {
+            background-color: var(--nc-gray-700);
+        }
+    </style>
+</head>
+<body>
+    <div class="nc-app-layout">
+        <!-- 侧边栏 -->
+        <aside class="nc-sidebar nc-sidebar-expanded" id="mainSidebar">
+            <div class="nc-sidebar-header">
+                <h2>🧠 NecoRAG</h2>
+            </div>
+            
+            <nav class="nc-sidebar-nav">
+                <a href="#" class="nc-nav-item active" data-view="dashboard">
+                    <span class="nc-nav-item-icon">📊</span>
+                    <span class="nc-nav-item-text">仪表板</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="debug-panel">
+                    <span class="nc-nav-item-icon">🔍</span>
+                    <span class="nc-nav-item-text">调试面板</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="performance">
+                    <span class="nc-nav-item-icon">⚡</span>
+                    <span class="nc-nav-item-text">性能监控</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="path-analysis">
+                    <span class="nc-nav-item-icon">🔗</span>
+                    <span class="nc-nav-item-text">路径分析</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="ab-testing">
+                    <span class="nc-nav-item-icon">🧪</span>
+                    <span class="nc-nav-item-text">A/B测试</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="parameter-tuning">
+                    <span class="nc-nav-item-icon">⚙️</span>
+                    <span class="nc-nav-item-text">参数调优</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="recommendations">
+                    <span class="nc-nav-item-icon">💡</span>
+                    <span class="nc-nav-item-text">优化建议</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="history">
+                    <span class="nc-nav-item-icon">📜</span>
+                    <span class="nc-nav-item-text">查询历史</span>
+                </a>
+                
+                <a href="#" class="nc-nav-item" data-view="settings">
+                    <span class="nc-nav-item-icon">🛠️</span>
+                    <span class="nc-nav-item-text">系统设置</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="nc-main-content">
+            <!-- 顶部导航栏 -->
+            <header class="nc-header">
+                <div style="display: flex; align-items: center; gap: var(--nc-spacing-md);">
+                    <button class="nc-mobile-menu-toggle" data-toggle="mobile-menu">☰</button>
+                    <h1 class="nc-header-title" id="pageTitle">仪表板</h1>
+                </div>
+                
+                <div class="nc-header-actions">
+                    <button class="nc-btn nc-btn-ghost nc-btn-sm" id="themeToggle">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                    <div class="nc-badge nc-badge-info" id="connectionStatus">
+                        <span class="nc-spinner" style="width: 0.75rem; height: 0.75rem; border-width: 1px;"></span>
+                        连接中
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 内容区域 -->
+            <div class="nc-content-area" id="contentArea">
+                <!-- 仪表板视图 -->
+                <div class="nc-dashboard-view" id="dashboardView">
+                    <div class="nc-dashboard-grid cols-4">
+                        <div class="nc-widget">
+                            <div class="nc-widget-header">
+                                <h3 class="nc-widget-title">系统状态</h3>
+                            </div>
+                            <div class="nc-widget-body">
+                                <div class="nc-stat-grid cols-2">
+                                    <div class="nc-stat-card">
+                                        <div class="nc-stat-value" id="activeSessions">0</div>
+                                        <div class="nc-stat-label">活跃会话</div>
+                                    </div>
+                                    <div class="nc-stat-card">
+                                        <div class="nc-stat-value" id="totalQueries">0</div>
+                                        <div class="nc-stat-label">总查询数</div>
+                                    </div>
+                                    <div class="nc-stat-card">
+                                        <div class="nc-stat-value" id="avgResponseTime">0</div>
+                                        <div class="nc-stat-label">平均响应(ms)</div>
+                                    </div>
+                                    <div class="nc-stat-card">
+                                        <div class="nc-stat-value" id="successRate">0%</div>
+                                        <div class="nc-stat-label">成功率</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="nc-widget">
+                            <div class="nc-widget-header">
+                                <h3 class="nc-widget-title">实时监控</h3>
+                                <div class="nc-widget-actions">
+                                    <button class="nc-btn nc-btn-sm nc-btn-ghost">刷新</button>
+                                </div>
+                            </div>
+                            <div class="nc-widget-body">
+                                <div class="nc-chart-container">
+                                    <div class="nc-chart-placeholder">
+                                        <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                                        <p>实时性能图表</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="nc-widget">
+                            <div class="nc-widget-header">
+                                <h3 class="nc-widget-title">最近告警</h3>
+                            </div>
+                            <div class="nc-widget-body">
+                                <div id="recentAlerts">
+                                    <p class="nc-text-center nc-text-secondary">暂无告警</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="nc-widget">
+                            <div class="nc-widget-header">
+                                <h3 class="nc-widget-title">系统资源</h3>
+                            </div>
+                            <div class="nc-widget-body">
+                                <div class="nc-stat-grid cols-1">
+                                    <div>
+                                        <div class="nc-text-small nc-text-secondary mb-2">CPU使用率</div>
+                                        <div class="nc-progress-bar">
+                                            <div class="nc-progress-fill" id="cpuUsage" style="width: 0%"></div>
+                                        </div>
+                                        <div class="nc-text-right nc-text-small" id="cpuUsageText">0%</div>
+                                    </div>
+                                    <div>
+                                        <div class="nc-text-small nc-text-secondary mb-2">内存使用率</div>
+                                        <div class="nc-progress-bar">
+                                            <div class="nc-progress-fill" id="memoryUsage" style="width: 0%"></div>
+                                        </div>
+                                        <div class="nc-text-right nc-text-small" id="memoryUsageText">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nc-widget">
+                        <div class="nc-widget-header">
+                            <h3 class="nc-widget-title">快速操作</h3>
+                        </div>
+                        <div class="nc-widget-body">
+                            <div style="display: flex; gap: var(--nc-spacing-md); flex-wrap: wrap;">
+                                <button class="nc-btn nc-btn-primary" onclick="NC.app.navigateTo('debug-panel')">
+                                    开始调试会话
+                                </button>
+                                <button class="nc-btn nc-btn-success" onclick="NC.app.navigateTo('performance')">
+                                    查看性能详情
+                                </button>
+                                <button class="nc-btn nc-btn-warning" onclick="NC.app.navigateTo('recommendations')">
+                                    获取优化建议
+                                </button>
+                                <button class="nc-btn nc-btn-secondary" onclick="NC.app.refreshDashboard()">
+                                    刷新数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 其他视图容器 -->
+                <div id="debugPanelView" style="display: none;">
+                    <iframe src="/components/DebugPanel.html" style="width: 100%; height: 800px; border: none;"></iframe>
+                </div>
+                
+                <div id="performanceView" style="display: none;">
+                    <iframe src="/components/PerformanceDashboard.html" style="width: 100%; height: 800px; border: none;"></iframe>
+                </div>
+                
+                <div id="pathAnalysisView" style="display: none;">
+                    <iframe src="/components/PathAnalysis.html" style="width: 100%; height: 800px; border: none;"></iframe>
+                </div>
+                
+                <div id="abTestingView" style="display: none;">
+                    <iframe src="/components/ABTesting.html" style="width: 100%; height: 800px; border: none;"></iframe>
+                </div>
+                
+                <div id="parameterTuningView" style="display: none;">
+                    <iframe src="/components/ParameterTuning.html" style="width: 100%; height: 800px; border: none;"></iframe>
+                </div>
+                
+                <div id="recommendationsView" style="display: none;">
+                    <iframe src="/components/RecommendationEngine.html" style="width: 100%; height: 800px; border: none;"></iframe>
+                </div>
+                
+                <div id="historyView" style="display: none;">
+                    <div class="nc-widget">
+                        <div class="nc-widget-header">
+                            <h3 class="nc-widget-title">查询历史</h3>
+                        </div>
+                        <div class="nc-widget-body">
+                            <p class="nc-text-center nc-text-secondary">查询历史功能即将上线</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="settingsView" style="display: none;">
+                    <div class="nc-widget">
+                        <div class="nc-widget-header">
+                            <h3 class="nc-widget-title">系统设置</h3>
+                        </div>
+                        <div class="nc-widget-body">
+                            <p class="nc-text-center nc-text-secondary">系统设置功能即将上线</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/nc-responsive.js"></script>
+    <script>
+        class NecoRAGApp {
+            constructor() {
+                this.currentView = 'dashboard';
+                this.wsConnection = null;
+                this.statsUpdateInterval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupNavigation();
+                this.setupThemeToggle();
+                this.setupWebSocket();
+                this.startStatsUpdates();
+                this.setupEventListeners();
+            }
+            
+            setupNavigation() {
+                const navItems = document.querySelectorAll('.nc-nav-item');
+                navItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const view = item.getAttribute('data-view');
+                        this.navigateTo(view);
+                    });
+                });
+            }
+            
+            setupThemeToggle() {
+                const themeToggle = document.getElementById('themeToggle');
+                const themeIcon = document.getElementById('themeIcon');
+                
+                themeToggle.addEventListener('click', () => {
+                    NC.themeManager.toggleTheme();
+                    const currentTheme = NC.themeManager.getCurrentTheme();
+                    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+                });
+                
+                // 初始化图标
+                const currentTheme = NC.themeManager.getCurrentTheme();
+                themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+            }
+            
+            setupWebSocket() {
+                const wsUrl = `ws://${window.location.host}/ws/app`;
+                this.wsConnection = new WebSocket(wsUrl);
+                
+                this.wsConnection.onopen = () => {
+                    document.getElementById('connectionStatus').innerHTML = 
+                        '<span class="nc-badge nc-badge-success">已连接</span>';
+                };
+                
+                this.wsConnection.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+                
+                this.wsConnection.onclose = () => {
+                    document.getElementById('connectionStatus').innerHTML = 
+                        '<span class="nc-badge nc-badge-danger">连接断开</span>';
+                };
+            }
+            
+            handleWebSocketMessage(data) {
+                switch(data.type) {
+                    case 'stats_update':
+                        this.updateDashboardStats(data.stats);
+                        break;
+                    case 'alert':
+                        this.showAlert(data.alert);
+                        break;
+                }
+            }
+            
+            navigateTo(view) {
+                // 更新导航状态
+                document.querySelectorAll('.nc-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-view="${view}"]`).classList.add('active');
+                
+                // 更新标题
+                const viewTitles = {
+                    'dashboard': '仪表板',
+                    'debug-panel': '调试面板',
+                    'performance': '性能监控',
+                    'path-analysis': '路径分析',
+                    'ab-testing': 'A/B测试',
+                    'parameter-tuning': '参数调优',
+                    'recommendations': '优化建议',
+                    'history': '查询历史',
+                    'settings': '系统设置'
+                };
+                
+                document.getElementById('pageTitle').textContent = viewTitles[view] || view;
+                
+                // 切换视图
+                document.querySelectorAll('[id$="View"]').forEach(viewEl => {
+                    viewEl.style.display = 'none';
+                });
+                
+                const targetView = document.getElementById(`${view}View`) || 
+                                 document.getElementById(`${view.replace('-', '')}View`);
+                if (targetView) {
+                    targetView.style.display = 'block';
+                }
+                
+                this.currentView = view;
+                
+                // 触发视图切换事件
+                const event = new CustomEvent('viewchange', {
+                    detail: { view: view }
+                });
+                document.dispatchEvent(event);
+            }
+            
+            updateDashboardStats(stats) {
+                document.getElementById('activeSessions').textContent = stats.active_sessions || 0;
+                document.getElementById('totalQueries').textContent = stats.total_queries || 0;
+                document.getElementById('avgResponseTime').textContent = Math.round(stats.avg_response_time || 0);
+                document.getElementById('successRate').textContent = `${Math.round((stats.success_rate || 0) * 100)}%`;
+                
+                // 更新资源使用率
+                const cpuUsage = stats.cpu_usage || 0;
+                const memoryUsage = stats.memory_usage || 0;
+                
+                document.getElementById('cpuUsage').style.width = `${cpuUsage}%`;
+                document.getElementById('cpuUsageText').textContent = `${Math.round(cpuUsage)}%`;
+                
+                document.getElementById('memoryUsage').style.width = `${memoryUsage}%`;
+                document.getElementById('memoryUsageText').textContent = `${Math.round(memoryUsage)}%`;
+            }
+            
+            showAlert(alert) {
+                const alertsContainer = document.getElementById('recentAlerts');
+                const alertElement = document.createElement('div');
+                alertElement.className = `nc-alert nc-alert-${alert.level || 'info'} nc-mb-2`;
+                alertElement.innerHTML = `
+                    <div class="nc-flex nc-justify-between">
+                        <span>${alert.message}</span>
+                        <span class="nc-text-small">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                `;
+                
+                alertsContainer.prepend(alertElement);
+                
+                // 限制显示数量
+                const alerts = alertsContainer.querySelectorAll('.nc-alert');
+                if (alerts.length > 5) {
+                    alerts[alerts.length - 1].remove();
+                }
+            }
+            
+            startStatsUpdates() {
+                this.statsUpdateInterval = setInterval(() => {
+                    this.fetchDashboardStats();
+                }, 5000);
+            }
+            
+            async fetchDashboardStats() {
+                try {
+                    const response = await fetch('/api/debug/stats');
+                    const stats = await response.json();
+                    this.updateDashboardStats(stats);
+                } catch (error) {
+                    console.error('获取统计信息失败:', error);
+                }
+            }
+            
+            refreshDashboard() {
+                this.fetchDashboardStats();
+                // 可以添加其他刷新逻辑
+            }
+            
+            setupEventListeners() {
+                // 响应式断点变化监听
+                NC.responsiveManager.onBreakpointChange((event) => {
+                    console.log(`断点从 ${event.oldBreakpoint} 变更为 ${event.newBreakpoint}`);
+                });
+                
+                // 主题变化监听
+                document.addEventListener('themechange', (event) => {
+                    console.log(`主题变更为: ${event.detail.theme}`);
+                });
+            }
+            
+            destroy() {
+                if (this.wsConnection) {
+                    this.wsConnection.close();
+                }
+                
+                if (this.statsUpdateInterval) {
+                    clearInterval(this.statsUpdateInterval);
+                }
+            }
+        }
+        
+        // 应用初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            window.NC = window.NC || {};
+            window.NC.app = new NecoRAGApp();
+        });
+        
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (window.NC && window.NC.app) {
+                window.NC.app.destroy();
+            }
+        });
+    </script>
+</body>
+</html>

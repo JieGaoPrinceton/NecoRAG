@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>性能指标监控</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #0ea5e9;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            padding: 1.5rem;
+        }
+
+        .performance-dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-bg);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .metric-header {
+            padding: 1rem;
+            background: var(--dark-bg);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-title {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .metric-body {
+            padding: 1rem;
+        }
+
+        .metric-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--light-bg);
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metric-chart {
+            height: 120px;
+            background: var(--light-bg);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            background: var(--primary-color);
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        .alerts-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .alerts-header {
+            padding: 1rem;
+            background: var(--danger-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alerts-body {
+            padding: 1rem;
+        }
+
+        .alert-item {
+            padding: 1rem;
+            border-left: 4px solid var(--warning-color);
+            background: #fef3c7;
+            margin-bottom: 0.75rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .alert-item.critical {
+            border-left-color: var(--danger-color);
+            background: #fee2e2;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-severity {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .severity-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .alert-message {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-running {
+            background: var(--success-color);
+        }
+
+        .status-stopped {
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="performance-dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">
+                <span class="status-indicator status-stopped" id="monitoringStatus"></span>
+                性能指标监控面板
+            </h1>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="toggleMonitoring()" id="toggleBtn">
+                    开始监控
+                </button>
+                <button class="btn btn-success" onclick="refreshMetrics()">
+                    刷新数据
+                </button>
+            </div>
+        </div>
+
+        <!-- 关键指标卡片 -->
+        <div class="metrics-grid" id="metricsGrid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>加载性能指标中...</p>
+            </div>
+        </div>
+
+        <!-- 告警面板 -->
+        <div class="alerts-section">
+            <div class="alerts-header">
+                <h3>系统告警</h3>
+                <span id="alertCount">0 条活跃告警</span>
+            </div>
+            <div class="alerts-body" id="alertsContainer">
+                <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                    暂无告警
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PerformanceDashboard {
+            constructor() {
+                this.isMonitoring = false;
+                this.metricsData = {};
+                this.alerts = [];
+                this.wsConnection = null;
+                this.refreshInterval = null;
+                
+                this.metricConfigs = {
+                    'cpu_usage': {
+                        title: 'CPU使用率',
+                        icon: '🖥️',
+                        unit: '%',
+                        color: '#3b82f6',
+                        threshold: { warning: 75, critical: 90 }
+                    },
+                    'memory_usage': {
+                        title: '内存使用率',
+                        icon: '💾',
+                        unit: '%',
+                        color: '#10b981',
+                        threshold: { warning: 70, critical: 85 }
+                    },
+                    'response_time': {
+                        title: '响应时间',
+                        icon: '⚡',
+                        unit: 'ms',
+                        color: '#f59e0b',
+                        threshold: { warning: 2000, critical: 5000 }
+                    },
+                    'throughput': {
+                        title: '吞吐量',
+                        icon: '📈',
+                        unit: 'QPS',
+                        color: '#8b5cf6',
+                        threshold: { warning: 50, critical: 100 }
+                    },
+                    'error_rate': {
+                        title: '错误率',
+                        icon: '⚠️',
+                        unit: '%',
+                        color: '#ef4444',
+                        threshold: { warning: 5, critical: 10 }
+                    }
+                };
+            }
+
+            async init() {
+                await this.loadInitialData();
+                this.setupWebSocket();
+            }
+
+            async loadInitialData() {
+                try {
+                    // 加载初始指标数据
+                    const response = await fetch('/api/debug/performance/metrics');
+                    const data = await response.json();
+                    this.metricsData = data.metrics || {};
+                    this.renderMetrics();
+                    
+                    // 加载告警数据
+                    const alertResponse = await fetch('/api/debug/performance/alerts');
+                    this.alerts = await alertResponse.json();
+                    this.renderAlerts();
+                    
+                } catch (error) {
+                    console.error('加载初始数据失败:', error);
+                }
+            }
+
+            setupWebSocket() {
+                const wsUrl = `ws://${window.location.host}/ws/performance`;
+                this.wsConnection = new WebSocket(wsUrl);
+                
+                this.wsConnection.onopen = () => {
+                    console.log('性能监控WebSocket连接已建立');
+                };
+                
+                this.wsConnection.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+                
+                this.wsConnection.onclose = () => {
+                    console.log('性能监控WebSocket连接已关闭');
+                    // 尝试重连
+                    setTimeout(() => this.setupWebSocket(), 5000);
+                };
+            }
+
+            handleWebSocketMessage(data) {
+                switch(data.type) {
+                    case 'metric_update':
+                        this.updateMetric(data.metric);
+                        break;
+                    case 'alert_triggered':
+                        this.addAlert(data.alert);
+                        break;
+                    case 'alert_resolved':
+                        this.resolveAlert(data.alert_id);
+                        break;
+                }
+            }
+
+            updateMetric(metric) {
+                const metricType = metric.metric_type;
+                if (!this.metricsData[metricType]) {
+                    this.metricsData[metricType] = [];
+                }
+                
+                // 添加新数据点
+                this.metricsData[metricType].push({
+                    value: metric.value,
+                    timestamp: new Date(metric.timestamp)
+                });
+                
+                // 保持最近100个数据点
+                if (this.metricsData[metricType].length > 100) {
+                    this.metricsData[metricType] = this.metricsData[metricType].slice(-100);
+                }
+                
+                // 更新显示
+                this.renderMetrics();
+            }
+
+            addAlert(alert) {
+                this.alerts.unshift(alert);
+                // 保持最多20条告警
+                if (this.alerts.length > 20) {
+                    this.alerts = this.alerts.slice(0, 20);
+                }
+                this.renderAlerts();
+            }
+
+            resolveAlert(alertId) {
+                const alert = this.alerts.find(a => a.alert_id === alertId);
+                if (alert) {
+                    alert.resolved = true;
+                    alert.resolution_time = new Date().toISOString();
+                    this.renderAlerts();
+                }
+            }
+
+            renderMetrics() {
+                const container = document.getElementById('metricsGrid');
+                
+                if (Object.keys(this.metricsData).length === 0) {
+                    container.innerHTML = `
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>等待性能数据...</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const metricCards = Object.entries(this.metricConfigs).map(([metricType, config]) => {
+                    const dataPoints = this.metricsData[metricType] || [];
+                    const currentValue = dataPoints.length > 0 ? dataPoints[dataPoints.length - 1].value : 0;
+                    const recentData = dataPoints.slice(-10); // 最近10个数据点
+                    
+                    // 计算统计数据
+                    const stats = this.calculateStats(dataPoints);
+                    
+                    // 获取状态颜色
+                    const statusColor = this.getStatusColor(currentValue, config.threshold);
+                    
+                    return `
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">
+                                    <span>${config.icon}</span>
+                                    <span>${config.title}</span>
+                                </div>
+                                <div class="metric-value" style="color: ${statusColor}">
+                                    ${currentValue.toFixed(1)}${config.unit}
+                                </div>
+                            </div>
+                            <div class="metric-body">
+                                <div class="metric-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">平均值</div>
+                                        <div class="stat-value">${stats.avg.toFixed(1)}${config.unit}</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">最大值</div>
+                                        <div class="stat-value">${stats.max.toFixed(1)}${config.unit}</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">最小值</div>
+                                        <div class="stat-value">${stats.min.toFixed(1)}${config.unit}</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">数据点</div>
+                                        <div class="stat-value">${dataPoints.length}</div>
+                                    </div>
+                                </div>
+                                <div class="metric-chart" id="chart-${metricType}">
+                                    ${this.renderChartBars(recentData, config)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = metricCards;
+            }
+
+            calculateStats(dataPoints) {
+                if (dataPoints.length === 0) {
+                    return { avg: 0, min: 0, max: 0 };
+                }
+                
+                const values = dataPoints.map(point => point.value);
+                return {
+                    avg: values.reduce((sum, val) => sum + val, 0) / values.length,
+                    min: Math.min(...values),
+                    max: Math.max(...values)
+                };
+            }
+
+            renderChartBars(dataPoints, config) {
+                if (dataPoints.length === 0) return '';
+                
+                const maxValue = Math.max(...dataPoints.map(p => p.value), config.threshold.critical);
+                const barWidth = 100 / Math.max(dataPoints.length, 1);
+                
+                return dataPoints.map((point, index) => {
+                    const heightPercent = (point.value / maxValue) * 80; // 最大高度80%
+                    const leftPercent = index * barWidth;
+                    const barColor = this.getStatusColor(point.value, config.threshold);
+                    
+                    return `
+                        <div class="chart-bar" 
+                             style="left: ${leftPercent}%; height: ${heightPercent}%; background: ${barColor}; width: ${barWidth * 0.8}%"
+                             title="${point.value.toFixed(1)}${config.unit} at ${point.timestamp.toLocaleTimeString()}">
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            getStatusColor(value, threshold) {
+                if (value >= threshold.critical) {
+                    return '#ef4444'; // 红色
+                } else if (value >= threshold.warning) {
+                    return '#f59e0b'; // 黄色
+                }
+                return '#10b981'; // 绿色
+            }
+
+            renderAlerts() {
+                const container = document.getElementById('alertsContainer');
+                const alertCountElement = document.getElementById('alertCount');
+                
+                const activeAlerts = this.alerts.filter(alert => !alert.resolved);
+                alertCountElement.textContent = `${activeAlerts.length} 条活跃告警`;
+                
+                if (this.alerts.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">暂无告警</p>';
+                    return;
+                }
+
+                const alertItems = this.alerts.map(alert => {
+                    const severityClass = alert.severity === 'critical' ? 'critical' : '';
+                    const severityBadgeClass = `severity-${alert.severity}`;
+                    
+                    return `
+                        <div class="alert-item ${severityClass}">
+                            <div class="alert-header">
+                                <span class="alert-severity ${severityBadgeClass}">
+                                    ${alert.severity.toUpperCase()}
+                                </span>
+                                ${alert.resolved ? '<span style="color: var(--success-color); font-size: 0.875rem;">✓ 已解决</span>' : ''}
+                            </div>
+                            <div class="alert-message">${alert.message}</div>
+                            <div class="alert-timestamp">
+                                触发时间: ${new Date(alert.timestamp).toLocaleString()}
+                                ${alert.resolution_time ? `<br>解决时间: ${new Date(alert.resolution_time).toLocaleString()}` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = alertItems;
+            }
+
+            async toggleMonitoring() {
+                const btn = document.getElementById('toggleBtn');
+                const statusIndicator = document.getElementById('monitoringStatus');
+                
+                if (this.isMonitoring) {
+                    // 停止监控
+                    try {
+                        await fetch('/api/debug/performance/stop', { method: 'POST' });
+                        this.isMonitoring = false;
+                        btn.textContent = '开始监控';
+                        btn.className = 'btn btn-primary';
+                        statusIndicator.className = 'status-indicator status-stopped';
+                        
+                        // 清除刷新间隔
+                        if (this.refreshInterval) {
+                            clearInterval(this.refreshInterval);
+                            this.refreshInterval = null;
+                        }
+                        
+                    } catch (error) {
+                        console.error('停止监控失败:', error);
+                    }
+                } else {
+                    // 开始监控
+                    try {
+                        await fetch('/api/debug/performance/start', { method: 'POST' });
+                        this.isMonitoring = true;
+                        btn.textContent = '停止监控';
+                        btn.className = 'btn btn-danger';
+                        statusIndicator.className = 'status-indicator status-running';
+                        
+                        // 设置定期刷新
+                        this.refreshInterval = setInterval(() => this.refreshMetrics(), 5000);
+                        
+                    } catch (error) {
+                        console.error('开始监控失败:', error);
+                    }
+                }
+            }
+
+            async refreshMetrics() {
+                try {
+                    const response = await fetch('/api/debug/performance/metrics');
+                    const data = await response.json();
+                    this.metricsData = data.metrics || {};
+                    this.renderMetrics();
+                    
+                    const alertResponse = await fetch('/api/debug/performance/alerts');
+                    this.alerts = await alertResponse.json();
+                    this.renderAlerts();
+                    
+                } catch (error) {
+                    console.error('刷新指标失败:', error);
+                }
+            }
+        }
+
+        // 初始化仪表板
+        const dashboard = new PerformanceDashboard();
+        document.addEventListener('DOMContentLoaded', () => {
+            dashboard.init();
+        });
+
+        // 全局函数供HTML调用
+        function toggleMonitoring() {
+            dashboard.toggleMonitoring();
+        }
+
+        function refreshMetrics() {
+            dashboard.refreshMetrics();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,680 @@
+/*
+ * NecoRAG 调试面板 UI/UX 优化样式库
+ * 统一的设计语言和响应式布局系统
+ */
+
+:root {
+    /* 主题颜色系统 */
+    --nc-primary-50: #eff6ff;
+    --nc-primary-100: #dbeafe;
+    --nc-primary-200: #bfdbfe;
+    --nc-primary-300: #93c5fd;
+    --nc-primary-400: #60a5fa;
+    --nc-primary-500: #3b82f6;
+    --nc-primary-600: #2563eb;
+    --nc-primary-700: #1d4ed8;
+    --nc-primary-800: #1e40af;
+    --nc-primary-900: #1e3a8a;
+    
+    --nc-success-50: #f0fdf4;
+    --nc-success-100: #dcfce7;
+    --nc-success-200: #bbf7d0;
+    --nc-success-300: #86efac;
+    --nc-success-400: #4ade80;
+    --nc-success-500: #22c55e;
+    --nc-success-600: #16a34a;
+    --nc-success-700: #15803d;
+    --nc-success-800: #166534;
+    --nc-success-900: #14532d;
+    
+    --nc-warning-50: #fffbeb;
+    --nc-warning-100: #fef3c7;
+    --nc-warning-200: #fde68a;
+    --nc-warning-300: #fcd34d;
+    --nc-warning-400: #fbbf24;
+    --nc-warning-500: #f59e0b;
+    --nc-warning-600: #d97706;
+    --nc-warning-700: #b45309;
+    --nc-warning-800: #92400e;
+    --nc-warning-900: #78350f;
+    
+    --nc-danger-50: #fef2f2;
+    --nc-danger-100: #fee2e2;
+    --nc-danger-200: #fecaca;
+    --nc-danger-300: #fca5a5;
+    --nc-danger-400: #f87171;
+    --nc-danger-500: #ef4444;
+    --nc-danger-600: #dc2626;
+    --nc-danger-700: #b91c1c;
+    --nc-danger-800: #991b1b;
+    --nc-danger-900: #7f1d1d;
+    
+    --nc-gray-50: #f9fafb;
+    --nc-gray-100: #f3f4f6;
+    --nc-gray-200: #e5e7eb;
+    --nc-gray-300: #d1d5db;
+    --nc-gray-400: #9ca3af;
+    --nc-gray-500: #6b7280;
+    --nc-gray-600: #4b5563;
+    --nc-gray-700: #374151;
+    --nc-gray-800: #1f2937;
+    --nc-gray-900: #111827;
+    
+    /* 语义化颜色 */
+    --nc-background: var(--nc-gray-50);
+    --nc-surface: #ffffff;
+    --nc-border: var(--nc-gray-200);
+    --nc-text-primary: var(--nc-gray-900);
+    --nc-text-secondary: var(--nc-gray-600);
+    --nc-text-disabled: var(--nc-gray-400);
+    --nc-shadow: rgba(0, 0, 0, 0.1);
+    
+    /* 间距系统 */
+    --nc-spacing-xs: 0.25rem;
+    --nc-spacing-sm: 0.5rem;
+    --nc-spacing-md: 1rem;
+    --nc-spacing-lg: 1.5rem;
+    --nc-spacing-xl: 2rem;
+    --nc-spacing-2xl: 3rem;
+    --nc-spacing-3xl: 4rem;
+    
+    /* 圆角系统 */
+    --nc-radius-sm: 0.125rem;
+    --nc-radius-md: 0.25rem;
+    --nc-radius-lg: 0.5rem;
+    --nc-radius-xl: 0.75rem;
+    --nc-radius-2xl: 1rem;
+    --nc-radius-full: 9999px;
+    
+    /* 阴影系统 */
+    --nc-shadow-sm: 0 1px 2px 0 var(--nc-shadow);
+    --nc-shadow-md: 0 4px 6px -1px var(--nc-shadow);
+    --nc-shadow-lg: 0 10px 15px -3px var(--nc-shadow);
+    --nc-shadow-xl: 0 20px 25px -5px var(--nc-shadow);
+    
+    /* 动画系统 */
+    --nc-transition-fast: 150ms ease;
+    --nc-transition-normal: 300ms ease;
+    --nc-transition-slow: 500ms ease;
+    
+    /* 断点系统 */
+    --nc-breakpoint-sm: 640px;
+    --nc-breakpoint-md: 768px;
+    --nc-breakpoint-lg: 1024px;
+    --nc-breakpoint-xl: 1280px;
+    --nc-breakpoint-2xl: 1536px;
+}
+
+/* 基础重置和排版 */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--nc-text-primary);
+    background-color: var(--nc-background);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 排版系统 */
+.nc-heading-1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.nc-heading-2 {
+    font-size: 1.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.nc-heading-3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.nc-heading-4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.nc-body-large {
+    font-size: 1.125rem;
+    line-height: 1.6;
+}
+
+.nc-body-medium {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.nc-body-small {
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.nc-caption {
+    font-size: 0.75rem;
+    line-height: 1.3;
+}
+
+/* 按钮系统 */
+.nc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--nc-spacing-xs);
+    padding: var(--nc-spacing-sm) var(--nc-spacing-md);
+    border: 1px solid transparent;
+    border-radius: var(--nc-radius-lg);
+    font-size: var(--nc-body-medium);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--nc-transition-fast);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.nc-btn:focus {
+    outline: 2px solid var(--nc-primary-500);
+    outline-offset: 2px;
+}
+
+.nc-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 按钮变体 */
+.nc-btn-primary {
+    background-color: var(--nc-primary-600);
+    color: white;
+    border-color: var(--nc-primary-600);
+}
+
+.nc-btn-primary:hover:not(:disabled) {
+    background-color: var(--nc-primary-700);
+    border-color: var(--nc-primary-700);
+}
+
+.nc-btn-secondary {
+    background-color: var(--nc-gray-100);
+    color: var(--nc-gray-900);
+    border-color: var(--nc-gray-300);
+}
+
+.nc-btn-secondary:hover:not(:disabled) {
+    background-color: var(--nc-gray-200);
+    border-color: var(--nc-gray-400);
+}
+
+.nc-btn-success {
+    background-color: var(--nc-success-600);
+    color: white;
+    border-color: var(--nc-success-600);
+}
+
+.nc-btn-success:hover:not(:disabled) {
+    background-color: var(--nc-success-700);
+    border-color: var(--nc-success-700);
+}
+
+.nc-btn-warning {
+    background-color: var(--nc-warning-600);
+    color: white;
+    border-color: var(--nc-warning-600);
+}
+
+.nc-btn-warning:hover:not(:disabled) {
+    background-color: var(--nc-warning-700);
+    border-color: var(--nc-warning-700);
+}
+
+.nc-btn-danger {
+    background-color: var(--nc-danger-600);
+    color: white;
+    border-color: var(--nc-danger-600);
+}
+
+.nc-btn-danger:hover:not(:disabled) {
+    background-color: var(--nc-danger-700);
+    border-color: var(--nc-danger-700);
+}
+
+.nc-btn-ghost {
+    background-color: transparent;
+    color: var(--nc-gray-700);
+    border-color: transparent;
+}
+
+.nc-btn-ghost:hover:not(:disabled) {
+    background-color: var(--nc-gray-100);
+    color: var(--nc-gray-900);
+}
+
+/* 按钮尺寸 */
+.nc-btn-sm {
+    padding: var(--nc-spacing-xs) var(--nc-spacing-sm);
+    font-size: var(--nc-body-small);
+    border-radius: var(--nc-radius-md);
+}
+
+.nc-btn-lg {
+    padding: var(--nc-spacing-md) var(--nc-spacing-lg);
+    font-size: var(--nc-body-large);
+    border-radius: var(--nc-radius-xl);
+}
+
+/* 卡片系统 */
+.nc-card {
+    background-color: var(--nc-surface);
+    border: 1px solid var(--nc-border);
+    border-radius: var(--nc-radius-xl);
+    box-shadow: var(--nc-shadow-sm);
+    overflow: hidden;
+    transition: box-shadow var(--nc-transition-normal);
+}
+
+.nc-card:hover {
+    box-shadow: var(--nc-shadow-md);
+}
+
+.nc-card-header {
+    padding: var(--nc-spacing-lg);
+    border-bottom: 1px solid var(--nc-border);
+    background-color: var(--nc-gray-50);
+}
+
+.nc-card-body {
+    padding: var(--nc-spacing-lg);
+}
+
+.nc-card-footer {
+    padding: var(--nc-spacing-lg);
+    border-top: 1px solid var(--nc-border);
+    background-color: var(--nc-gray-50);
+}
+
+/* 表单系统 */
+.nc-input {
+    width: 100%;
+    padding: var(--nc-spacing-sm) var(--nc-spacing-md);
+    border: 1px solid var(--nc-border);
+    border-radius: var(--nc-radius-lg);
+    font-size: var(--nc-body-medium);
+    background-color: var(--nc-surface);
+    transition: all var(--nc-transition-fast);
+}
+
+.nc-input:focus {
+    outline: none;
+    border-color: var(--nc-primary-500);
+    box-shadow: 0 0 0 3px var(--nc-primary-100);
+}
+
+.nc-input:disabled {
+    background-color: var(--nc-gray-100);
+    cursor: not-allowed;
+}
+
+.nc-select {
+    width: 100%;
+    padding: var(--nc-spacing-sm) var(--nc-spacing-md);
+    border: 1px solid var(--nc-border);
+    border-radius: var(--nc-radius-lg);
+    font-size: var(--nc-body-medium);
+    background-color: var(--nc-surface);
+    cursor: pointer;
+    transition: all var(--nc-transition-fast);
+}
+
+.nc-select:focus {
+    outline: none;
+    border-color: var(--nc-primary-500);
+    box-shadow: 0 0 0 3px var(--nc-primary-100);
+}
+
+.nc-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: var(--nc-spacing-sm) var(--nc-spacing-md);
+    border: 1px solid var(--nc-border);
+    border-radius: var(--nc-radius-lg);
+    font-size: var(--nc-body-medium);
+    font-family: inherit;
+    background-color: var(--nc-surface);
+    resize: vertical;
+    transition: all var(--nc-transition-fast);
+}
+
+.nc-textarea:focus {
+    outline: none;
+    border-color: var(--nc-primary-500);
+    box-shadow: 0 0 0 3px var(--nc-primary-100);
+}
+
+/* 布局系统 */
+.nc-container {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--nc-spacing-md);
+    padding-right: var(--nc-spacing-md);
+}
+
+.nc-grid {
+    display: grid;
+    gap: var(--nc-spacing-lg);
+}
+
+.nc-grid-cols-1 { grid-template-columns: 1fr; }
+.nc-grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.nc-grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.nc-grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.nc-flex {
+    display: flex;
+}
+
+.nc-flex-col {
+    flex-direction: column;
+}
+
+.nc-flex-row {
+    flex-direction: row;
+}
+
+.nc-items-center {
+    align-items: center;
+}
+
+.nc-justify-between {
+    justify-content: space-between;
+}
+
+.nc-gap-sm { gap: var(--nc-spacing-sm); }
+.nc-gap-md { gap: var(--nc-spacing-md); }
+.nc-gap-lg { gap: var(--nc-spacing-lg); }
+
+/* 间距工具类 */
+.nc-m-0 { margin: 0; }
+.nc-m-1 { margin: var(--nc-spacing-xs); }
+.nc-m-2 { margin: var(--nc-spacing-sm); }
+.nc-m-3 { margin: var(--nc-spacing-md); }
+.nc-m-4 { margin: var(--nc-spacing-lg); }
+.nc-m-5 { margin: var(--nc-spacing-xl); }
+
+.nc-p-0 { padding: 0; }
+.nc-p-1 { padding: var(--nc-spacing-xs); }
+.nc-p-2 { padding: var(--nc-spacing-sm); }
+.nc-p-3 { padding: var(--nc-spacing-md); }
+.nc-p-4 { padding: var(--nc-spacing-lg); }
+.nc-p-5 { padding: var(--nc-spacing-xl); }
+
+/* 响应式工具类 */
+@media (min-width: 768px) {
+    .nc-md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .nc-md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .nc-md\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .nc-md\:flex-row { flex-direction: row; }
+}
+
+@media (min-width: 1024px) {
+    .nc-lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .nc-lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .nc-lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .nc-lg\:hidden { display: none; }
+    .nc-lg\:block { display: block; }
+}
+
+/* 状态指示器 */
+.nc-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--nc-spacing-xs) var(--nc-spacing-sm);
+    border-radius: var(--nc-radius-full);
+    font-size: var(--nc-caption);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.nc-badge-success {
+    background-color: var(--nc-success-100);
+    color: var(--nc-success-800);
+}
+
+.nc-badge-warning {
+    background-color: var(--nc-warning-100);
+    color: var(--nc-warning-800);
+}
+
+.nc-badge-danger {
+    background-color: var(--nc-danger-100);
+    color: var(--nc-danger-800);
+}
+
+.nc-badge-info {
+    background-color: var(--nc-primary-100);
+    color: var(--nc-primary-800);
+}
+
+/* 加载状态 */
+.nc-loading {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--nc-spacing-sm);
+}
+
+.nc-spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: nc-spin 1s linear infinite;
+}
+
+.nc-skeleton {
+    background: linear-gradient(90deg, var(--nc-gray-200) 25%, var(--nc-gray-300) 50%, var(--nc-gray-200) 75%);
+    background-size: 200% 100%;
+    animation: nc-shimmer 1.5s infinite;
+    border-radius: var(--nc-radius-md);
+}
+
+@keyframes nc-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes nc-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* 通知系统 */
+.nc-toast {
+    position: fixed;
+    top: var(--nc-spacing-lg);
+    right: var(--nc-spacing-lg);
+    z-index: 1000;
+    min-width: 300px;
+    max-width: 500px;
+    padding: var(--nc-spacing-md);
+    border-radius: var(--nc-radius-lg);
+    box-shadow: var(--nc-shadow-lg);
+    transform: translateX(100%);
+    transition: transform var(--nc-transition-normal);
+}
+
+.nc-toast.show {
+    transform: translateX(0);
+}
+
+.nc-toast-success {
+    background-color: var(--nc-success-50);
+    border: 1px solid var(--nc-success-200);
+    color: var(--nc-success-800);
+}
+
+.nc-toast-error {
+    background-color: var(--nc-danger-50);
+    border: 1px solid var(--nc-danger-200);
+    color: var(--nc-danger-800);
+}
+
+.nc-toast-warning {
+    background-color: var(--nc-warning-50);
+    border: 1px solid var(--nc-warning-200);
+    color: var(--nc-warning-800);
+}
+
+.nc-toast-info {
+    background-color: var(--nc-primary-50);
+    border: 1px solid var(--nc-primary-200);
+    color: var(--nc-primary-800);
+}
+
+/* 模态框系统 */
+.nc-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--nc-transition-normal);
+}
+
+.nc-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.nc-modal-content {
+    background-color: var(--nc-surface);
+    border-radius: var(--nc-radius-2xl);
+    box-shadow: var(--nc-shadow-xl);
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform var(--nc-transition-normal);
+}
+
+.nc-modal.show .nc-modal-content {
+    transform: translateY(0);
+}
+
+.nc-modal-header {
+    padding: var(--nc-spacing-lg);
+    border-bottom: 1px solid var(--nc-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nc-modal-body {
+    padding: var(--nc-spacing-lg);
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+.nc-modal-footer {
+    padding: var(--nc-spacing-lg);
+    border-top: 1px solid var(--nc-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--nc-spacing-sm);
+}
+
+/* 图表容器 */
+.nc-chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: var(--nc-gray-50);
+    border-radius: var(--nc-radius-lg);
+    overflow: hidden;
+}
+
+.nc-chart-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--nc-text-secondary);
+}
+
+/* 工具类 */
+.nc-text-center { text-align: center; }
+.nc-text-left { text-align: left; }
+.nc-text-right { text-align: right; }
+
+.nc-font-bold { font-weight: 700; }
+.nc-font-semibold { font-weight: 600; }
+.nc-font-medium { font-weight: 500; }
+
+.nc-rounded-sm { border-radius: var(--nc-radius-sm); }
+.nc-rounded-md { border-radius: var(--nc-radius-md); }
+.nc-rounded-lg { border-radius: var(--nc-radius-lg); }
+.nc-rounded-xl { border-radius: var(--nc-radius-xl); }
+.nc-rounded-full { border-radius: var(--nc-radius-full); }
+
+.nc-shadow-sm { box-shadow: var(--nc-shadow-sm); }
+.nc-shadow-md { box-shadow: var(--nc-shadow-md); }
+.nc-shadow-lg { box-shadow: var(--nc-shadow-lg); }
+.nc-shadow-xl { box-shadow: var(--nc-shadow-xl); }
+
+.nc-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nc-transition {
+    transition: all var(--nc-transition-normal);
+}
+
+.nc-transition-fast {
+    transition: all var(--nc-transition-fast);
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --nc-background: var(--nc-gray-900);
+        --nc-surface: var(--nc-gray-800);
+        --nc-border: var(--nc-gray-700);
+        --nc-text-primary: var(--nc-gray-100);
+        --nc-text-secondary: var(--nc-gray-400);
+        --nc-text-disabled: var(--nc-gray-600);
+        --nc-shadow: rgba(0, 0, 0, 0.3);
+    }
+}

@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优化建议引擎</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #0ea5e9;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            padding: 1.5rem;
+        }
+
+        .recommendation-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-bg);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem;
+            background: var(--dark-bg);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        .recommendation-item {
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+            transition: all 0.2s;
+        }
+
+        .recommendation-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .recommendation-item.critical {
+            border-left: 6px solid var(--danger-color);
+        }
+
+        .recommendation-item.high {
+            border-left: 6px solid var(--warning-color);
+        }
+
+        .recommendation-item.medium {
+            border-left: 6px solid var(--info-color);
+        }
+
+        .recommendation-item.low {
+            border-left: 6px solid var(--success-color);
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .recommendation-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tag-type {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tag-priority {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .tag-confidence {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .recommendation-content {
+            margin-bottom: 1.25rem;
+        }
+
+        .recommendation-description {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .impact-meter {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .impact-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        .impact-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .impact-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .impact-high {
+            background: var(--danger-color);
+        }
+
+        .impact-medium {
+            background: var(--warning-color);
+        }
+
+        .impact-low {
+            background: var(--success-color);
+        }
+
+        .recommendation-steps {
+            background: var(--light-bg);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .steps-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .recommendation-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 0.375rem 0.875rem;
+            font-size: 0.75rem;
+            border-radius: 3px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--light-bg);
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .pattern-item {
+            padding: 1rem;
+            background: var(--light-bg);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .pattern-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pattern-confidence {
+            padding: 0.25rem 0.5rem;
+            background: var(--success-color);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .pattern-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pattern-metrics {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--light-bg);
+            border-radius: 6px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            background: var(--dark-bg);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-bg);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            background: var(--light-bg);
+            padding: 0.75rem;
+            border-radius: 4px;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="recommendation-dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">💡 优化建议引擎</h1>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="refreshRecommendations()">
+                    刷新建议
+                </button>
+                <button class="btn btn-success" onclick="generateNewRecommendations()">
+                    生成新建议
+                </button>
+                <button class="btn btn-warning" onclick="exportRecommendations()">
+                    导出报告
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label class="filter-label">建议类型</label>
+                <select class="filter-select" id="typeFilter" onchange="filterRecommendations()">
+                    <option value="">全部类型</option>
+                    <option value="performance">性能优化</option>
+                    <option value="quality">质量提升</option>
+                    <option value="cost">成本优化</option>
+                    <option value="scalability">可扩展性</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">优先级</label>
+                <select class="filter-select" id="priorityFilter" onchange="filterRecommendations()">
+                    <option value="">全部优先级</option>
+                    <option value="critical">紧急</option>
+                    <option value="high">高</option>
+                    <option value="medium">中</option>
+                    <option value="low">低</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">状态</label>
+                <select class="filter-select" id="statusFilter" onchange="filterRecommendations()">
+                    <option value="">全部状态</option>
+                    <option value="pending">待处理</option>
+                    <option value="applied">已应用</option>
+                    <option value="validated">已验证</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layout">
+            <!-- 优化建议面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>📋 优化建议</span>
+                    </div>
+                    <span id="recommendationCount">0 条建议</span>
+                </div>
+                <div class="panel-body" id="recommendationsContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载优化建议中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计和模式面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>📊 分析统计</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>加载统计数据中...</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h3 style="margin-bottom: 1rem; color: var(--dark-bg);">检测到的模式</h3>
+                        <div id="patternsContainer">
+                            <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                暂无检测到的模式
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细建议模态框 -->
+        <div class="modal" id="recommendationDetailModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="detailTitle">建议详情</h3>
+                    <button class="btn" onclick="closeDetailModal()" style="background: none; color: white; border: none; font-size: 1.5rem;">×</button>
+                </div>
+                <div class="modal-body" id="detailContent">
+                    <!-- 详情内容将在这里动态生成 -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeDetailModal()">关闭</button>
+                    <button class="btn btn-success" onclick="applyRecommendation()" id="applyButton">应用建议</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RecommendationDashboard {
+            constructor() {
+                this.recommendations = [];
+                this.filteredRecommendations = [];
+                this.selectedRecommendation = null;
+                this.patterns = [];
+                this.wsConnection = null;
+            }
+
+            async init() {
+                await this.loadRecommendations();
+                await this.loadStatistics();
+                await this.loadPatterns();
+                this.setupWebSocket();
+            }
+
+            async loadRecommendations() {
+                try {
+                    const response = await fetch('/api/debug/recommendations');
+                    this.recommendations = await response.json();
+                    this.filteredRecommendations = [...this.recommendations];
+                    this.renderRecommendations();
+                    this.updateRecommendationCount();
+                } catch (error) {
+                    console.error('加载优化建议失败:', error);
+                }
+            }
+
+            async loadStatistics() {
+                try {
+                    const response = await fetch('/api/debug/recommendations/stats');
+                    const stats = await response.json();
+                    this.renderStatistics(stats);
+                } catch (error) {
+                    console.error('加载统计数据失败:', error);
+                }
+            }
+
+            async loadPatterns() {
+                try {
+                    const response = await fetch('/api/debug/patterns');
+                    const patternsData = await response.json();
+                    this.patterns = patternsData.recent_patterns || [];
+                    this.renderPatterns();
+                } catch (error) {
+                    console.error('加载模式数据失败:', error);
+                }
+            }
+
+            setupWebSocket() {
+                const wsUrl = `ws://${window.location.host}/ws/recommendations`;
+                this.wsConnection = new WebSocket(wsUrl);
+                
+                this.wsConnection.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+            }
+
+            handleWebSocketMessage(data) {
+                switch(data.type) {
+                    case 'new_recommendation':
+                        this.addRecommendation(data.recommendation);
+                        break;
+                    case 'recommendation_updated':
+                        this.updateRecommendation(data.recommendation);
+                        break;
+                    case 'pattern_detected':
+                        this.addPattern(data.pattern);
+                        break;
+                }
+            }
+
+            renderRecommendations() {
+                const container = document.getElementById('recommendationsContainer');
+                
+                if (this.filteredRecommendations.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">💡</div>
+                            <p>暂无优化建议</p>
+                            <button class="btn btn-primary" onclick="generateNewRecommendations()" style="margin-top: 1rem;">
+                                生成优化建议
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const recommendationsHtml = this.filteredRecommendations.map(rec => 
+                    this.renderRecommendationItem(rec)
+                ).join('');
+
+                container.innerHTML = recommendationsHtml;
+            }
+
+            renderRecommendationItem(rec) {
+                const priorityClass = rec.priority.toLowerCase();
+                const impactPercentage = Math.round(rec.impact_score * 100);
+                const impactLevel = this.getImpactLevel(rec.impact_score);
+                const impactFillClass = `impact-${impactLevel}`;
+                
+                return `
+                    <div class="recommendation-item ${priorityClass}">
+                        <div class="recommendation-header">
+                            <div>
+                                <div class="recommendation-title">${rec.title}</div>
+                                <div class="recommendation-meta">
+                                    <div class="meta-item">
+                                        <span>📊</span>
+                                        <span>${this.getTypeDisplayName(rec.recommendation_type)}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>⚡</span>
+                                        <span>${this.getPriorityDisplayName(rec.priority)}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>📈</span>
+                                        <span>影响: ${impactPercentage}%</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>⏱️</span>
+                                        <span>${new Date(rec.created_at).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-tags">
+                            <span class="tag tag-type">${this.getTypeDisplayName(rec.recommendation_type)}</span>
+                            <span class="tag tag-priority">${this.getPriorityDisplayName(rec.priority)}</span>
+                            <span class="tag tag-confidence">${this.getConfidenceDisplayName(rec.confidence)}</span>
+                            <span class="tag" style="background: var(--info-color); color: white;">
+                                💪 ${rec.implementation_effort}
+                            </span>
+                        </div>
+                        
+                        <div class="recommendation-content">
+                            <div class="recommendation-description">${rec.description}</div>
+                            
+                            <div class="impact-meter">
+                                <span class="impact-label">预期影响</span>
+                                <div class="impact-bar">
+                                    <div class="impact-fill ${impactFillClass}" style="width: ${impactPercentage}%"></div>
+                                </div>
+                                <span style="font-weight: 600; color: var(--text-primary);">${impactPercentage}%</span>
+                            </div>
+                            
+                            <div class="recommendation-steps">
+                                <div class="steps-title">实施步骤</div>
+                                ${(rec.implementation_steps || []).slice(0, 3).map((step, index) => `
+                                    <div class="step-item">
+                                        <div class="step-number">${index + 1}</div>
+                                        <div>${step}</div>
+                                    </div>
+                                `).join('')}
+                                ${(rec.implementation_steps || []).length > 3 ? 
+                                    `<div style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                                        还有 ${(rec.implementation_steps || []).length - 3} 个步骤...
+                                    </div>` : ''
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-actions">
+                            <button class="btn btn-small btn-primary" onclick="viewRecommendationDetail('${rec.recommendation_id}')">
+                                查看详情
+                            </button>
+                            ${rec.status === 'pending' ? 
+                                `<button class="btn btn-small btn-success" onclick="applyRecommendationDirect('${rec.recommendation_id}')">
+                                    应用建议
+                                </button>` : ''
+                            }
+                            <button class="btn btn-small" onclick="viewRiskAssessment('${rec.recommendation_id}')">
+                                风险评估
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderStatistics(stats) {
+                const container = document.getElementById('statsGrid');
+                
+                const statCards = [
+                    {
+                        label: '总建议数',
+                        value: stats.total_recommendations || 0,
+                        icon: '📋'
+                    },
+                    {
+                        label: '待处理',
+                        value: stats.pending_recommendations || 0,
+                        icon: '⏳'
+                    },
+                    {
+                        label: '已应用',
+                        value: stats.applied_recommendations || 0,
+                        icon: '✅'
+                    },
+                    {
+                        label: '高优先级',
+                        value: stats.high_priority_recommendations || 0,
+                        icon: '🔥'
+                    },
+                    {
+                        label: '平均影响',
+                        value: `${Math.round((stats.average_impact || 0) * 100)}%`,
+                        icon: '📈'
+                    },
+                    {
+                        label: '检测模式',
+                        value: stats.detected_patterns || 0,
+                        icon: '🔍'
+                    }
+                ];
+
+                const cardsHtml = statCards.map(card => `
+                    <div class="stat-card">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">${card.icon}</div>
+                        <div class="stat-value">${card.value}</div>
+                        <div class="stat-label">${card.label}</div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = cardsHtml;
+            }
+
+            renderPatterns() {
+                const container = document.getElementById('patternsContainer');
+                
+                if (this.patterns.length === 0) {
+                    container.innerHTML = `
+                        <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                            暂无检测到的模式
+                        </p>
+                    `;
+                    return;
+                }
+
+                const patternsHtml = this.patterns.slice(0, 5).map(pattern => `
+                    <div class="pattern-item">
+                        <div class="pattern-header">
+                            <div class="pattern-title">${this.getPatternDisplayName(pattern.pattern_type)}</div>
+                            <span class="pattern-confidence">${Math.round(pattern.confidence * 100)}% 置信度</span>
+                        </div>
+                        <div class="pattern-description">${pattern.description}</div>
+                        <div class="pattern-metrics">
+                            <span>🕒 持续: ${Math.round(pattern.duration / 60)}分钟</span>
+                            <span>🔢 频率: ${pattern.frequency}次</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = patternsHtml;
+            }
+
+            getTypeDisplayName(type) {
+                const typeMap = {
+                    'performance': '性能优化',
+                    'quality': '质量提升',
+                    'cost': '成本优化',
+                    'scalability': '可扩展性',
+                    'maintainability': '可维护性',
+                    'security': '安全性'
+                };
+                return typeMap[type] || type;
+            }
+
+            getPriorityDisplayName(priority) {
+                const priorityMap = {
+                    'critical': '紧急',
+                    'high': '高',
+                    'medium': '中',
+                    'low': '低'
+                };
+                return priorityMap[priority] || priority;
+            }
+
+            getConfidenceDisplayName(confidence) {
+                const confidenceMap = {
+                    'high': '高置信度',
+                    'medium': '中等置信度',
+                    'low': '低置信度'
+                };
+                return confidenceMap[confidence] || confidence;
+            }
+
+            getImpactLevel(score) {
+                if (score >= 0.7) return 'high';
+                if (score >= 0.4) return 'medium';
+                return 'low';
+            }
+
+            getPatternDisplayName(patternType) {
+                const patternMap = {
+                    'cpu_spike': 'CPU尖峰',
+                    'response_spike': '响应时间尖峰',
+                    'upward_trend': '上升趋势',
+                    'correlation': '相关性模式',
+                    'anomaly': '异常模式'
+                };
+                return patternMap[patternType] || patternType;
+            }
+
+            updateRecommendationCount() {
+                const countElement = document.getElementById('recommendationCount');
+                countElement.textContent = `${this.filteredRecommendations.length} 条建议`;
+            }
+
+            filterRecommendations() {
+                const typeFilter = document.getElementById('typeFilter').value;
+                const priorityFilter = document.getElementById('priorityFilter').value;
+                const statusFilter = document.getElementById('statusFilter').value;
+                
+                this.filteredRecommendations = this.recommendations.filter(rec => {
+                    if (typeFilter && rec.recommendation_type !== typeFilter) return false;
+                    if (priorityFilter && rec.priority !== priorityFilter) return false;
+                    if (statusFilter && rec.status !== statusFilter) return false;
+                    return true;
+                });
+                
+                this.renderRecommendations();
+                this.updateRecommendationCount();
+            }
+
+            addRecommendation(recommendation) {
+                this.recommendations.unshift(recommendation);
+                this.filteredRecommendations = [...this.recommendations];
+                this.renderRecommendations();
+                this.updateRecommendationCount();
+            }
+
+            updateRecommendation(recommendation) {
+                const index = this.recommendations.findIndex(rec => rec.recommendation_id === recommendation.recommendation_id);
+                if (index !== -1) {
+                    this.recommendations[index] = recommendation;
+                    this.filterRecommendations();
+                }
+            }
+
+            addPattern(pattern) {
+                this.patterns.unshift(pattern);
+                if (this.patterns.length > 10) {
+                    this.patterns = this.patterns.slice(0, 10);
+                }
+                this.renderPatterns();
+            }
+
+            async viewRecommendationDetail(recommendationId) {
+                this.selectedRecommendation = this.recommendations.find(rec => rec.recommendation_id === recommendationId);
+                if (!this.selectedRecommendation) return;
+                
+                const rec = this.selectedRecommendation;
+                document.getElementById('detailTitle').textContent = rec.title;
+                
+                const detailHtml = `
+                    <div class="detail-section">
+                        <h3 class="section-title">基本信息</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">建议类型</div>
+                                <div class="detail-value">${this.getTypeDisplayName(rec.recommendation_type)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">优先级</div>
+                                <div class="detail-value">${this.getPriorityDisplayName(rec.priority)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">置信度</div>
+                                <div class="detail-value">${this.getConfidenceDisplayName(rec.confidence)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">影响分数</div>
+                                <div class="detail-value">${Math.round(rec.impact_score * 100)}%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3 class="section-title">详细描述</h3>
+                        <div style="background: var(--light-bg); padding: 1rem; border-radius: 6px; line-height: 1.6;">
+                            ${rec.description}
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3 class="section-title">实施步骤</h3>
+                        <div style="background: var(--light-bg); padding: 1rem; border-radius: 6px;">
+                            ${(rec.implementation_steps || []).map((step, index) => `
+                                <div class="step-item" style="margin-bottom: 1rem;">
+                                    <div class="step-number">${index + 1}</div>
+                                    <div style="flex: 1;">${step}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3 class="section-title">风险评估</h3>
+                        <div style="background: var(--light-bg); padding: 1rem; border-radius: 6px;">
+                            <p><strong>风险等级:</strong> ${rec.risk_assessment || 'N/A'}</p>
+                            <p><strong>验证方法:</strong> ${rec.validation_method || 'N/A'}</p>
+                            <p><strong>预计收益:</strong> ${rec.estimated_benefit || 'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3 class="section-title">影响组件</h3>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            ${(rec.affected_components || []).map(component => `
+                                <span style="background: var(--primary-color); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem;">
+                                    ${component}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('detailContent').innerHTML = detailHtml;
+                document.getElementById('applyButton').style.display = 
+                    rec.status === 'pending' ? 'inline-block' : 'none';
+                
+                document.getElementById('recommendationDetailModal').style.display = 'block';
+            }
+
+            closeDetailModal() {
+                document.getElementById('recommendationDetailModal').style.display = 'none';
+            }
+
+            async applyRecommendationDirect(recommendationId) {
+                try {
+                    const response = await fetch(`/api/debug/recommendations/${recommendationId}/apply`, {
+                        method: 'POST'
+                    });
+                    
+                    if (response.ok) {
+                        // 更新本地状态
+                        const rec = this.recommendations.find(r => r.recommendation_id === recommendationId);
+                        if (rec) {
+                            rec.status = 'applied';
+                            rec.applied_at = new Date().toISOString();
+                        }
+                        
+                        this.filterRecommendations();
+                        alert('建议已成功应用！');
+                    } else {
+                        throw new Error('应用失败');
+                    }
+                } catch (error) {
+                    console.error('应用建议失败:', error);
+                    alert('应用建议失败，请重试');
+                }
+            }
+
+            async applyRecommendation() {
+                if (!this.selectedRecommendation) return;
+                await this.applyRecommendationDirect(this.selectedRecommendation.recommendation_id);
+                this.closeDetailModal();
+            }
+
+            async generateNewRecommendations() {
+                try {
+                    const response = await fetch('/api/debug/recommendations/generate', {
+                        method: 'POST'
+                    });
+                    
+                    if (response.ok) {
+                        await this.loadRecommendations();
+                        alert('新建议生成成功！');
+                    } else {
+                        throw new Error('生成失败');
+                    }
+                } catch (error) {
+                    console.error('生成建议失败:', error);
+                    alert('生成建议失败，请重试');
+                }
+            }
+
+            async refreshRecommendations() {
+                await this.loadRecommendations();
+                await this.loadStatistics();
+                await this.loadPatterns();
+            }
+
+            exportRecommendations() {
+                if (this.recommendations.length === 0) {
+                    alert('暂无可导出的建议');
+                    return;
+                }
+                
+                // 导出为JSON
+                const dataStr = JSON.stringify(this.recommendations, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `optimization-recommendations-${Date.now()}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // 全局实例和函数
+        const dashboard = new RecommendationDashboard();
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            dashboard.init();
+        });
+
+        // 全局函数供HTML调用
+        function filterRecommendations() {
+            dashboard.filterRecommendations();
+        }
+
+        function viewRecommendationDetail(recommendationId) {
+            dashboard.viewRecommendationDetail(recommendationId);
+        }
+
+        function closeDetailModal() {
+            dashboard.closeDetailModal();
+        }
+
+        function applyRecommendation() {
+            dashboard.applyRecommendation();
+        }
+
+        function applyRecommendationDirect(recommendationId) {
+            dashboard.applyRecommendationDirect(recommendationId);
+        }
+
+        function generateNewRecommendations() {
+            dashboard.generateNewRecommendations();
+        }
+
+        function refreshRecommendations() {
+            dashboard.refreshRecommendations();
+        }
+
+        function exportRecommendations() {
+            dashboard.exportRecommendations();
+        }
+    </script>
+</body>
+</html>

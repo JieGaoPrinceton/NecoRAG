@@ -371,13 +371,35 @@ class DashboardServer:
         # ========== Web UI ==========
         
         @self.app.get("/", response_class=HTMLResponse)
-        async def get_dashboard():
-            """返回 Dashboard UI"""
-            html_file = Path(__file__).parent / "static" / "index.html"
+        async def get_main_console():
+            """返回主控制台 UI"""
+            html_file = Path(__file__).parent / "components" / "MainConsole.html"
             if html_file.exists():
                 return HTMLResponse(content=html_file.read_text(encoding='utf-8'))
             else:
-                # 返回简单的 HTML
+                # 返回调试面板作为备选
+                debug_file = Path(__file__).parent / "components" / "DebugPanel.html"
+                if debug_file.exists():
+                    return HTMLResponse(content=debug_file.read_text(encoding='utf-8'))
+                else:
+                    return self._get_simple_ui()
+        
+        @self.app.get("/console", response_class=HTMLResponse)
+        async def get_debug_console():
+            """返回调试控制台 UI"""
+            html_file = Path(__file__).parent / "components" / "DebugConsole.html"
+            if html_file.exists():
+                return HTMLResponse(content=html_file.read_text(encoding='utf-8'))
+            else:
+                return self._get_simple_ui()
+        
+        @self.app.get("/debug", response_class=HTMLResponse)
+        async def get_debug_panel():
+            """返回调试面板 UI"""
+            html_file = Path(__file__).parent / "components" / "DebugPanel.html"
+            if html_file.exists():
+                return HTMLResponse(content=html_file.read_text(encoding='utf-8'))
+            else:
                 return self._get_simple_ui()
         
         # 静态文件服务

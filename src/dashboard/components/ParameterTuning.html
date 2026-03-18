@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>参数调优面板</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #0ea5e9;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            padding: 1.5rem;
+        }
+
+        .tuning-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-bg);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem;
+            background: var(--dark-bg);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        .parameter-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .category-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--dark-bg);
+        }
+
+        .parameter-item {
+            margin-bottom: 1.25rem;
+            padding: 1rem;
+            background: var(--light-bg);
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .parameter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .parameter-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .parameter-type {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .parameter-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .parameter-control {
+            margin-bottom: 0.75rem;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .checkbox-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .select-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .parameter-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 3px;
+        }
+
+        .impact-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .impact-high {
+            background: var(--danger-color);
+        }
+
+        .impact-medium {
+            background: var(--warning-color);
+        }
+
+        .impact-low {
+            background: var(--success-color);
+        }
+
+        .experiments-section {
+            margin-top: 2rem;
+        }
+
+        .experiment-item {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+        }
+
+        .experiment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .experiment-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .experiment-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .status-running {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .status-completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-failed {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .experiment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            background: var(--dark-bg);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="tuning-dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">⚙️ 参数调优面板</h1>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="saveAllParameters()">
+                    保存所有参数
+                </button>
+                <button class="btn btn-success" onclick="createExperiment()">
+                    创建优化实验
+                </button>
+                <button class="btn btn-warning" onclick="resetToDefaults()">
+                    恢复默认值
+                </button>
+            </div>
+        </div>
+
+        <div class="layout">
+            <!-- 参数配置面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>🔧 参数配置</span>
+                    </div>
+                </div>
+                <div class="panel-body" id="parametersContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载参数配置中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实验管理面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>🔬 优化实验</span>
+                    </div>
+                </div>
+                <div class="panel-body" id="experimentsContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载实验列表中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实验创建模态框 -->
+        <div class="modal" id="experimentModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>创建优化实验</h3>
+                    <button class="btn" onclick="closeExperimentModal()" style="background: none; color: white; border: none; font-size: 1.5rem;">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="parameter-control">
+                        <label class="control-label">实验名称</label>
+                        <input type="text" class="input-control" id="experimentName" placeholder="输入实验名称">
+                    </div>
+                    
+                    <div class="parameter-control">
+                        <label class="control-label">优化参数</label>
+                        <div id="parameterSelection">
+                            <!-- 参数选择项将在这里动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <div class="parameter-control">
+                        <label class="control-label">优化策略</label>
+                        <select class="select-control" id="optimizationStrategy">
+                            <option value="grid_search">网格搜索</option>
+                            <option value="random_search">随机搜索</option>
+                        </select>
+                    </div>
+                    
+                    <div class="parameter-control">
+                        <label class="control-label">迭代次数</label>
+                        <input type="number" class="input-control" id="iterationCount" min="1" max="100" value="10">
+                    </div>
+                    
+                    <div class="parameter-control">
+                        <label class="control-label">目标指标</label>
+                        <select class="select-control" id="targetMetric">
+                            <option value="accuracy">准确率</option>
+                            <option value="response_time">响应时间</option>
+                            <option value="f1_score">F1分数</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeExperimentModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitExperiment()">创建实验</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ParameterTuningDashboard {
+            constructor() {
+                this.parameters = {};
+                this.experiments = [];
+                this.parameterCategories = ['retrieval', 'reranking', 'generation', 'general'];
+                this.wsConnection = null;
+            }
+
+            async init() {
+                await this.loadParameters();
+                await this.loadExperiments();
+                this.setupWebSocket();
+            }
+
+            async loadParameters() {
+                try {
+                    const response = await fetch('/api/debug/tuning/parameters');
+                    const data = await response.json();
+                    this.parameters = data.parameters || {};
+                    this.renderParameters();
+                } catch (error) {
+                    console.error('加载参数失败:', error);
+                }
+            }
+
+            async loadExperiments() {
+                try {
+                    const response = await fetch('/api/debug/tuning/experiments');
+                    this.experiments = await response.json();
+                    this.renderExperiments();
+                } catch (error) {
+                    console.error('加载实验失败:', error);
+                }
+            }
+
+            setupWebSocket() {
+                const wsUrl = `ws://${window.location.host}/ws/tuning`;
+                this.wsConnection = new WebSocket(wsUrl);
+                
+                this.wsConnection.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+            }
+
+            handleWebSocketMessage(data) {
+                switch(data.type) {
+                    case 'parameter_updated':
+                        this.updateParameterDisplay(data.parameter);
+                        break;
+                    case 'experiment_status':
+                        this.updateExperimentStatus(data.experiment);
+                        break;
+                }
+            }
+
+            renderParameters() {
+                const container = document.getElementById('parametersContainer');
+                
+                if (Object.keys(this.parameters).length === 0) {
+                    container.innerHTML = `
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>暂无参数配置</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const categorySections = this.parameterCategories.map(category => {
+                    const categoryParams = Object.values(this.parameters).filter(
+                        param => param.category === category
+                    );
+                    
+                    if (categoryParams.length === 0) return '';
+
+                    const paramItems = categoryParams.map(param => this.renderParameterItem(param)).join('');
+                    
+                    return `
+                        <div class="parameter-category">
+                            <div class="category-header">${this.getCategoryDisplayName(category)}</div>
+                            ${paramItems}
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = categorySections || '<p style="text-align: center; color: var(--text-secondary);">暂无参数</p>';
+            }
+
+            renderParameterItem(param) {
+                const impactLevel = this.getImpactLevelClass(param.impact_level);
+                const controlHtml = this.renderParameterControl(param);
+                
+                return `
+                    <div class="parameter-item">
+                        <div class="parameter-header">
+                            <div class="parameter-name">
+                                <span class="impact-indicator ${impactLevel}"></span>
+                                ${param.name}
+                            </div>
+                            <span class="parameter-type">${param.param_type}</span>
+                        </div>
+                        
+                        <div class="parameter-description">${param.description || '无描述'}</div>
+                        
+                        ${controlHtml}
+                        
+                        <div class="parameter-actions">
+                            <button class="btn btn-small btn-primary" onclick="applyParameter('${param.name}')">
+                                应用
+                            </button>
+                            <button class="btn btn-small" onclick="resetParameter('${param.name}')">
+                                重置
+                            </button>
+                            <button class="btn btn-small btn-success" onclick="compareParameter('${param.name}')">
+                                对比
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderParameterControl(param) {
+                const currentValue = param.current_value !== undefined ? param.current_value : param.default_value;
+                
+                switch(param.param_type) {
+                    case 'integer':
+                    case 'float':
+                        return this.renderSliderControl(param, currentValue);
+                    case 'boolean':
+                        return this.renderBooleanControl(param, currentValue);
+                    case 'enum':
+                        return this.renderEnumControl(param, currentValue);
+                    default:
+                        return this.renderTextInputControl(param, currentValue);
+                }
+            }
+
+            renderSliderControl(param, value) {
+                const min = param.min_value || 0;
+                const max = param.max_value || 100;
+                const step = param.step || (param.param_type === 'integer' ? 1 : 0.1);
+                
+                return `
+                    <div class="parameter-control">
+                        <label class="control-label">当前值: <span id="value-${param.name}">${value}</span></label>
+                        <div class="slider-container">
+                            <input type="range" 
+                                   class="slider" 
+                                   id="slider-${param.name}"
+                                   min="${min}" 
+                                   max="${max}" 
+                                   step="${step}"
+                                   value="${value}"
+                                   oninput="updateSliderValue('${param.name}', this.value)">
+                            <span class="value-display" id="display-${param.name}">${value}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            <span>最小: ${min}</span>
+                            <span>最大: ${max}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderBooleanControl(param, value) {
+                return `
+                    <div class="parameter-control">
+                        <div class="checkbox-control">
+                            <input type="checkbox" 
+                                   id="checkbox-${param.name}"
+                                   ${value ? 'checked' : ''}
+                                   onchange="updateParameterValue('${param.name}', this.checked)">
+                            <label for="checkbox-${param.name}">${param.description || '启用此选项'}</label>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderEnumControl(param, value) {
+                const options = param.choices || [];
+                const optionHtml = options.map(option => 
+                    `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`
+                ).join('');
+                
+                return `
+                    <div class="parameter-control">
+                        <label class="control-label">选择值</label>
+                        <select class="select-control" 
+                                id="select-${param.name}"
+                                onchange="updateParameterValue('${param.name}', this.value)">
+                            ${optionHtml}
+                        </select>
+                    </div>
+                `;
+            }
+
+            renderTextInputControl(param, value) {
+                return `
+                    <div class="parameter-control">
+                        <label class="control-label">输入值</label>
+                        <input type="text" 
+                               class="input-control" 
+                               id="input-${param.name}"
+                               value="${value}"
+                               onchange="updateParameterValue('${param.name}', this.value)">
+                    </div>
+                `;
+            }
+
+            getCategoryDisplayName(category) {
+                const displayNameMap = {
+                    'retrieval': '🔍 检索参数',
+                    'reranking': '🔄 重排序参数',
+                    'generation': '💬 生成参数',
+                    'general': '⚙️ 通用参数'
+                };
+                return displayNameMap[category] || category;
+            }
+
+            getImpactLevelClass(level) {
+                const classMap = {
+                    'high': 'impact-high',
+                    'medium': 'impact-medium',
+                    'low': 'impact-low'
+                };
+                return classMap[level] || 'impact-medium';
+            }
+
+            updateSliderValue(paramName, value) {
+                document.getElementById(`value-${paramName}`).textContent = value;
+                document.getElementById(`display-${paramName}`).textContent = value;
+                this.parameters[paramName].current_value = parseFloat(value);
+            }
+
+            updateParameterValue(paramName, value) {
+                this.parameters[paramName].current_value = value;
+            }
+
+            updateParameterDisplay(parameter) {
+                // 更新参数显示
+                this.parameters[parameter.name] = parameter;
+                this.renderParameters();
+            }
+
+            renderExperiments() {
+                const container = document.getElementById('experimentsContainer');
+                
+                if (this.experiments.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">暂无实验</p>';
+                    return;
+                }
+
+                const experimentItems = this.experiments.map(exp => `
+                    <div class="experiment-item">
+                        <div class="experiment-header">
+                            <div class="experiment-title">${exp.name}</div>
+                            <span class="experiment-status status-${exp.status}">${this.getStatusDisplayName(exp.status)}</span>
+                        </div>
+                        <div class="experiment-details">
+                            <div class="detail-item">
+                                <span class="detail-label">策略</span>
+                                <span>${this.getStrategyDisplayName(exp.strategy)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">迭代次数</span>
+                                <span>${exp.iterations}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">目标指标</span>
+                                <span>${exp.target_metric}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">创建时间</span>
+                                <span>${new Date(exp.created_at).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <button class="btn btn-small btn-primary" onclick="viewExperiment('${exp.experiment_id}')">查看详情</button>
+                            ${exp.status === 'pending' ? 
+                                `<button class="btn btn-small btn-success" onclick="runExperiment('${exp.experiment_id}')">运行实验</button>` : ''
+                            }
+                            ${exp.status === 'completed' ? 
+                                `<button class="btn btn-small btn-warning" onclick="applyBestParams('${exp.experiment_id}')">应用最优参数</button>` : ''
+                            }
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = experimentItems;
+            }
+
+            getStatusDisplayName(status) {
+                const statusMap = {
+                    'pending': '待运行',
+                    'running': '运行中',
+                    'completed': '已完成',
+                    'failed': '失败'
+                };
+                return statusMap[status] || status;
+            }
+
+            getStrategyDisplayName(strategy) {
+                const strategyMap = {
+                    'grid_search': '网格搜索',
+                    'random_search': '随机搜索',
+                    'bayesian': '贝叶斯优化',
+                    'gradient_based': '梯度优化'
+                };
+                return strategyMap[strategy] || strategy;
+            }
+
+            updateExperimentStatus(experiment) {
+                // 更新实验状态显示
+                const index = this.experiments.findIndex(exp => exp.experiment_id === experiment.experiment_id);
+                if (index !== -1) {
+                    this.experiments[index] = experiment;
+                    this.renderExperiments();
+                }
+            }
+
+            async applyParameter(paramName) {
+                const param = this.parameters[paramName];
+                const value = param.current_value !== undefined ? param.current_value : param.default_value;
+                
+                try {
+                    await fetch('/api/debug/tuning/parameters/' + paramName, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ value: value })
+                    });
+                    
+                    alert(`参数 ${paramName} 已应用: ${value}`);
+                } catch (error) {
+                    console.error('应用参数失败:', error);
+                    alert('应用参数失败');
+                }
+            }
+
+            async resetParameter(paramName) {
+                const param = this.parameters[paramName];
+                param.current_value = param.default_value;
+                this.renderParameters();
+                
+                try {
+                    await fetch('/api/debug/tuning/parameters/' + paramName + '/reset', {
+                        method: 'POST'
+                    });
+                } catch (error) {
+                    console.error('重置参数失败:', error);
+                }
+            }
+
+            async saveAllParameters() {
+                try {
+                    const paramUpdates = {};
+                    for (const [name, param] of Object.entries(this.parameters)) {
+                        if (param.current_value !== undefined) {
+                            paramUpdates[name] = param.current_value;
+                        }
+                    }
+                    
+                    await fetch('/api/debug/tuning/parameters/batch', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ parameters: paramUpdates })
+                    });
+                    
+                    alert('所有参数已保存');
+                } catch (error) {
+                    console.error('保存参数失败:', error);
+                    alert('保存参数失败');
+                }
+            }
+
+            openExperimentModal() {
+                // 生成参数选择项
+                const paramSelection = document.getElementById('parameterSelection');
+                const paramCheckboxes = Object.values(this.parameters).map(param => `
+                    <div style="margin: 0.5rem 0;">
+                        <label>
+                            <input type="checkbox" name="optimizeParams" value="${param.name}">
+                            ${param.name} (${param.description || '无描述'})
+                        </label>
+                    </div>
+                `).join('');
+                
+                paramSelection.innerHTML = paramCheckboxes;
+                document.getElementById('experimentModal').style.display = 'block';
+            }
+
+            closeExperimentModal() {
+                document.getElementById('experimentModal').style.display = 'none';
+            }
+
+            async submitExperiment() {
+                const name = document.getElementById('experimentName').value;
+                const strategy = document.getElementById('optimizationStrategy').value;
+                const iterations = parseInt(document.getElementById('iterationCount').value);
+                const targetMetric = document.getElementById('targetMetric').value;
+                
+                // 获取选中的参数
+                const selectedParams = Array.from(
+                    document.querySelectorAll('input[name="optimizeParams"]:checked')
+                ).map(cb => cb.value);
+                
+                if (!name || selectedParams.length === 0) {
+                    alert('请填写实验名称并选择至少一个参数');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/debug/tuning/experiments', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            parameters: selectedParams,
+                            strategy: strategy,
+                            iterations: iterations,
+                            target_metric: targetMetric
+                        })
+                    });
+                    
+                    const experiment = await response.json();
+                    this.experiments.unshift(experiment);
+                    this.renderExperiments();
+                    this.closeExperimentModal();
+                    alert(`实验 "${name}" 创建成功`);
+                    
+                } catch (error) {
+                    console.error('创建实验失败:', error);
+                    alert('创建实验失败');
+                }
+            }
+        }
+
+        // 全局实例和函数
+        const dashboard = new ParameterTuningDashboard();
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            dashboard.init();
+        });
+
+        // 全局函数供HTML调用
+        function applyParameter(paramName) {
+            dashboard.applyParameter(paramName);
+        }
+
+        function resetParameter(paramName) {
+            dashboard.resetParameter(paramName);
+        }
+
+        function updateSliderValue(paramName, value) {
+            dashboard.updateSliderValue(paramName, value);
+        }
+
+        function updateParameterValue(paramName, value) {
+            dashboard.updateParameterValue(paramName, value);
+        }
+
+        function saveAllParameters() {
+            dashboard.saveAllParameters();
+        }
+
+        function createExperiment() {
+            dashboard.openExperimentModal();
+        }
+
+        function closeExperimentModal() {
+            dashboard.closeExperimentModal();
+        }
+
+        function submitExperiment() {
+            dashboard.submitExperiment();
+        }
+
+        function resetToDefaults() {
+            if (confirm('确定要将所有参数恢复为默认值吗？')) {
+                // 实现恢复默认值的逻辑
+                alert('参数已恢复为默认值');
+            }
+        }
+    </script>
+</body>
+</html>

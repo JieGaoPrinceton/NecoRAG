@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/B测试管理面板</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #0ea5e9;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            padding: 1.5rem;
+        }
+
+        .ab-testing-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-bg);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem;
+            background: var(--dark-bg);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        .test-item {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+            transition: all 0.2s;
+        }
+
+        .test-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .test-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .test-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .status-running {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .status-completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-paused {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .test-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .test-variants {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .variant-card {
+            flex: 1;
+            padding: 1rem;
+            background: var(--light-bg);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .variant-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .variant-metric {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        .test-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 3px;
+        }
+
+        .chart-container {
+            height: 300px;
+            background: var(--light-bg);
+            border-radius: 6px;
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--light-bg);
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            background: var(--dark-bg);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .variant-form {
+            background: var(--light-bg);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .variant-form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .variant-number {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .report-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--light-bg);
+            border-radius: 6px;
+        }
+
+        .report-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-bg);
+        }
+
+        .recommendation-item {
+            padding: 0.75rem;
+            background: var(--card-bg);
+            border-left: 4px solid var(--success-color);
+            margin-bottom: 0.75rem;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="ab-testing-dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">🧪 A/B测试管理面板</h1>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="createNewTest()">
+                    创建新测试
+                </button>
+                <button class="btn btn-success" onclick="refreshTests()">
+                    刷新数据
+                </button>
+            </div>
+        </div>
+
+        <div class="layout">
+            <!-- 测试列表面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>📋 测试列表</span>
+                    </div>
+                </div>
+                <div class="panel-body" id="testsContainer">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载测试列表中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计概览面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span>📊 统计概览</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>加载统计数据中...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container" id="performanceChart">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                            <p>性能对比图表将在此显示</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细测试结果 -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>🔬 详细测试结果</span>
+                </div>
+            </div>
+            <div class="panel-body" id="testResultsContainer">
+                <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                    选择一个测试查看详细结果
+                </p>
+            </div>
+        </div>
+
+        <!-- 创建测试模态框 -->
+        <div class="modal" id="createTestModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>创建A/B测试</h3>
+                    <button class="btn" onclick="closeCreateModal()" style="background: none; color: white; border: none; font-size: 1.5rem;">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">测试名称</label>
+                        <input type="text" class="form-input" id="testName" placeholder="输入测试名称">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">测试类型</label>
+                        <select class="form-select" id="testType">
+                            <option value="parameter">参数测试</option>
+                            <option value="algorithm">算法测试</option>
+                            <option value="configuration">配置测试</option>
+                            <option value="model">模型测试</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">主要指标</label>
+                        <select class="form-select" id="primaryMetric">
+                            <option value="accuracy">准确率</option>
+                            <option value="response_time">响应时间</option>
+                            <option value="conversion_rate">转化率</option>
+                            <option value="user_satisfaction">用户满意度</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">统计检验方法</label>
+                        <select class="form-select" id="statisticalTest">
+                            <option value="t_test">T检验</option>
+                            <option value="chi_square">卡方检验</option>
+                            <option value="anova">方差分析</option>
+                            <option value="mann_whitney">Mann-Whitney检验</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">最小样本量</label>
+                        <input type="number" class="form-input" id="minSampleSize" min="100" value="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">变体配置</label>
+                        <div id="variantsContainer">
+                            <!-- 变体表单将在这里动态生成 -->
+                        </div>
+                        <button class="btn btn-primary" onclick="addVariant()" style="margin-top: 1rem;">
+                            添加变体
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeCreateModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitTestCreation()">创建测试</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试报告模态框 -->
+        <div class="modal" id="testReportModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="reportTitle">测试报告</h3>
+                    <button class="btn" onclick="closeReportModal()" style="background: none; color: white; border: none; font-size: 1.5rem;">×</button>
+                </div>
+                <div class="modal-body" id="reportContent">
+                    <!-- 报告内容将在这里动态生成 -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="exportReport()">导出报告</button>
+                    <button class="btn" onclick="closeReportModal()">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ABTestingDashboard {
+            constructor() {
+                this.tests = [];
+                this.selectedTest = null;
+                this.variantCount = 2;
+                this.wsConnection = null;
+            }
+
+            async init() {
+                await this.loadTests();
+                await this.loadStatistics();
+                this.setupWebSocket();
+            }
+
+            async loadTests() {
+                try {
+                    const response = await fetch('/api/debug/ab-tests');
+                    this.tests = await response.json();
+                    this.renderTests();
+                } catch (error) {
+                    console.error('加载测试列表失败:', error);
+                }
+            }
+
+            async loadStatistics() {
+                try {
+                    const response = await fetch('/api/debug/ab-tests/stats');
+                    const stats = await response.json();
+                    this.renderStatistics(stats);
+                } catch (error) {
+                    console.error('加载统计数据失败:', error);
+                }
+            }
+
+            setupWebSocket() {
+                const wsUrl = `ws://${window.location.host}/ws/ab-testing`;
+                this.wsConnection = new WebSocket(wsUrl);
+                
+                this.wsConnection.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+            }
+
+            handleWebSocketMessage(data) {
+                switch(data.type) {
+                    case 'test_status_update':
+                        this.updateTestStatus(data.test);
+                        break;
+                    case 'test_completed':
+                        this.showTestCompletion(data.test_id);
+                        break;
+                }
+            }
+
+            renderTests() {
+                const container = document.getElementById('testsContainer');
+                
+                if (this.tests.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                            <p>暂无A/B测试</p>
+                            <button class="btn btn-primary" onclick="createNewTest()" style="margin-top: 1rem;">
+                                创建第一个测试
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const testItems = this.tests.map(test => this.renderTestItem(test)).join('');
+                container.innerHTML = testItems;
+            }
+
+            renderTestItem(test) {
+                const statusClass = `status-${test.status}`;
+                const statusText = this.getStatusDisplayName(test.status);
+                
+                // 计算进度
+                const progress = test.total_samples ? 
+                    Math.min(100, (test.total_samples / test.minimum_sample_size) * 100) : 0;
+                
+                // 渲染变体信息
+                const variantCards = (test.variants || []).map(variant => `
+                    <div class="variant-card">
+                        <div class="variant-name">${variant.name}</div>
+                        <div class="variant-metric">样本数</div>
+                        <div class="metric-value">${variant.sample_size || 0}</div>
+                        <div class="variant-metric">转化率</div>
+                        <div class="metric-value">${((variant.conversion_rate || 0) * 100).toFixed(1)}%</div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="test-item">
+                        <div class="test-header">
+                            <div class="test-title">${test.test_name}</div>
+                            <span class="test-status ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div class="test-details">
+                            <div class="detail-item">
+                                <span class="detail-label">测试类型</span>
+                                <span>${this.getTestTypeDisplayName(test.test_type)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">主要指标</span>
+                                <span>${test.primary_metric}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">样本进度</span>
+                                <span>${test.total_samples || 0}/${test.minimum_sample_size}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">创建时间</span>
+                                <span>${new Date(test.created_at).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <div style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0;">
+                            ${progress.toFixed(1)}% 完成
+                        </div>
+                        
+                        <div class="test-variants">
+                            ${variantCards}
+                        </div>
+                        
+                        <div class="test-actions">
+                            <button class="btn btn-small btn-primary" onclick="viewTestDetails('${test.test_id}')">
+                                查看详情
+                            </button>
+                            ${test.status === 'pending' ? 
+                                `<button class="btn btn-small btn-success" onclick="startTest('${test.test_id}')">启动测试</button>` : ''
+                            }
+                            ${test.status === 'running' ? 
+                                `<button class="btn btn-small btn-warning" onclick="pauseTest('${test.test_id}')">暂停</button>` : ''
+                            }
+                            ${test.status === 'paused' ? 
+                                `<button class="btn btn-small btn-success" onclick="resumeTest('${test.test_id}')">恢复</button>` : ''
+                            }
+                            ${test.status === 'completed' ? 
+                                `<button class="btn btn-small btn-info" onclick="viewReport('${test.test_id}')">查看报告</button>` : ''
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderStatistics(stats) {
+                const container = document.getElementById('statsGrid');
+                
+                const statCards = [
+                    {
+                        label: '总测试数',
+                        value: stats.total_tests || 0,
+                        icon: '📋'
+                    },
+                    {
+                        label: '运行中测试',
+                        value: stats.running_tests || 0,
+                        icon: '⚡'
+                    },
+                    {
+                        label: '已完成测试',
+                        value: stats.completed_tests || 0,
+                        icon: '✅'
+                    },
+                    {
+                        label: '平均提升',
+                        value: `${(stats.average_improvement || 0).toFixed(1)}%`,
+                        icon: '📈'
+                    }
+                ];
+
+                const cardsHtml = statCards.map(card => `
+                    <div class="stat-card">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">${card.icon}</div>
+                        <div class="stat-value">${card.value}</div>
+                        <div class="stat-label">${card.label}</div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = cardsHtml;
+            }
+
+            getStatusDisplayName(status) {
+                const statusMap = {
+                    'pending': '待启动',
+                    'running': '运行中',
+                    'paused': '已暂停',
+                    'completed': '已完成',
+                    'failed': '失败'
+                };
+                return statusMap[status] || status;
+            }
+
+            getTestTypeDisplayName(testType) {
+                const typeMap = {
+                    'parameter': '参数测试',
+                    'algorithm': '算法测试',
+                    'configuration': '配置测试',
+                    'model': '模型测试'
+                };
+                return typeMap[testType] || testType;
+            }
+
+            updateTestStatus(test) {
+                // 更新测试状态显示
+                const index = this.tests.findIndex(t => t.test_id === test.test_id);
+                if (index !== -1) {
+                    this.tests[index] = test;
+                    this.renderTests();
+                }
+            }
+
+            showTestCompletion(testId) {
+                const test = this.tests.find(t => t.test_id === testId);
+                if (test) {
+                    alert(`测试 "${test.test_name}" 已完成！点击查看详细报告。`);
+                }
+            }
+
+            async viewTestDetails(testId) {
+                this.selectedTest = testId;
+                try {
+                    const response = await fetch(`/api/debug/ab-tests/${testId}`);
+                    const testDetails = await response.json();
+                    this.renderTestDetails(testDetails);
+                } catch (error) {
+                    console.error('加载测试详情失败:', error);
+                }
+            }
+
+            renderTestDetails(test) {
+                const container = document.getElementById('testResultsContainer');
+                
+                const detailsHtml = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h3 style="margin-bottom: 1rem; color: var(--dark-bg);">测试配置</h3>
+                            <div style="background: var(--light-bg); padding: 1rem; border-radius: 6px;">
+                                <p><strong>测试名称:</strong> ${test.test_name}</p>
+                                <p><strong>测试类型:</strong> ${this.getTestTypeDisplayName(test.test_type)}</p>
+                                <p><strong>主要指标:</strong> ${test.primary_metric}</p>
+                                <p><strong>统计方法:</strong> ${test.statistical_test}</p>
+                                <p><strong>最小样本量:</strong> ${test.minimum_sample_size}</p>
+                                <p><strong>显著性水平:</strong> ${(test.significance_level * 100).toFixed(1)}%</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 style="margin-bottom: 1rem; color: var(--dark-bg);">实时数据</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                ${(test.variants || []).map(variant => `
+                                    <div style="background: var(--light-bg); padding: 1rem; border-radius: 6px; text-align: center;">
+                                        <h4 style="margin-bottom: 0.5rem; color: var(--primary-color);">${variant.name}</h4>
+                                        <p>样本数: ${variant.sample_size || 0}</p>
+                                        <p>转化数: ${variant.conversions || 0}</p>
+                                        <p>转化率: ${((variant.conversion_rate || 0) * 100).toFixed(1)}%</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML = detailsHtml;
+            }
+
+            openCreateModal() {
+                this.variantCount = 2;
+                this.renderVariantsForm();
+                document.getElementById('createTestModal').style.display = 'block';
+            }
+
+            closeCreateModal() {
+                document.getElementById('createTestModal').style.display = 'none';
+            }
+
+            renderVariantsForm() {
+                const container = document.getElementById('variantsContainer');
+                let variantsHtml = '';
+                
+                for (let i = 0; i < this.variantCount; i++) {
+                    variantsHtml += `
+                        <div class="variant-form">
+                            <div class="variant-form-header">
+                                <span class="variant-number">变体 ${String.fromCharCode(65 + i)}</span>
+                                ${i >= 2 ? `<button class="btn btn-small btn-danger" onclick="removeVariant(${i})">删除</button>` : ''}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">变体名称</label>
+                                <input type="text" class="form-input" name="variantName" value="变体 ${String.fromCharCode(65 + i)}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">流量权重</label>
+                                <input type="number" class="form-input" name="variantWeight" min="0" max="1" step="0.1" value="1.0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">配置参数 (JSON)</label>
+                                <textarea class="form-textarea" name="variantConfig" placeholder='{"parameter": "value"}'>{"test_param": "value_${i}"}</textarea>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = variantsHtml;
+            }
+
+            addVariant() {
+                this.variantCount++;
+                this.renderVariantsForm();
+            }
+
+            removeVariant(index) {
+                if (this.variantCount > 2) {
+                    this.variantCount--;
+                    this.renderVariantsForm();
+                }
+            }
+
+            async submitTestCreation() {
+                const testName = document.getElementById('testName').value;
+                const testType = document.getElementById('testType').value;
+                const primaryMetric = document.getElementById('primaryMetric').value;
+                const statisticalTest = document.getElementById('statisticalTest').value;
+                const minSampleSize = parseInt(document.getElementById('minSampleSize').value);
+                
+                if (!testName) {
+                    alert('请输入测试名称');
+                    return;
+                }
+                
+                // 收集变体数据
+                const variantForms = document.querySelectorAll('.variant-form');
+                const variants = [];
+                
+                variantForms.forEach((form, index) => {
+                    const name = form.querySelector('[name="variantName"]').value;
+                    const weight = parseFloat(form.querySelector('[name="variantWeight"]').value);
+                    const config = form.querySelector('[name="variantConfig"]').value;
+                    
+                    try {
+                        variants.push({
+                            name: name,
+                            weight: weight,
+                            config: JSON.parse(config)
+                        });
+                    } catch (e) {
+                        alert(`变体 ${String.fromCharCode(65 + index)} 的配置格式不正确`);
+                        return;
+                    }
+                });
+                
+                if (variants.length < 2) {
+                    alert('至少需要两个变体');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/debug/ab-tests', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            test_name: testName,
+                            test_type: testType,
+                            primary_metric: primaryMetric,
+                            statistical_test: statisticalTest,
+                            minimum_sample_size: minSampleSize,
+                            variants: variants
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    this.tests.unshift(result);
+                    this.renderTests();
+                    this.closeCreateModal();
+                    
+                    alert(`测试 "${testName}" 创建成功`);
+                    
+                } catch (error) {
+                    console.error('创建测试失败:', error);
+                    alert('创建测试失败');
+                }
+            }
+
+            async startTest(testId) {
+                try {
+                    await fetch(`/api/debug/ab-tests/${testId}/start`, { method: 'POST' });
+                    await this.loadTests();
+                    alert('测试已启动');
+                } catch (error) {
+                    console.error('启动测试失败:', error);
+                    alert('启动测试失败');
+                }
+            }
+
+            async pauseTest(testId) {
+                try {
+                    await fetch(`/api/debug/ab-tests/${testId}/pause`, { method: 'POST' });
+                    await this.loadTests();
+                    alert('测试已暂停');
+                } catch (error) {
+                    console.error('暂停测试失败:', error);
+                    alert('暂停测试失败');
+                }
+            }
+
+            async resumeTest(testId) {
+                try {
+                    await fetch(`/api/debug/ab-tests/${testId}/resume`, { method: 'POST' });
+                    await this.loadTests();
+                    alert('测试已恢复');
+                } catch (error) {
+                    console.error('恢复测试失败:', error);
+                    alert('恢复测试失败');
+                }
+            }
+
+            async viewReport(testId) {
+                try {
+                    const response = await fetch(`/api/debug/ab-tests/${testId}/report`);
+                    const report = await response.json();
+                    this.showReport(report);
+                } catch (error) {
+                    console.error('加载报告失败:', error);
+                    alert('加载报告失败');
+                }
+            }
+
+            showReport(report) {
+                document.getElementById('reportTitle').textContent = `测试报告: ${report.test_name}`;
+                
+                const reportHtml = `
+                    <div class="report-section">
+                        <h3 class="report-title">🏆 测试结果</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="background: var(--card-bg); padding: 1rem; border-radius: 6px; text-align: center;">
+                                <h4 style="color: var(--success-color); margin-bottom: 0.5rem;">获胜变体</h4>
+                                <p style="font-size: 1.5rem; font-weight: 600;">${report.winner_variant || '暂无'}</p>
+                            </div>
+                            <div style="background: var(--card-bg); padding: 1rem; border-radius: 6px; text-align: center;">
+                                <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">统计置信度</h4>
+                                <p style="font-size: 1.5rem; font-weight: 600;">${(report.statistical_confidence * 100).toFixed(1)}%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <h3 class="report-title">💡 优化建议</h3>
+                        ${(report.recommendations || []).map(rec => `
+                            <div class="recommendation-item">${rec}</div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="report-section">
+                        <h3 class="report-title">📊 详细数据</h3>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: var(--dark-bg); color: white;">
+                                        <th style="padding: 0.75rem; text-align: left;">变体</th>
+                                        <th style="padding: 0.75rem; text-align: left;">指标</th>
+                                        <th style="padding: 0.75rem; text-align: left;">均值</th>
+                                        <th style="padding: 0.75rem; text-align: left;">P值</th>
+                                        <th style="padding: 0.75rem; text-align: left;">显著性</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${(report.detailed_results || []).map(result => `
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td style="padding: 0.75rem;">${result.variant_id}</td>
+                                            <td style="padding: 0.75rem;">${result.metric_name}</td>
+                                            <td style="padding: 0.75rem;">${result.mean.toFixed(4)}</td>
+                                            <td style="padding: 0.75rem;">${result.p_value.toFixed(4)}</td>
+                                            <td style="padding: 0.75rem;">
+                                                <span style="color: ${result.statistical_significance ? 'var(--success-color)' : 'var(--text-secondary)'}">
+                                                    ${result.statistical_significance ? '✓ 显著' : '✗ 不显著'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('reportContent').innerHTML = reportHtml;
+                document.getElementById('testReportModal').style.display = 'block';
+            }
+
+            closeReportModal() {
+                document.getElementById('testReportModal').style.display = 'none';
+            }
+
+            exportReport() {
+                alert('报告导出功能将在后续版本中实现');
+            }
+
+            async refreshTests() {
+                await this.loadTests();
+                await this.loadStatistics();
+            }
+        }
+
+        // 全局实例和函数
+        const dashboard = new ABTestingDashboard();
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            dashboard.init();
+        });
+
+        // 全局函数供HTML调用
+        function createNewTest() {
+            dashboard.openCreateModal();
+        }
+
+        function closeCreateModal() {
+            dashboard.closeCreateModal();
+        }
+
+        function addVariant() {
+            dashboard.addVariant();
+        }
+
+        function removeVariant(index) {
+            dashboard.removeVariant(index);
+        }
+
+        function submitTestCreation() {
+            dashboard.submitTestCreation();
+        }
+
+        function viewTestDetails(testId) {
+            dashboard.viewTestDetails(testId);
+        }
+
+        function startTest(testId) {
+            dashboard.startTest(testId);
+        }
+
+        function pauseTest(testId) {
+            dashboard.pauseTest(testId);
+        }
+
+        function resumeTest(testId) {
+            dashboard.resumeTest(testId);
+        }
+
+        function viewReport(testId) {
+            dashboard.viewReport(testId);
+        }
+
+        function closeReportModal() {
+            dashboard.closeReportModal();
+        }
+
+        function exportReport() {
+            dashboard.exportReport();
+        }
+
+        function refreshTests() {
+            dashboard.refreshTests();
+        }
+    </script>
+</body>
+</html>
