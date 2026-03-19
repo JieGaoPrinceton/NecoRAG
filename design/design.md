@@ -1,7 +1,7 @@
 # 📜 NecoRAG 技术框架设计任务书 (Technical Design Charter)
 
 **项目名称：** NecoRAG (Neuro-Cognitive Retrieval-Augmented Generation)  
-**版本号：** v1.8-Alpha
+**版本号：** v1.9-Alpha
 **日期：** 2026-03-19
 **状态：** ✅ Phase 1 & 2 核心功能已完成，Phase 3 进行中
 **核心理念：** 模拟人脑双系统记忆与认知科学理论，构建下一代认知型 RAG 框架。
@@ -1868,4 +1868,4 @@ class ChainOfThoughtReasoner:
 **项目负责人：** Qijie  
 **GitHub 仓库：** github.com/qijie2026/NecoRAG  
 **最后更新：** 2026-03-19  
-**当前版本：** v1.7.0-alpha (功能完善版)
+**当前版本：** v1.9.0-alpha (功能完善版)

@@ -1,155 +1,149 @@
 # HyDE增强技术
 
 <cite>
-**本文引用的文件**
+**本文档引用的文件**
 - [src/retrieval/hyde.py](file://src/retrieval/hyde.py)
 - [src/retrieval/retriever.py](file://src/retrieval/retriever.py)
 - [src/retrieval/models.py](file://src/retrieval/models.py)
-- [src/retrieval/fusion.py](file://src/retrieval/fusion.py)
 - [src/core/llm/base.py](file://src/core/llm/base.py)
 - [src/core/llm/mock.py](file://src/core/llm/mock.py)
-- [src/memory/manager.py](file://src/memory/manager.py)
+- [src/core/config.py](file://src/core/config.py)
 - [example/example_usage.py](file://example/example_usage.py)
-- [README.md](file://README.md)
+- [tests/test_retrieval/test_retriever.py](file://tests/test_retrieval/test_retriever.py)
+- [wiki/wiki/检索引擎模块/HyDE增强技术.md](file://wiki/wiki/检索引擎模块/HyDE增强技术.md)
+- [wiki/wiki/核心架构设计/五层认知架构/检索层 (L3)/HyDE增强技术.md](file://wiki/wiki/核心架构设计/五层认知架构/检索层 (L3)/HyDE增强技术.md)
 </cite>
 
 ## 目录
-1. [引言](#引言)
+1. [简介](#简介)
 2. [项目结构](#项目结构)
 3. [核心组件](#核心组件)
-4. [架构总览](#架构总览)
+4. [架构概览](#架构概览)
 5. [详细组件分析](#详细组件分析)
-6. [依赖分析](#依赖分析)
-7. [性能考量](#性能考量)
-8. [故障排查指南](#故障排查指南)
-9. [结论](#结论)
-10. [附录](#附录)
+6. [依赖关系分析](#依赖关系分析)
+7. [性能考虑](#性能考虑)
+8. [故障排除指南](#故障排除指南)
+9. [配置选项说明](#配置选项说明)
+10. [最佳实践指南](#最佳实践指南)
+11. [与其他检索技术的结合](#与其他检索技术的结合)
+12. [实际应用场景](#实际应用场景)
+13. [结论](#结论)
 
-## 引言
-本文件围绕HyDE（Hypothetical Document Embeddings）增强技术展开，系统阐述其理论基础、实现原理与在NecoRAG中的集成方式。重点包括：
-- 假设文档生成算法与多样性控制
-- 假设文档向量化与检索优化效果
-- HyDEEnhancer类的工作流程与参数配置
-- 在模糊查询与长尾查询场景下的优势
-- 实际调用示例与结果对比思路
+## 简介
+
+HyDE（Hypothetical Document Embeddings）增强技术是NecoRAG检索系统中的核心技术组件，通过生成假设性文档来解决传统检索中的语义鸿沟问题。该技术的核心思想是：不是直接用用户的模糊查询进行检索，而是先生成一个"包含答案的真实文档"风格的假设文档，然后将这个假设文档向量化并与知识库中的真实文档进行相似度匹配。
+
+这种LLM驱动的文档构造过程能够有效缓解查询表达模糊带来的检索偏差，特别适用于处理模糊查询、长尾查询和复杂查询场景。通过假设文档生成、语义一致性保证和向量化策略的有机结合，HyDE技术显著提升了检索系统的准确性和鲁棒性。
 
 ## 项目结构
-与HyDE增强技术直接相关的模块主要位于检索层与核心LLM接口层：
-- 检索层：HyDE增强器、自适应检索器、结果融合策略、检索数据模型
-- 核心LLM：抽象接口与Mock实现，用于生成与向量化
-- 记忆层：提供向量检索能力，支撑HyDE增强后的查询向量
-- 示例：完整工作流演示，包含HyDE启用与检索调用
+
+HyDE增强技术在NecoRAG项目中的组织结构如下：
 
 ```mermaid
 graph TB
-subgraph "检索层"
-HYDE["HyDEEnhancer<br/>假设文档生成与向量化"]
-RETRIEVER["AdaptiveRetriever<br/>自适应检索器"]
-FUSION["FusionStrategy<br/>结果融合"]
-MODELS["RetrievalResult<br/>数据模型"]
+subgraph "检索层模块"
+HYDE[HyDEEnhancer<br/>假设文档生成器]
+RETRIEVER[AdaptiveRetriever<br/>自适应检索器]
+MODELS[RetrievalResult<br/>数据模型]
 end
-subgraph "核心LLM"
-BASE["BaseLLMClient<br/>抽象接口"]
-MOCK["MockLLMClient<br/>Mock实现"]
+subgraph "LLM客户端层"
+BASELLM[BaseLLMClient<br/>抽象基类]
+MOCKLLM[MockLLMClient<br/>模拟LLM客户端]
 end
-subgraph "记忆层"
-MEM["MemoryManager<br/>向量检索"]
+subgraph "配置管理层"
+CONFIG[RetrievalConfig<br/>检索配置]
+GLOBALCFG[NecoRAGConfig<br/>全局配置]
 end
-subgraph "示例"
-EX["example_usage.py<br/>完整流程演示"]
+subgraph "测试与示例"
+TESTS[单元测试]
+EXAMPLE[使用示例]
 end
-HYDE --> BASE
-BASE --> MOCK
+HYDE --> BASELLM
+BASELLM --> MOCKLLM
 RETRIEVER --> HYDE
-RETRIEVER --> FUSION
-RETRIEVER --> MEM
-EX --> RETRIEVER
+RETRIEVER --> MODELS
+CONFIG --> RETRIEVER
+GLOBALCFG --> CONFIG
+TESTS --> HYDE
+EXAMPLE --> RETRIEVER
 ```
 
-图表来源
+**图表来源**
 - [src/retrieval/hyde.py:17-213](file://src/retrieval/hyde.py#L17-L213)
-- [src/retrieval/retriever.py:122-440](file://src/retrieval/retriever.py#L122-L440)
-- [src/retrieval/fusion.py:9-128](file://src/retrieval/fusion.py#L9-L128)
-- [src/core/llm/base.py:11-178](file://src/core/llm/base.py#L11-L178)
-- [src/core/llm/mock.py:16-313](file://src/core/llm/mock.py#L16-L313)
-- [src/memory/manager.py:16-195](file://src/memory/manager.py#L16-L195)
-- [example/example_usage.py:94-136](file://example/example_usage.py#L94-L136)
+- [src/retrieval/retriever.py:135-200](file://src/retrieval/retriever.py#L135-L200)
+- [src/core/llm/base.py:16-50](file://src/core/llm/base.py#L16-L50)
 
-章节来源
+**章节来源**
 - [src/retrieval/hyde.py:1-213](file://src/retrieval/hyde.py#L1-L213)
-- [src/retrieval/retriever.py:1-440](file://src/retrieval/retriever.py#L1-L440)
-- [src/retrieval/fusion.py:1-128](file://src/retrieval/fusion.py#L1-L128)
-- [src/core/llm/base.py:1-178](file://src/core/llm/base.py#L1-L178)
-- [src/core/llm/mock.py:1-313](file://src/core/llm/mock.py#L1-L313)
-- [src/memory/manager.py:1-195](file://src/memory/manager.py#L1-L195)
-- [example/example_usage.py:1-252](file://example/example_usage.py#L1-L252)
-- [README.md:247-286](file://README.md#L247-L286)
+- [src/retrieval/retriever.py:1-200](file://src/retrieval/retriever.py#L1-L200)
 
 ## 核心组件
-- HyDEEnhancer：负责生成假设文档、生成多样化假设、获取假设向量、增强查询
-- AdaptiveRetriever：集成HyDE增强器，执行HyDE增强检索与多路检索、融合、重排序、早停
-- BaseLLMClient/MockLLMClient：提供文本生成与向量化能力，支持回退方案
-- MemoryManager：提供向量检索能力，支撑HyDE增强后的查询向量
-- FusionStrategy：结果融合策略（RRF等）
-- RetrievalResult：检索结果数据模型
 
-章节来源
+### HyDEEnhancer类
+
+HyDEEnhancer是HyDE增强技术的核心实现类，负责生成假设文档并提供相关的检索增强功能。
+
+#### 主要功能特性
+
+1. **假设文档生成**：使用LLM客户端生成符合真实文档风格的假设答案
+2. **多样化生成**：通过温度参数控制生成的多样性
+3. **向量化支持**：将假设文档转换为向量表示
+4. **规则回退**：在缺少LLM客户端时使用规则生成策略
+5. **查询增强**：生成包含原始查询和假设文档的查询列表
+
+#### 关键方法
+
+- `generate_hypothetical_doc()`: 生成单个假设文档
+- `generate_multiple_hypotheses()`: 生成多个假设文档
+- `get_hypothesis_embedding()`: 获取假设文档的向量表示
+- `enhance_query()`: 增强查询列表
+
+**章节来源**
 - [src/retrieval/hyde.py:17-213](file://src/retrieval/hyde.py#L17-L213)
-- [src/retrieval/retriever.py:122-440](file://src/retrieval/retriever.py#L122-L440)
-- [src/core/llm/base.py:11-178](file://src/core/llm/base.py#L11-L178)
-- [src/core/llm/mock.py:16-313](file://src/core/llm/mock.py#L16-L313)
-- [src/memory/manager.py:16-195](file://src/memory/manager.py#L16-L195)
-- [src/retrieval/fusion.py:9-128](file://src/retrieval/fusion.py#L9-L128)
-- [src/retrieval/models.py:9-29](file://src/retrieval/models.py#L9-L29)
 
-## 架构总览
-HyDE增强技术在NecoRAG中的位置与交互如下：
-- HyDEEnhancer生成假设文档并可选生成向量
-- AdaptiveRetriever在检索流程中可调用HyDE增强，将假设向量作为查询向量参与向量检索
-- MemoryManager提供向量检索能力
-- 结果经融合与重排序，结合早停机制输出最终结果
+### AdaptiveRetriever集成
+
+AdaptiveRetriever作为检索系统的主控制器，集成了HyDE增强技术，实现了完整的检索流程。
+
+#### 集成特点
+
+1. **条件启用**：通过配置参数控制HyDE的启用状态
+2. **无缝集成**：HyDE增强与传统检索方法的自然融合
+3. **性能优化**：支持早停机制和结果重排序
+4. **结果追踪**：记录检索过程和路径信息
+
+**章节来源**
+- [src/retrieval/retriever.py:135-200](file://src/retrieval/retriever.py#L135-L200)
+
+## 架构概览
+
+HyDE增强技术的整体架构采用分层设计，确保了模块间的松耦合和高内聚。
 
 ```mermaid
 sequenceDiagram
-participant U as "用户"
-participant R as "AdaptiveRetriever"
-participant H as "HyDEEnhancer"
-participant L as "LLM客户端"
-participant M as "MemoryManager"
-participant F as "FusionStrategy"
-U->>R : "提交查询"
-R->>R : "分析查询/准备多路检索"
-alt 启用HyDE
-R->>H : "生成假设文档/向量"
-H->>L : "生成假设文本"
-L-->>H : "假设文本"
-H->>L : "向量化假设文本"
-L-->>H : "假设向量"
-H-->>R : "返回假设向量"
-R->>M : "向量检索(查询向量=假设向量)"
-else 未启用HyDE
-R->>M : "向量检索(查询向量=原始查询向量)"
-end
-R->>F : "多路结果融合"
-F-->>R : "融合结果"
-R-->>U : "返回Top-K结果"
+participant Client as "客户端"
+participant Retriever as "AdaptiveRetriever"
+participant HyDE as "HyDEEnhancer"
+participant LLM as "LLM客户端"
+participant Memory as "记忆管理器"
+Client->>Retriever : "retrieve_with_hyde(query)"
+Retriever->>HyDE : "生成假设文档"
+HyDE->>LLM : "generate(prompt)"
+LLM-->>HyDE : "假设文档"
+HyDE-->>Retriever : "假设文档"
+Retriever->>Memory : "向量化检索"
+Memory-->>Retriever : "检索结果"
+Retriever-->>Client : "HyDE增强检索结果"
+Note over HyDE,LLM : "LLM客户端可选，支持Mock回退"
 ```
 
-图表来源
-- [src/retrieval/retriever.py:177-254](file://src/retrieval/retriever.py#L177-L254)
-- [src/retrieval/retriever.py:307-331](file://src/retrieval/retriever.py#L307-L331)
-- [src/retrieval/hyde.py:58-142](file://src/retrieval/hyde.py#L58-L142)
-- [src/memory/manager.py:114-147](file://src/memory/manager.py#L114-L147)
-- [src/retrieval/fusion.py:18-70](file://src/retrieval/fusion.py#L18-L70)
+**图表来源**
+- [src/retrieval/retriever.py:362-388](file://src/retrieval/retriever.py#L362-L388)
+- [src/retrieval/hyde.py:58-170](file://src/retrieval/hyde.py#L58-L170)
 
 ## 详细组件分析
 
-### HyDEEnhancer类分析
-HyDEEnhancer的核心职责：
-- 生成单一假设文档
-- 生成多样化假设（通过温度扰动）
-- 获取假设文档向量（需LLM客户端）
-- 增强查询（可包含原始查询与假设集合）
+### HyDEEnhancer类详细分析
 
 ```mermaid
 classDiagram
@@ -158,6 +152,7 @@ class HyDEEnhancer {
 -_temperature : float
 -_num_hypotheses : int
 -_hypothesis_prompt : str
++__init__(llm_client, temperature, num_hypotheses)
 +generate_hypothetical_doc(query, max_length) str
 +generate_multiple_hypotheses(query, num_hypotheses, max_length) str[]
 +get_hypothesis_embedding(query, max_length) float[]
@@ -172,18 +167,26 @@ class BaseLLMClient {
 +model_name : str
 +embedding_dimension : int
 }
-HyDEEnhancer --> BaseLLMClient : "依赖"
+class MockLLMClient {
++model_name : str
++embedding_dimension : int
++generate(prompt, max_tokens, temperature) str
++embed(text) float[]
+}
+HyDEEnhancer --> BaseLLMClient : uses
+MockLLMClient --|> BaseLLMClient : extends
 ```
 
-图表来源
+**图表来源**
 - [src/retrieval/hyde.py:17-213](file://src/retrieval/hyde.py#L17-L213)
-- [src/core/llm/base.py:11-178](file://src/core/llm/base.py#L11-L178)
+- [src/core/llm/base.py:16-50](file://src/core/llm/base.py#L16-L50)
+- [src/core/llm/mock.py:16-70](file://src/core/llm/mock.py#L16-L70)
 
-实现要点与算法流程：
-- 假设生成：使用提示词模板，调用LLM生成假设文档；若无LLM客户端则回退到规则生成
-- 多样化生成：通过逐步增加温度生成不同变体，提升检索覆盖
-- 向量化：调用LLM客户端的embed接口获取向量；若无LLM客户端则返回None
-- 增强查询：可选择是否包含原始查询，组合为查询列表
+#### 类结构设计
+
+HyDEEnhancer采用了面向对象的设计模式，通过依赖注入的方式与LLM客户端解耦。这种设计使得系统既可以在生产环境中使用真实的LLM服务，也可以在开发和测试环境中使用Mock客户端。
+
+#### 算法流程
 
 ```mermaid
 flowchart TD
@@ -198,151 +201,234 @@ ReturnHyp --> End(["结束"])
 ReturnEmb --> End
 ```
 
-图表来源
-- [src/retrieval/hyde.py:58-142](file://src/retrieval/hyde.py#L58-L142)
-- [src/core/llm/base.py:14-47](file://src/core/llm/base.py#L14-L47)
+**图表来源**
+- [src/retrieval/hyde.py:58-170](file://src/retrieval/hyde.py#L58-L170)
 
-章节来源
+**章节来源**
 - [src/retrieval/hyde.py:17-213](file://src/retrieval/hyde.py#L17-L213)
-- [src/core/llm/base.py:11-178](file://src/core/llm/base.py#L11-L178)
 
-### AdaptiveRetriever与HyDE集成
-AdaptiveRetriever在检索流程中可调用HyDE增强：
-- retrieve_with_hyde：生成假设文档，记录日志，然后调用retrieve
-- retrieve：执行多路检索、融合、重排序、领域权重、过滤、早停
-- retrieve方法中预留了HyDE向量化使用的注释（TODO），表明后续可将假设向量作为查询向量参与向量检索
+### 数据模型支持
 
-```mermaid
-sequenceDiagram
-participant R as "AdaptiveRetriever"
-participant H as "HyDEEnhancer"
-participant M as "MemoryManager"
-participant F as "FusionStrategy"
-R->>H : "generate_hypothetical_doc()"
-H-->>R : "假设文档"
-R->>M : "向量检索(查询向量=假设向量)"
-M-->>R : "向量检索结果"
-R->>F : "多路结果融合"
-F-->>R : "融合结果"
-R-->>R : "重排序/领域权重/过滤/早停"
-R-->>R : "返回Top-K结果"
-```
+HyDE增强技术与RetrievalResult数据模型无缝集成，支持记录HyDE相关的检索信息。
 
-图表来源
-- [src/retrieval/retriever.py:307-331](file://src/retrieval/retriever.py#L307-L331)
-- [src/retrieval/retriever.py:177-254](file://src/retrieval/retriever.py#L177-L254)
-- [src/memory/manager.py:114-147](file://src/memory/manager.py#L114-L147)
-- [src/retrieval/fusion.py:18-70](file://src/retrieval/fusion.py#L18-L70)
+#### RetrievalResult模型扩展
 
-章节来源
-- [src/retrieval/retriever.py:122-440](file://src/retrieval/retriever.py#L122-L440)
-- [src/memory/manager.py:114-147](file://src/memory/manager.py#L114-L147)
-- [src/retrieval/fusion.py:18-70](file://src/retrieval/fusion.py#L18-L70)
+- `memory_id`: 记忆ID
+- `content`: 内容文本
+- `score`: 相关性分数
+- `source`: 检索来源（vector/graph/hyde）
+- `metadata`: 元数据信息（包含权重详情）
+- `retrieval_path`: 检索路径（用于可视化）
 
-### 检索数据模型
-RetrievalResult用于承载检索结果，包含内存ID、内容、分数、来源、元数据与检索路径等字段，便于HyDE增强后的结果可视化与溯源。
+**章节来源**
+- [src/retrieval/models.py:9-18](file://src/retrieval/models.py#L9-L18)
 
-章节来源
-- [src/retrieval/models.py:9-29](file://src/retrieval/models.py#L9-L29)
+## 依赖关系分析
 
-## 依赖分析
-- HyDEEnhancer依赖BaseLLMClient接口，支持Mock实现，保证在无外部LLM时仍可运行
-- AdaptiveRetriever依赖HyDEEnhancer、FusionStrategy、MemoryManager与重排序器
-- MemoryManager提供向量检索能力，支撑HyDE增强后的查询向量
-- FusionStrategy提供多路结果融合（RRF等）
+### 组件依赖图
 
 ```mermaid
 graph TB
-HYDE["HyDEEnhancer"] --> LLM["BaseLLMClient"]
-LLM --> MOCK["MockLLMClient"]
-RETRIEVER["AdaptiveRetriever"] --> HYDE
-RETRIEVER --> FUSION["FusionStrategy"]
-RETRIEVER --> MEM["MemoryManager"]
+subgraph "HyDE模块依赖"
+HYDE[HyDEEnhancer]
+LLM[BaseLLMClient]
+MOCK[MockLLMClient]
+end
+subgraph "检索器依赖"
+RETRIEVER[AdaptiveRetriever]
+FUSION[FusionStrategy]
+RERANKER[ReRanker]
+end
+subgraph "核心依赖"
+BASE[BaseRetriever]
+MODELS[数据模型]
+end
+subgraph "配置依赖"
+RETCONFIG[RetrievalConfig]
+GLOBALCFG[NecoRAGConfig]
+end
+HYDE --> LLM
+LLM --> MOCK
+RETRIEVER --> HYDE
+RETRIEVER --> FUSION
+RETRIEVER --> RERANKER
+RETRIEVER --> BASE
+RETRIEVER --> MODELS
+RETCONFIG --> RETRIEVER
+GLOBALCFG --> RETCONFIG
 ```
 
-图表来源
-- [src/retrieval/hyde.py:17-213](file://src/retrieval/hyde.py#L17-L213)
-- [src/core/llm/base.py:11-178](file://src/core/llm/base.py#L11-L178)
-- [src/core/llm/mock.py:16-313](file://src/core/llm/mock.py#L16-L313)
-- [src/retrieval/retriever.py:122-440](file://src/retrieval/retriever.py#L122-L440)
-- [src/retrieval/fusion.py:9-128](file://src/retrieval/fusion.py#L9-L128)
-- [src/memory/manager.py:16-195](file://src/memory/manager.py#L16-L195)
+**图表来源**
+- [src/retrieval/hyde.py:13-14](file://src/retrieval/hyde.py#L13-L14)
+- [src/retrieval/retriever.py:13-17](file://src/retrieval/retriever.py#L13-L17)
 
-章节来源
-- [src/retrieval/hyde.py:17-213](file://src/retrieval/hyde.py#L17-L213)
-- [src/core/llm/base.py:11-178](file://src/core/llm/base.py#L11-L178)
-- [src/core/llm/mock.py:16-313](file://src/core/llm/mock.py#L16-L313)
-- [src/retrieval/retriever.py:122-440](file://src/retrieval/retriever.py#L122-L440)
-- [src/retrieval/fusion.py:9-128](file://src/retrieval/fusion.py#L9-L128)
-- [src/memory/manager.py:16-195](file://src/memory/manager.py#L16-L195)
+### 外部依赖分析
 
-## 性能考量
-- 假设生成成本：每次生成假设都会触发一次LLM调用，生成多个假设时成本线性增长
-- 向量化成本：假设向量生成需要额外的嵌入调用，增加延迟与资源消耗
-- 多样化温度：适度增加温度可提升多样性，但可能影响质量稳定性
-- 早停机制：在融合与重排序后评估置信度，满足阈值即可提前终止，减少无效计算
-- 批量嵌入：如需批量生成假设向量，可利用LLM客户端的批量嵌入接口（embed_batch）降低开销
+HyDE增强技术的主要外部依赖包括：
 
-章节来源
-- [src/retrieval/hyde.py:85-121](file://src/retrieval/hyde.py#L85-L121)
-- [src/core/llm/base.py:49-59](file://src/core/llm/base.py#L49-L59)
-- [src/retrieval/retriever.py:307-331](file://src/retrieval/retriever.py#L307-L331)
+1. **LLM客户端接口**：通过BaseLLMClient抽象层实现，支持多种LLM服务提供商
+2. **向量存储**：与记忆管理器的SemanticMemory集成，支持向量数据库
+3. **配置管理**：支持运行时配置和参数调整，通过NecoRAGConfig统一管理
 
-## 故障排查指南
-- 无LLM客户端：HyDEEnhancer会回退到规则生成，确保系统可用；若需要向量化，请提供有效LLM客户端
-- 假设向量为空：get_hypothesis_embedding在无LLM客户端时返回None，需检查初始化参数
-- HyDE增强未生效：确认AdaptiveRetriever初始化时enable_hyde为True，并正确调用retrieve_with_hyde或在更高层启用HyDE
-- 结果质量不稳定：适当调整temperature与num_hypotheses，平衡多样性与稳定性
-- 性能瓶颈：减少num_hypotheses、使用批量嵌入、启用早停机制
+**章节来源**
+- [src/retrieval/retriever.py:13-17](file://src/retrieval/retriever.py#L13-L17)
 
-章节来源
-- [src/retrieval/hyde.py:42-48](file://src/retrieval/hyde.py#L42-L48)
-- [src/retrieval/hyde.py:138-142](file://src/retrieval/hyde.py#L138-L142)
-- [src/retrieval/retriever.py:129-151](file://src/retrieval/retriever.py#L129-L151)
+## 性能考虑
 
-## 结论
-HyDE增强技术通过“生成假设文档—向量化—检索真实文档”的范式，显著提升了模糊查询与长尾查询的检索质量。在NecoRAG中，HyDEEnhancer与AdaptiveRetriever紧密协作，配合多路检索、融合、重排序与早停机制，形成高效稳定的检索闭环。合理配置温度、假设数量与向量化策略，可在保证性能的同时获得更优的检索效果。
+### 生成效率优化
 
-## 附录
+1. **温度参数调节**：通过逐步增加温度参数生成多样化的假设文档，平衡生成质量和速度
+2. **批量处理**：支持批量生成和向量化处理，提高整体吞吐量
+3. **缓存策略**：可以考虑实现假设文档的缓存机制，减少重复生成开销
 
-### HyDE技术理论基础与实现原理
-- 理论基础：假设文档嵌入（HyDE）通过生成一个“包含答案的真实文档”风格的假设文本，将其向量化后与真实文档进行相似度匹配，从而缓解查询表达模糊带来的检索偏差
-- 实现要点：提示词模板设计、LLM生成与向量化、多样化假设生成（温度扰动）、回退方案（规则生成）
+### 内存管理
 
-章节来源
-- [src/retrieval/hyde.py:17-56](file://src/retrieval/hyde.py#L17-L56)
-- [src/retrieval/hyde.py:172-213](file://src/retrieval/hyde.py#L172-L213)
+1. **向量维度控制**：通过embedding_dimension参数控制向量大小，避免内存溢出
+2. **文本长度限制**：max_length参数防止过长文本影响性能
+3. **批量操作**：使用embed_batch方法提高向量化效率
 
-### HyDEEnhancer工作流程
-- 输入：查询文本、温度、假设数量
-- 输出：假设文档、假设向量、增强后的查询列表
-- 关键步骤：提示词构造、LLM生成、向量化、多样化生成、规则回退
+### 并发处理
 
-章节来源
-- [src/retrieval/hyde.py:58-170](file://src/retrieval/hyde.py#L58-L170)
+```mermaid
+flowchart TD
+Start([并发处理开始]) --> SplitTasks["拆分生成任务"]
+SplitTasks --> ParallelGen["并行生成假设文档"]
+ParallelGen --> BatchEmbed["批量向量化"]
+BatchEmbed --> CombineResults["合并处理结果"]
+CombineResults --> End([处理完成])
+ParallelGen --> TempAdjust["温度参数调整"]
+TempAdjust --> GenDoc["生成文档"]
+```
 
-### HyDE在模糊查询与长尾查询中的优势
-- 模糊查询：通过生成“真实文档风格”的假设，使查询向量更贴近知识库中的表达方式，提升召回
-- 长尾查询：多样化假设生成有助于覆盖少见表达，提高稀疏查询的检索命中
+**图表来源**
+- [src/retrieval/hyde.py:105-119](file://src/retrieval/hyde.py#L105-L119)
+- [src/core/llm/base.py:24-36](file://src/core/llm/base.py#L24-L36)
 
-章节来源
-- [src/retrieval/hyde.py:85-121](file://src/retrieval/hyde.py#L85-L121)
+**章节来源**
+- [src/retrieval/hyde.py:105-119](file://src/retrieval/hyde.py#L105-L119)
 
-### HyDE配置参数使用指南
-- temperature：控制生成多样性，默认0.5；增大可提升多样性，但可能降低稳定性
-- num_hypotheses：生成假设数量，默认1；建议在1-3之间权衡性能与效果
-- llm_client：可选；若为空则使用Mock回退方案，仅支持规则生成与向量化
-- enable_hyde：在AdaptiveRetriever中启用HyDE增强检索
+## 故障排除指南
 
-章节来源
-- [src/retrieval/hyde.py:24-40](file://src/retrieval/hyde.py#L24-L40)
-- [src/retrieval/retriever.py:129-151](file://src/retrieval/retriever.py#L129-L151)
-- [README.md:279-285](file://README.md#L279-L285)
+### 常见问题及解决方案
 
-### 实际调用方法与结果对比分析
-- 基础检索：使用AdaptiveRetriever.retrieve执行多路检索、融合、重排序与早停
-- HyDE增强检索：使用AdaptiveRetriever.retrieve_with_hyde，内部生成假设并参与检索
-- 完整流程示例：参考example_usage.py中的检索示例，观察检索路径与结果
+#### 1. LLM客户端未正确初始化
+
+**问题症状**：
+- HyDE增强器无法生成假设文档
+- 返回空结果或错误
+
+**解决方案**：
+- 确保正确传入BaseLLMClient实例
+- 检查LLM客户端的model_name和embedding_dimension属性
+- 验证generate和embed方法的实现
+
+#### 2. 向量维度不匹配
+
+**问题症状**：
+- 向量计算时报维度错误
+- 检索结果异常
+
+**解决方案**：
+- 确保HyDEEnhancer使用的LLM客户端与记忆管理器期望的维度一致
+- 检查embedding_dimension配置
+
+#### 3. 性能问题
+
+**问题症状**：
+- 假设文档生成速度慢
+- 检索响应时间过长
+
+**解决方案**：
+- 调整temperature参数，平衡生成质量和速度
+- 适当减少num_hypotheses数量
+- 实现适当的缓存机制
+
+**章节来源**
+- [tests/test_retrieval/test_retriever.py:231-248](file://tests/test_retrieval/test_retriever.py#L231-L248)
+
+## 配置选项说明
+
+### HyDE配置参数
+
+| 参数名 | 类型 | 默认值 | 描述 |
+|--------|------|--------|------|
+| enable_hyde | bool | True | 是否启用HyDE增强功能 |
+| hyde_temperature | float | 0.5 | 控制假设生成的多样性，范围0-1 |
+| num_hypotheses | int | 1 | 生成假设文档的数量 |
+| max_length | int | 300 | 假设文档的最大长度 |
+
+### 检索配置参数
+
+| 参数名 | 类型 | 默认值 | 描述 |
+|--------|------|--------|------|
+| default_top_k | int | 10 | 默认返回结果数量 |
+| enable_early_termination | bool | True | 是否启用早停机制 |
+| confidence_threshold | float | 0.85 | 早停置信度阈值 |
+| enable_rerank | bool | True | 是否启用重排序 |
+| rerank_top_k | int | 20 | 重排序输入规模 |
+
+**章节来源**
+- [src/core/config.py:160-181](file://src/core/config.py#L160-L181)
+
+## 最佳实践指南
+
+### HyDE技术理论基础
+
+HyDE（Hypothetical Document Embeddings）技术的核心理论基础是通过生成一个"包含答案的真实文档"风格的假设文本，将其向量化后与真实文档进行相似度匹配，从而缓解查询表达模糊带来的检索偏差。
+
+### 实现要点
+
+1. **提示词模板设计**：精心设计的提示词模板是生成高质量假设文档的关键
+2. **LLM生成与向量化**：确保LLM客户端正确实现generate和embed方法
+3. **多样化假设生成**：通过温度参数控制生成的多样性
+4. **回退方案**：在缺少LLM客户端时使用规则生成策略
+
+### 使用示例
+
+```python
+# 初始化HyDE增强器
+from src.retrieval.hyde import HyDEEnhancer
+from src.core.llm import MockLLMClient
+
+llm_client = MockLLMClient(
+    model_name="mock-llm-v1",
+    embedding_dim=768,
+    deterministic=True
+)
+
+hyde_enhancer = HyDEEnhancer(
+    llm_client=llm_client,
+    temperature=0.7,
+    num_hypotheses=3
+)
+
+# 生成假设文档
+query = "什么是深度学习？"
+hypothesis = hyde_enhancer.generate_hypothetical_doc(query, max_length=300)
+print(f"假设文档: {hypothesis}")
+
+# 生成多个假设文档
+hypotheses = hyde_enhancer.generate_multiple_hypotheses(
+    query, 
+    num_hypotheses=3, 
+    max_length=300
+)
+print(f"假设文档数量: {len(hypotheses)}")
+
+# 获取向量表示
+embedding = hyde_enhancer.get_hypothesis_embedding(query, max_length=300)
+if embedding:
+    print(f"向量维度: {len(embedding)}")
+```
+
+**章节来源**
+- [wiki/wiki/核心架构设计/五层认知架构/检索层 (L3)/HyDE增强技术.md:400-445](file://wiki/wiki/核心架构设计/五层认知架构/检索层 (L3)/HyDE增强技术.md#L400-L445)
+
+## 与其他检索技术的结合
+
+### 与自适应检索的结合
+
+HyDE增强技术与AdaptiveRetriever的结合形成了完整的检索闭环：
 
 ```mermaid
 sequenceDiagram
@@ -356,10 +442,66 @@ H-->>R : "返回假设文档"
 R-->>EX : "返回HyDE增强检索结果"
 ```
 
-图表来源
+**图表来源**
 - [example/example_usage.py:94-136](file://example/example_usage.py#L94-L136)
-- [src/retrieval/retriever.py:307-331](file://src/retrieval/retriever.py#L307-L331)
+- [src/retrieval/retriever.py:362-388](file://src/retrieval/retriever.py#L362-L388)
 
-章节来源
-- [example/example_usage.py:94-136](file://example/example_usage.py#L94-L136)
-- [src/retrieval/retriever.py:307-331](file://src/retrieval/retriever.py#L307-L331)
+### 与重排序系统的集成
+
+HyDE生成的假设文档可以与传统的向量检索结果一起参与重排序，提升最终结果的质量。
+
+### 与多路检索的融合
+
+HyDE增强的检索结果可以与向量检索、图谱检索等多种检索方式的结果进行融合，形成更全面的检索效果。
+
+**章节来源**
+- [src/retrieval/retriever.py:362-388](file://src/retrieval/retriever.py#L362-L388)
+
+## 实际应用场景
+
+### 模糊查询处理
+
+HyDE技术特别适用于处理模糊、简短或复杂的查询，能够有效减少语义歧义，提高检索质量。
+
+### 长尾查询优化
+
+通过多样化假设生成，HyDE技术能够覆盖少见的查询表达，提高稀疏查询的检索命中率。
+
+### 复杂查询场景
+
+对于需要多跳推理或跨领域知识的复杂查询，HyDE生成的假设文档能够提供更好的语义对齐。
+
+### 实际调用方法
+
+```python
+# 在AdaptiveRetriever中启用HyDE
+from src.retrieval.retriever import AdaptiveRetriever
+
+retriever = AdaptiveRetriever(
+    memory=memory_manager,
+    enable_hyde=True,
+    confidence_threshold=0.85
+)
+
+# 执行HyDE增强检索
+results = retriever.retrieve_with_hyde(
+    query="深度学习的应用领域",
+    top_k=10
+)
+```
+
+**章节来源**
+- [src/retrieval/retriever.py:362-388](file://src/retrieval/retriever.py#L362-L388)
+
+## 结论
+
+NecoRAG的HyDE增强技术模块通过实现假设文档驱动检索，显著提升了检索系统的准确性和鲁棒性。该模块的设计具有以下优势：
+
+1. **模块化设计**：HyDEEnhancer独立于具体LLM实现，易于扩展和替换
+2. **智能回退**：在缺少LLM客户端时自动使用规则生成策略
+3. **性能优化**：支持批量处理和参数调节，适应不同性能需求
+4. **无缝集成**：与AdaptiveRetriever完美集成，形成完整的检索管道
+
+HyDE技术特别适用于处理模糊、简短或复杂的查询，能够有效减少语义歧义，提高检索质量。随着LLM能力的提升，HyDE技术将在未来的检索系统中发挥越来越重要的作用。
+
+通过合理的参数配置和最佳实践指导，HyDE增强技术能够在保证性能的同时获得更优的检索效果，为用户提供更加精准和可靠的检索体验。
