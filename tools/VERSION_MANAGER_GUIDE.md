@@ -21,7 +21,7 @@ NecoRAG/
 
 ```
 主版本号。次版本号.补丁号 - 预发布标识
-例如：3.0.1-alpha, 3.0.1-alpha, 3.0.1-alpha
+例如：3.1.0-alpha, 3.1.0-alpha, 3.1.0-alpha
 ```
 
 - **主版本号 (Major)**: 重大更新，不兼容的 API 变更
@@ -43,7 +43,7 @@ python tools/version_manager.py show
 ============================================================
 NecoRAG 版本信息
 ============================================================
-当前版本：3.0.1-alpha
+当前版本：3.1.0-alpha
 
 版本组成:
   主版本号 (Major): 1
@@ -64,27 +64,27 @@ NecoRAG 版本信息
 
 ```bash
 python tools/version_manager.py bump patch
-# 3.0.1-alpha -> 3.0.1-alpha
+# 3.1.0-alpha -> 3.1.0-alpha
 ```
 
 #### 递增次版本号（添加新功能）
 
 ```bash
 python tools/version_manager.py bump minor
-# 3.0.1-alpha -> 3.0.1-alpha
+# 3.1.0-alpha -> 3.1.0-alpha
 ```
 
 #### 递增主版本号（重大变更）
 
 ```bash
 python tools/version_manager.py bump major
-# 3.0.1-alpha -> 3.0.1-alpha
+# 3.1.0-alpha -> 3.1.0-alpha
 ```
 
 ### 直接设置版本号
 
 ```bash
-python tools/version_manager.py set 3.0.1-alpha
+python tools/version_manager.py set 3.1.0-alpha
 ```
 
 ### 同步版本号到所有文件
@@ -111,10 +111,10 @@ python tools/version_manager.py sync --dry-run
 
 | 模式 | 示例 | 替换为 |
 |------|------|--------|
-| `v3.0.1-alpha` | README 徽章 | `v3.0.1-alpha` |
-| `V3.0.1-alpha-alpha-alpha-alpha-alpha-alpha` | 标题中的大写版本 | `V3.0.1-alpha-alpha-alpha-alpha-alpha-alpha` |
-| `3.0.1-alpha` | 纯文本版本号 | `3.0.1-alpha` |
-| `v3.0` | 短版本号 | `v3.0` |
+| `v3.1.0-alpha` | README 徽章 | `v3.1.0-alpha` |
+| `V3.1.0-alpha-alpha-alpha-alpha-alpha-alpha-alpha` | 标题中的大写版本 | `V3.1.0-alpha-alpha-alpha-alpha-alpha-alpha-alpha` |
+| `3.1.0-alpha` | 纯文本版本号 | `3.1.0-alpha` |
+| `v3.1` | 短版本号 | `v3.1` |
 | `**最后更新**: 2026-03-19` | 更新日期 | `**最后更新**: 2026-03-19` |
 
 ### 3. 更新的文档类型
@@ -143,11 +143,11 @@ python tools/version_manager.py sync --dry-run
 
 # 4. 提交更改
 git add VERSION pyproject.toml *.md
-git commit -m "chore: bump version to 3.0.1-alpha"
+git commit -m "chore: bump version to 3.1.0-alpha"
 
 # 5. 打标签（可选）
-git tag v3.0.1-alpha
-git push origin v3.0.1-alpha
+git tag v3.1.0-alpha
+git push origin v3.1.0-alpha
 ```
 
 ### 紧急修复流程
@@ -161,7 +161,7 @@ python tools/version_manager.py sync
 
 # 3. 提交并推送
 git add .
-git commit -m "fix: release 3.0.1-alpha with critical bug fixes"
+git commit -m "fix: release 3.1.0-alpha with critical bug fixes"
 git push
 ```
 
@@ -243,10 +243,10 @@ exclude_dirs = {
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
-| 3.0.1-alpha | 2026-03-19 | 智能路由与策略融合引擎 ⭐ |
-| 3.0.1-alpha | 2026-03-19 | Interface 模块增强 |
-| 3.0.1-alpha | 2026-03-19 | 可视化调试面板 ⭐ |
-| 3.0.1-alpha | 2026-03-17 | MVP 版本发布 |
+| 3.1.0-alpha | 2026-03-19 | 智能路由与策略融合引擎 ⭐ |
+| 3.1.0-alpha | 2026-03-19 | Interface 模块增强 |
+| 3.1.0-alpha | 2026-03-19 | 可视化调试面板 ⭐ |
+| 3.1.0-alpha | 2026-03-17 | MVP 版本发布 |
 
 ## 🆘 故障排查
 
@@ -257,9 +257,9 @@ exclude_dirs = {
 **解决方案**:
 ```bash
 # 使用正确的格式
-python tools/version_manager.py set 3.0.1-alpha
+python tools/version_manager.py set 3.1.0-alpha
 # 或
-python tools/version_manager.py set 3.0.1-alpha
+python tools/version_manager.py set 3.1.0-alpha
 ```
 
 ### 问题 2: 某些文件未更新
@@ -287,8 +287,8 @@ sudo python tools/version_manager.py sync
 
 ## 📚 相关资源
 
-- [语义化版本规范 3.0.1-alpha](https://semver.org/lang/zh-CN/)
-- [Keep a Changelog](https://keepachangelog.com/zh-CN/3.0.1-alpha/)
+- [语义化版本规范 3.1.0-alpha](https://semver.org/lang/zh-CN/)
+- [Keep a Changelog](https://keepachangelog.com/zh-CN/3.1.0-alpha/)
 - [Python 打包版本规范](https://packaging.python.org/en/latest/specifications/version-specifiers/)
 
 ---

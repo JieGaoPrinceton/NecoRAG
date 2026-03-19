@@ -2,7 +2,7 @@
 
 ## 📋 快速使用
 
-当前项目版本：**3.0.1-alpha**
+当前项目版本：**3.1.0-alpha**
 
 ### 查看当前版本
 
@@ -15,24 +15,24 @@ python tools/version_manager.py show
 #### 递增补丁号（小更新）
 ```bash
 python tools/version_manager.py bump patch
-# 3.0.1-alpha -> 3.0.1-alpha
+# 3.1.0-alpha -> 3.1.0-alpha
 ```
 
 #### 递增次版本号（新功能）
 ```bash
 python tools/version_manager.py bump minor
-# 3.0.1-alpha -> 3.0.1-alpha
+# 3.1.0-alpha -> 3.1.0-alpha
 ```
 
 #### 递增主版本号（重大变更）
 ```bash
 python tools/version_manager.py bump major
-# 3.0.1-alpha -> 3.0.1-alpha
+# 3.1.0-alpha -> 3.1.0-alpha
 ```
 
 #### 直接设置版本
 ```bash
-python tools/version_manager.py set 3.0.1-alpha
+python tools/version_manager.py set 3.1.0-alpha
 ```
 
 ### 同步版本号到所有文件
@@ -74,11 +74,11 @@ git status
 
 # 3. 提交更改
 git add VERSION pyproject.toml *.md
-git commit -m "chore: bump version to 3.0.1-alpha"
+git commit -m "chore: bump version to 3.1.0-alpha"
 
 # 4. 打标签（可选）
-git tag v3.0.1-alpha
-git push origin v3.0.1-alpha
+git tag v3.1.0-alpha
+git push origin v3.1.0-alpha
 ```
 
 ## 📚 详细文档
@@ -87,4 +87,4 @@ git push origin v3.0.1-alpha
 
 ---
 
-**最后更新**: 2026-03-19 | **版本**: 3.0.1-alpha
+**最后更新**: 2026-03-19 | **版本**: 3.1.0-alpha

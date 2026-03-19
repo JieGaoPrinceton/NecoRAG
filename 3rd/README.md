@@ -2,7 +2,7 @@
 
 **Third-Party Systems Documentation Index**
 
-版本：v3.0.1-alpha  
+版本：v3.1.0-alpha  
 更新日期：2026-03-18
 
 ---
@@ -269,17 +269,17 @@ docker exec -it qdrant bash
 
 ## 🔄 更新记录
 
-### v3.0.1-alpha (2026-03-18)
+### v3.1.0-alpha (2026-03-18)
 - ✅ 初始版本发布
 - ✅ 完成 14+ 第三方系统详细文档
 - ✅ 提供技术选型指南
 - ✅ 提供部署配置速查表
 
 ### 计划更新
-- [ ] v3.0.1-alpha: 添加 Kubernetes 部署专题
-- [ ] v3.0.1-alpha: 添加性能调优最佳实践
-- [ ] v3.0.1-alpha: 添加故障排查案例库
-- [ ] v3.0.1-alpha: 多语言支持（英文版本）
+- [ ] v3.1.0-alpha: 添加 Kubernetes 部署专题
+- [ ] v3.1.0-alpha: 添加性能调优最佳实践
+- [ ] v3.1.0-alpha: 添加故障排查案例库
+- [ ] v3.1.0-alpha: 多语言支持（英文版本）
 
 ---
 

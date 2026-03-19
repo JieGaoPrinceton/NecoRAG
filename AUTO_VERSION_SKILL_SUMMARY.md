@@ -58,8 +58,8 @@ NecoRAG 自动版本控制系统
 
 📊 分析变更类型...
 变更类型：🔴 重大重构 (37 个文件)
-当前版本：3.0.1-alpha
-建议更新：major → 3.0.1-alpha
+当前版本：3.1.0-alpha
+建议更新：major → 3.1.0-alpha
 ```
 
 ### 2. 自动递增版本号 ⬆️
@@ -153,10 +153,10 @@ $ python tools/auto_version_control.py --auto
 
 🔍 检测项目变更...
 变更类型：🟢 新功能 (1 个文件)
-✓ 已更新 VERSION 文件：3.0.1-alpha
+✓ 已更新 VERSION 文件：3.1.0-alpha
 ✓ 已同步 45 个 Markdown 文件
 
-新版本号：3.0.1-alpha
+新版本号：3.1.0-alpha
 ```
 
 ### 演示 2：紧急修复
@@ -170,7 +170,7 @@ git commit -m "fix: resolve memory leak issue"
 $ python tools/auto_version_control.py --auto
 
 变更类型：🔵 Bug 修复
-✓ 版本已更新为：3.0.1-alpha
+✓ 版本已更新为：3.1.0-alpha
 ```
 
 ### 演示 3：大版本发布
@@ -180,7 +180,7 @@ $ python tools/auto_version_control.py --auto
 $ python tools/auto_version_control.py --dry-run
 
 变更类型：🔴 重大重构
-📝 预览模式：将更新版本号为 3.0.1-alpha
+📝 预览模式：将更新版本号为 3.1.0-alpha
 ```
 
 ---
@@ -227,9 +227,9 @@ $ python tools/auto_version_control.py --dry-run
       ▼
 分析变更类型
       │
-      ├─▶ 重大重构 ──▶ major 递增 (3.0.1-alpha)
-      ├─▶ 新功能 ────▶ minor 递增 (3.0.1-alpha)
-      └─▶ Bug 修复 ──▶ patch 递增 (3.0.1-alpha)
+      ├─▶ 重大重构 ──▶ major 递增 (3.1.0-alpha)
+      ├─▶ 新功能 ────▶ minor 递增 (3.1.0-alpha)
+      └─▶ Bug 修复 ──▶ patch 递增 (3.1.0-alpha)
       │
       ▼
 计算新版本号
@@ -333,5 +333,5 @@ python tools/auto_version_control.py --auto
 ---
 
 **创建时间**: 2026-03-19  
-**版本**: 3.0.1-alpha → 3.0.1-alpha (测试演示)  
+**版本**: 3.1.0-alpha → 3.1.0-alpha (测试演示)  
 **作者**: NecoRAG Team

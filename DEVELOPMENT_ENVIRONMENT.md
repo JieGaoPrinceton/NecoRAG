@@ -17,7 +17,7 @@
 
 ### 最低要求
 - **Python**: >= 3.9
-- **推荐版本**: Python 3.0.1-alpha
+- **推荐版本**: Python 3.1.0-alpha
 - **支持版本**: 3.9, 3.10, 3.11, 3.12
 
 ### 为什么推荐 Python 3.11？
@@ -106,8 +106,8 @@ brew install python@3.11
 
 # 或使用 pyenv（多版本管理）
 brew install pyenv
-pyenv install 3.0.1-alpha
-pyenv global 3.0.1-alpha
+pyenv install 3.1.0-alpha
+pyenv global 3.1.0-alpha
 ```
 
 #### Linux (Ubuntu/Debian)
@@ -262,19 +262,19 @@ isort src/ example/ tests/
 ```yaml
 repos:
   - repo: https://github.com/psf/black
-    rev: 3.0.1-alpha
+    rev: 3.1.0-alpha
     hooks:
       - id: black
         language_version: python3.11
   
   - repo: https://github.com/pycqa/flake8
-    rev: 3.0.1-alpha
+    rev: 3.1.0-alpha
     hooks:
       - id: flake8
         args: [--max-line-length=100]
   
   - repo: https://github.com/pycqa/isort
-    rev: 3.0.1-alpha
+    rev: 3.1.0-alpha
     hooks:
       - id: isort
         args: [--profile=black]
@@ -316,8 +316,8 @@ pip install <package_name>
 python --version
 
 # 使用 pyenv 切换版本
-pyenv install 3.0.1-alpha
-pyenv local 3.0.1-alpha
+pyenv install 3.1.0-alpha
+pyenv local 3.1.0-alpha
 
 # 重新创建虚拟环境
 rm -rf .venv
@@ -369,7 +369,7 @@ docker-compose logs -f
 
 在开始开发前，请确认:
 
-- [ ] Python 版本 >= 3.9 (推荐 3.0.1-alpha)
+- [ ] Python 版本 >= 3.9 (推荐 3.1.0-alpha)
 - [ ] 虚拟环境已创建并激活
 - [ ] 所有依赖已成功安装
 - [ ] `python test_init.py` 运行成功
@@ -399,4 +399,4 @@ docker-compose logs -f
 
 ---
 
-*Last Updated: 2026-03-19 | Version: 3.0.1-alpha*
+*Last Updated: 2026-03-19 | Version: 3.1.0-alpha*

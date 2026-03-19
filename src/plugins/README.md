@@ -66,7 +66,7 @@ class MyCustomPlugin(PerceptionPlugin):
         super().__init__(
             plugin_id="my_custom_plugin",
             name="我的自定义插件",
-            version="3.0.1-alpha"
+            version="3.1.0-alpha"
         )
     
     @property

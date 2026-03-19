@@ -2,7 +2,7 @@
 
 **Third-Party Systems Integration Guide**
 
-版本：v3.0.1-alpha  
+版本：v3.1.0-alpha  
 更新日期：2026-03-18
 
 ---

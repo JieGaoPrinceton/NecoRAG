@@ -78,7 +78,7 @@ bash tools/code-count.sh
 📊 NecoRAG 项目代码统计报告
 ======================================================================
 ⏰ 统计时间：2026-03-19 12:21:45
-🏷️  项目版本：v3.0.1-alpha
+🏷️  项目版本：v3.1.0-alpha
 ======================================================================
 
 📁 文件统计
@@ -110,7 +110,7 @@ python tools/code-count.py -p .. -o
 # 或
 bash tools/code-count.sh -o
 
-# 生成的文件名为：code_count_v3.0.1-alpha_20260319_122145.md
+# 生成的文件名为：code_count_v3.1.0-alpha_20260319_122145.md
 ```
 
 ### 3️⃣ 指定输出文件名
@@ -152,7 +152,7 @@ bash tools/code-count.sh -v
 
 1. **版本信息**
    ```
-   🏷️  项目版本：v3.0.1-alpha
+   🏷️  项目版本：v3.1.0-alpha
    ```
    - 自动从 `VERSION` 文件读取
    - 如果找不到 VERSION 文件，显示为 "unknown"
@@ -302,7 +302,7 @@ python tools/code-count.py -p ..
 ```bash
 # 按版本命名
 code_count_v{version}_{timestamp}.md
-# 例如：code_count_v3.0.1-alpha_20260319_122145.md
+# 例如：code_count_v3.1.0-alpha_20260319_122145.md
 
 # 按日期命名
 code_count_{YYYYMMDD}.md
@@ -332,7 +332,7 @@ reports/
 确保项目根目录有 `VERSION` 文件：
 ```
 # VERSION 文件内容示例
-3.0.1-alpha
+3.1.0-alpha
 ```
 
 如果找不到 VERSION 文件，工具会显示版本号为 "unknown"。

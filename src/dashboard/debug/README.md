@@ -186,5 +186,5 @@ session.complete_session(performance_metrics)
 
 **项目状态**: ✅ 已完成  
 **最后更新**: 2026年3月19日  
-**版本**: v3.0.1-alpha  
+**版本**: v3.1.0-alpha  
 **维护者**: NecoRAG开发团队

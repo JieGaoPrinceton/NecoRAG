@@ -53,7 +53,7 @@ chmod +x verify_docker_images.sh
 
 | 镜像名称 | 版本 | 大小 | 用途 | Docker Hub |
 |---------|------|------|------|-----------|
-| milvusdb/milvus | `v3.0.1-alpha` | ~707MB | Milvus 向量数据库（备选） | [链接](https://hub.docker.com/r/milvusdb/milvus) |
+| milvusdb/milvus | `v3.1.0-alpha` | ~707MB | Milvus 向量数据库（备选） | [链接](https://hub.docker.com/r/milvusdb/milvus) |
 | memgraph/memgraph | `latest` | ~203MB | Memgraph 图数据库（备选） | [链接](https://hub.docker.com/r/memgraph/memgraph) |
 | prom/prometheus | `latest` | ~146MB | Prometheus 指标收集 | [链接](https://hub.docker.com/_/prometheus) |
 | apache/superset | `latest` | ~643MB | Superset 数据可视化 | [链接](https://hub.docker.com/r/apache/superset) |
@@ -314,11 +314,11 @@ docker load -i qdrant-latest.tar
 # 修改 import_docker_images.sh 中的镜像列表
 
 declare -a IMAGES=(
-    "redis:3.0.1-alpha"           # 锁定具体版本
-    "qdrant/qdrant:v3.0.1-alpha"         # 锁定具体版本
-    "neo4j:3.0.1-alpha"       # 锁定具体版本
-    "ollama/ollama:3.0.1-alpha"         # 锁定具体版本
-    "grafana/grafana:3.0.1-alpha"       # 锁定具体版本
+    "redis:3.1.0-alpha"           # 锁定具体版本
+    "qdrant/qdrant:v3.1.0-alpha"         # 锁定具体版本
+    "neo4j:3.1.0-alpha"       # 锁定具体版本
+    "ollama/ollama:3.1.0-alpha"         # 锁定具体版本
+    "grafana/grafana:3.1.0-alpha"       # 锁定具体版本
 )
 ```
 
@@ -392,7 +392,7 @@ docker rmi necorag/redis:latest
 
 **脚本作者**: NecoRAG DevOps Team  
 **最后更新**: 2026-03-19  
-**版本**: v3.0.1-alpha  
+**版本**: v3.1.0-alpha  
 **兼容性**: Docker 20.10+, Docker Compose 2.0+
 
 ---

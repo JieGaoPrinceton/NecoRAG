@@ -45,7 +45,7 @@
 
 ---
 
-### 2. 3.0.1-alpha 用户画像与权限模型
+### 2. 3.1.0-alpha 用户画像与权限模型
 
 #### 用户角色定义
 
@@ -89,7 +89,7 @@ class UserProfile:
 
 ---
 
-### 3. 3.0.1-alpha 个人工作空间 (Personal Workspace)
+### 3. 3.1.0-alpha 个人工作空间 (Personal Workspace)
 
 #### 功能特性
 
@@ -142,7 +142,7 @@ personal_workspace/{user_id}/
 
 ---
 
-### 4. 3.0.1-alpha 公共贡献空间 (Public Contribution Space)
+### 4. 3.1.0-alpha 公共贡献空间 (Public Contribution Space)
 
 #### 知识贡献流程
 
@@ -223,7 +223,7 @@ class PublicContributionSpace:
 
 ---
 
-### 5. 3.0.1-alpha 混合协作空间 (Hybrid Collaboration Space)
+### 5. 3.1.0-alpha 混合协作空间 (Hybrid Collaboration Space)
 
 #### 适用场景
 
@@ -259,7 +259,7 @@ class TeamMembership:
 
 ---
 
-### 6. 3.0.1-alpha 跨空间知识流动机制
+### 6. 3.1.0-alpha 跨空间知识流动机制
 
 #### 知识流动路径
 
@@ -298,7 +298,7 @@ class TeamMembership:
 
 ---
 
-### 7. 3.0.1-alpha 安全与隐私保护
+### 7. 3.1.0-alpha 安全与隐私保护
 
 #### 安全措施
 

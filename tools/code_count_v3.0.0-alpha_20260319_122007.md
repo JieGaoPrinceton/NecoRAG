@@ -1,7 +1,7 @@
 # NecoRAG 项目代码统计报告
 
 **统计时间**: 2026-03-19 12:20:07  
-**项目版本**: v3.0.1-alpha
+**项目版本**: v3.1.0-alpha
 
 ---
 
@@ -43,4 +43,4 @@
 
 ---
 
-*本报告由 NecoRAG Code Count 工具自动生成 (v3.0.1-alpha)*
+*本报告由 NecoRAG Code Count 工具自动生成 (v3.1.0-alpha)*

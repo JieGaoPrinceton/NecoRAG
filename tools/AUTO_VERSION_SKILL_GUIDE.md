@@ -21,11 +21,11 @@
 
 | 变更类型 | 触发条件 | 递增级别 | 示例 |
 |---------|---------|---------|------|
-| 🔴 重大重构 | 核心架构变更、BREAKING CHANGE | major | 3.0.1-alpha → 3.0.1-alpha |
-| 🟢 新功能 | 新增模块、新功能实现 | minor | 3.0.1-alpha → 3.0.1-alpha |
-| 🔵 Bug 修复 | 错误修复、性能优化 | patch | 3.0.1-alpha → 3.0.1-alpha |
-| 📝 文档更新 | 仅修改文档 | patch | 3.0.1-alpha → 3.0.1-alpha |
-| ⚙️ 配置调整 | 配置文件变更 | patch | 3.0.1-alpha → 3.0.1-alpha |
+| 🔴 重大重构 | 核心架构变更、BREAKING CHANGE | major | 3.1.0-alpha → 3.1.0-alpha |
+| 🟢 新功能 | 新增模块、新功能实现 | minor | 3.1.0-alpha → 3.1.0-alpha |
+| 🔵 Bug 修复 | 错误修复、性能优化 | patch | 3.1.0-alpha → 3.1.0-alpha |
+| 📝 文档更新 | 仅修改文档 | patch | 3.1.0-alpha → 3.1.0-alpha |
+| ⚙️ 配置调整 | 配置文件变更 | patch | 3.1.0-alpha → 3.1.0-alpha |
 
 ### 3. 批量同步
 - 自动更新 `VERSION` 文件
@@ -119,9 +119,9 @@ git commit -m "feat: add new retrieval strategy"
 # 
 # 📊 分析变更类型...
 # 变更类型：🟢 新功能 (1 个文件)
-# 建议更新：minor → 3.0.1-alpha
+# 建议更新：minor → 3.1.0-alpha
 # 
-# ✓ 已更新 VERSION 文件：3.0.1-alpha
+# ✓ 已更新 VERSION 文件：3.1.0-alpha
 # ✓ 已同步 45 个 Markdown 文件
 ```
 
@@ -134,7 +134,7 @@ python tools/auto_version_control.py --auto
 # 输出：
 # 🔍 检测项目变更...
 # 变更类型：🔵 Bug 修复
-# ✓ 版本已更新为：3.0.1-alpha
+# ✓ 版本已更新为：3.1.0-alpha
 ```
 
 ### 示例 3：大版本发布前检查
@@ -144,7 +144,7 @@ python tools/auto_version_control.py --auto
 python tools/auto_version_control.py --dry-run
 
 # 输出：
-# 📝 预览模式：将更新版本号为 3.0.1-alpha
+# 📝 预览模式：将更新版本号为 3.1.0-alpha
 # （不实际修改文件，仅查看将要发生的变化）
 ```
 
@@ -235,7 +235,7 @@ python tools/auto_version_control.py --dry-run
 ### 3. 自动生成更新日志
 
 ```markdown
-## [3.0.1-alpha] - 2026-03-19
+## [3.1.0-alpha] - 2026-03-19
 
 ### 🟢 新功能 (3 个文件)
 
@@ -275,9 +275,9 @@ git commit -m "Initial commit"
 # 检查 VERSION 文件内容
 cat VERSION
 
-# 应该类似：3.0.1-alpha
+# 应该类似：3.1.0-alpha
 # 如果格式不对，手动修正
-echo "3.0.1-alpha" > VERSION
+echo "3.1.0-alpha" > VERSION
 ```
 
 ### 问题 3：同步失败
@@ -354,5 +354,5 @@ python tools/auto_version_control.py --auto
 ---
 
 **创建时间**: 2026-03-19  
-**版本**: 3.0.1-alpha  
+**版本**: 3.1.0-alpha  
 **作者**: NecoRAG Team
