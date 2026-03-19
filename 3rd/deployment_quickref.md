@@ -2,7 +2,7 @@
 
 **Quick Reference: Deployment Configuration**
 
-版本：v1.0.0  
+版本：v2.0.1-alpha  
 更新日期：2026-03-18
 
 ---
@@ -327,7 +327,7 @@ docker run -d \
 #### APOC 插件安装
 ```bash
 # 下载 APOC 插件
-wget https://github.com/neo4j/apoc/releases/download/5.15.0/apoc-5.15.0-core.jar \
+wget https://github.com/neo4j/apoc/releases/download/2.0.1-alpha/apoc-2.0.1-alpha-alphae.jar \
   -P $(docker inspect neo4j --format='{{range .Mounts}}{{if eq .Destination "/plugins"}}{{.Source}}{{end}}{{end}}')
 
 # 启用 APOC

@@ -2,7 +2,7 @@
 
 **Missing Modules Analysis and Completion Plan**
 
-版本：v1.0.0  
+版本：v2.0.1-alpha  
 更新日期：2026-03-18
 
 ---
@@ -395,7 +395,7 @@ version: '3.8'
 
 services:
   elasticsearch:
-    image: elasticsearch:8.11.0
+    image: elasticsearch:2.0.1-alpha
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
@@ -405,14 +405,14 @@ services:
       - es_data:/usr/share/elasticsearch/data
 
   kibana:
-    image: kibana:8.11.0
+    image: kibana:2.0.1-alpha
     ports:
       - "5601:5601"
     depends_on:
       - elasticsearch
 
   prometheus:
-    image: prom/prometheus:v2.47.0
+    image: prom/prometheus:v2.0.1-alpha
     ports:
       - "9090:9090"
     volumes:
@@ -420,7 +420,7 @@ services:
       - prometheus_data:/prometheus
 
   grafana:
-    image: grafana/grafana:10.2.0
+    image: grafana/grafana:2.0.1-alpha
     ports:
       - "3000:3000"
     environment:
@@ -611,7 +611,7 @@ class CustomPDFParser(BasePlugin):
         super().__init__()
         self.metadata = PluginMetadata(
             name="custom_pdf_parser",
-            version="1.0.0",
+            version="2.0.1-alpha",
             author="NecoRAG Team",
             description="基于 PyMuPDF 的高性能 PDF 解析器",
             plugin_type=PluginType.PARSER

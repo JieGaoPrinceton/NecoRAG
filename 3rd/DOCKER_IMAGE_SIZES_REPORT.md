@@ -24,7 +24,7 @@
 
 ### 可选镜像（本次查询）
 
-#### 1. milvusdb/milvus:v2.3.0
+#### 1. milvusdb/milvus:v2.0.1-alpha
 
 **查询结果**:
 - **大小**: ~707MB (linux/amd64)
@@ -34,7 +34,7 @@
 
 **详细信息**:
 ```
-Image: milvusdb/milvus:v2.3.0
+Image: milvusdb/milvus:v2.0.1-alpha
 Platform: linux/amd64
 Size: 707.19 MB
 Layers: 4
@@ -110,7 +110,7 @@ OS/ARCH: linux/amd64
 ├─ prom/prometheus:latest  ████████████████████████████████████████ 146MB   (8.6%)
 ├─ memgraph/memgraph:latest ████████████████████████████████████████████████████████████████ 203MB   (12.0%)
 ├─ apache/superset:latest  ████████████████████████████████████████████████████████████████████████████████████████████████████████ 643MB   (37.9%)
-└─ milvusdb/milvus:v2.3.0  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████ 707MB   (41.7%)
+└─ milvusdb/milvus:v2.0.1-alpha  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████ 707MB   (41.7%)
 ```
 
 ### 大小对比表
@@ -232,7 +232,7 @@ OS/ARCH: linux/amd64
 
 ```bash
 # 根据需求选择特定镜像
-docker pull milvusdb/milvus:v2.3.0      # 需要 Milvus 时
+docker pull milvusdb/milvus:v2.0.1-alpha      # 需要 Milvus 时
 docker pull memgraph/memgraph:latest    # 需要轻量图数据库
 # ... 按需选择
 ```
@@ -265,7 +265,7 @@ docker pull memgraph/memgraph:latest    # 需要轻量图数据库
 
 | 镜像名称 | 版本 | 大小 | 用途 | Docker Hub |
 |---------|------|------|------|-----------|
-| milvusdb/milvus | `v2.3.0` | ~707MB | Milvus 向量数据库（备选） | [链接](https://hub.docker.com/r/milvusdb/milvus) |
+| milvusdb/milvus | `v2.0.1-alpha` | ~707MB | Milvus 向量数据库（备选） | [链接](https://hub.docker.com/r/milvusdb/milvus) |
 | memgraph/memgraph | `latest` | ~203MB | Memgraph 图数据库（备选） | [链接](https://hub.docker.com/r/memgraph/memgraph) |
 | prom/prometheus | `latest` | ~146MB | Prometheus 指标收集 | [链接](https://hub.docker.com/_/prometheus) |
 | apache/superset | `latest` | ~643MB | Superset 数据可视化 | [链接](https://hub.docker.com/r/apache/superset) |
@@ -280,7 +280,7 @@ docker pull memgraph/memgraph:latest    # 需要轻量图数据库
 
 | # | 镜像名称 | 大小 | 用途 | 说明 |
 |---|---------|------|------|------|
-| 1 | milvusdb/milvus:v2.3.0 | ~707MB | Milvus 向量数据库 | Qdrant 的替代方案 |
+| 1 | milvusdb/milvus:v2.0.1-alpha | ~707MB | Milvus 向量数据库 | Qdrant 的替代方案 |
 | 2 | memgraph/memgraph:latest | ~203MB | Memgraph 图数据库 | Neo4j 的替代方案 |
 | 3 | prom/prometheus:latest | ~146MB | Prometheus 指标收集 | 增强监控能力 |
 | 4 | apache/superset:latest | ~643MB | Superset 数据可视化 | 增强可视化能力 |
@@ -295,7 +295,7 @@ docker pull memgraph/memgraph:latest    # 需要轻量图数据库
 ### 查询渠道
 
 1. **Docker Hub 官方网站**
-   - milvusdb/milvus:v2.3.0
+   - milvusdb/milvus:v2.0.1-alpha
    - memgraph/memgraph:latest
    - prom/prometheus:latest
    - apache/superset:latest

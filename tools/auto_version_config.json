@@ -1,0 +1,58 @@
+{
+  "auto_mode": true,
+  "interactive": false,
+  "dry_run": false,
+  "commit_changes": true,
+  "generate_changelog": true,
+  
+  "exclude_patterns": [
+    "*.log",
+    "*.tmp",
+    ".git/",
+    "__pycache__/",
+    "*.pyc",
+    ".env.local",
+    "*.bak"
+  ],
+  
+  "core_files": [
+    "src/necorag.py",
+    "src/core/",
+    "interface/",
+    "design/design.md"
+  ],
+  
+  "version_bump_rules": {
+    "major_triggers": [
+      "BREAKING CHANGE",
+      "refactor!:",
+      "perf!:",
+      "architecture change"
+    ],
+    "minor_triggers": [
+      "feat:",
+      "feature:",
+      "new module",
+      "add functionality"
+    ],
+    "patch_triggers": [
+      "fix:",
+      "bugfix:",
+      "hotfix:",
+      "docs:",
+      "chore:"
+    ]
+  },
+  
+  "git_integration": {
+    "enabled": true,
+    "analyze_commits": true,
+    "max_commits_to_analyze": 10
+  },
+  
+  "changelog": {
+    "enabled": true,
+    "max_files_display": 10,
+    "group_by_type": true
+  }
+}

@@ -2,7 +2,7 @@
 
 **Third-Party System Selection Guide**
 
-版本：v1.0.0  
+版本：v2.0.1-alpha  
 更新日期：2026-03-18
 
 ---
@@ -882,10 +882,10 @@ print(response)
 
 软件版本:
   Python: 3.10
-  Ollama: 0.1.38
-  Qdrant: 1.9.0
-  Neo4j: 5.15.0
-  Rasa: 3.6.0
+  Ollama: 2.0.1-alpha
+  Qdrant: 2.0.1-alpha
+  Neo4j: 2.0.1-alpha
+  Rasa: 2.0.1-alpha
 ```
 
 ### 测试结果

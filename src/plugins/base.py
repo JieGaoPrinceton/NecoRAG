@@ -22,6 +22,22 @@ class PluginType(Enum):
 class BasePlugin(ABC):
     """插件基类"""
     
+    # ========== 市场元数据属性（带默认值，兼容现有子类）==========
+    marketplace_id: str = ""               # 市场中的唯一 ID
+    marketplace_version: str = "0.1.0"     # 版本号
+    marketplace_author: str = ""            # 作者
+    marketplace_category: str = "community" # 分类
+    marketplace_tags: List[str] = []        # 标签
+    marketplace_license: str = "MIT"
+    marketplace_homepage: str = ""
+    marketplace_repository: str = ""
+    marketplace_min_necorag: str = "0.1.0"
+    marketplace_max_necorag: Optional[str] = None
+    marketplace_entry_point: str = ""
+    
+    # 权限声明
+    required_permissions: List[str] = []    # 如 ["read_memory", "query_knowledge"]
+    
     def __init__(self, plugin_id: str, name: str, version: str, plugin_type: PluginType):
         self.plugin_id = plugin_id
         self.name = name
@@ -149,6 +165,109 @@ class BasePlugin(ABC):
             "enabled": self.is_enabled,
             "dependencies": self.dependencies
         }
+    
+    # ========== 市场集成方法 ==========
+    
+    @property
+    def manifest(self) -> Optional[Any]:
+        """
+        生成与市场兼容的 PluginManifest 对象
+        从现有 get_info() 和新增的 marketplace_* 属性构建
+        使用 try-except 导入 marketplace.models，如果导入失败返回 None
+        """
+        try:
+            from src.marketplace.models import PluginManifest, PluginType as MktPluginType, PluginCategory
+            
+            # 映射 PluginType
+            type_mapping = {
+                "perception": MktPluginType.PERCEPTION,
+                "memory": MktPluginType.MEMORY,
+                "retrieval": MktPluginType.RETRIEVAL,
+                "refinement": MktPluginType.REFINEMENT,
+                "response": MktPluginType.RESPONSE,
+                "custom": MktPluginType.UTILITY,
+            }
+            mkt_type = type_mapping.get(self.plugin_type.value, MktPluginType.UTILITY)
+            
+            # 映射 PluginCategory
+            category_mapping = {
+                "official": PluginCategory.OFFICIAL,
+                "certified": PluginCategory.CERTIFIED,
+                "community": PluginCategory.COMMUNITY,
+            }
+            mkt_category = category_mapping.get(
+                self.marketplace_category.lower(), 
+                PluginCategory.COMMUNITY
+            )
+            
+            return PluginManifest(
+                plugin_id=self.marketplace_id or self.plugin_id,
+                name=self.name,
+                version=self.marketplace_version or self.version,
+                author=self.marketplace_author,
+                description=self.description,
+                plugin_type=mkt_type,
+                entry_point=self.marketplace_entry_point or f"{self.__class__.__module__}:{self.__class__.__name__}",
+                category=mkt_category,
+                tags=list(self.marketplace_tags) if self.marketplace_tags else [],
+                license=self.marketplace_license,
+                homepage=self.marketplace_homepage,
+                repository=self.marketplace_repository,
+                min_necorag_version=self.marketplace_min_necorag,
+                max_necorag_version=self.marketplace_max_necorag,
+                dependencies={},  # 转换为市场依赖格式
+                permissions=[],   # 权限需要映射
+            )
+        except ImportError:
+            self.logger.debug("marketplace.models not available, manifest property returns None")
+            return None
+        except Exception as e:
+            self.logger.warning(f"Failed to create manifest: {e}")
+            return None
+    
+    def get_marketplace_info(self) -> Dict[str, Any]:
+        """
+        获取市场所需的元信息（纯字典格式，不依赖 marketplace 模块）
+        合并 get_info() 和 marketplace_* 属性
+        """
+        base_info = self.get_info()
+        marketplace_info = {
+            "marketplace_id": self.marketplace_id or self.plugin_id,
+            "marketplace_version": self.marketplace_version or self.version,
+            "marketplace_author": self.marketplace_author,
+            "marketplace_category": self.marketplace_category,
+            "marketplace_tags": list(self.marketplace_tags) if self.marketplace_tags else [],
+            "marketplace_license": self.marketplace_license,
+            "marketplace_homepage": self.marketplace_homepage,
+            "marketplace_repository": self.marketplace_repository,
+            "marketplace_min_necorag": self.marketplace_min_necorag,
+            "marketplace_max_necorag": self.marketplace_max_necorag,
+            "marketplace_entry_point": self.marketplace_entry_point or f"{self.__class__.__module__}:{self.__class__.__name__}",
+            "required_permissions": list(self.required_permissions) if self.required_permissions else [],
+        }
+        return {**base_info, **marketplace_info}
+    
+    # ========== 市场生命周期钩子（空实现，子类可覆盖）==========
+    
+    def on_marketplace_install(self, config: Optional[Dict] = None):
+        """市场安装后回调"""
+        pass
+    
+    def on_marketplace_uninstall(self):
+        """市场卸载前回调"""
+        pass
+    
+    def on_marketplace_upgrade(self, old_version: str, new_version: str):
+        """市场升级后回调"""
+        pass
+    
+    def on_marketplace_enable(self):
+        """市场启用回调"""
+        pass
+    
+    def on_marketplace_disable(self):
+        """市场禁用回调"""
+        pass
 
 
 # 感知层插件基类

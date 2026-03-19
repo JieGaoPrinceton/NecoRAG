@@ -1,0 +1,15 @@
+# NecoRAG Development Environment Configuration
+# ================================================
+# This file specifies the Python version for the project.
+# Used by pyenv and other Python version management tools.
+#
+# Usage:
+#   # Install the specified Python version
+#   pyenv install $(cat .python-version)
+#   
+#   # Or let pyenv automatically install it
+#   pyenv local
+#
+# Last Updated: 2026-03-19
+
+3.11.8

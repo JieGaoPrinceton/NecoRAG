@@ -4,7 +4,7 @@
 
 **项目名称**: 知识库健康仪表盘 (Knowledge Health Dashboard)  
 **实施日期**: 2026-03-19  
-**版本号**: v1.0.0  
+**版本号**: v2.0.1-alpha  
 **状态**: ✅ 已完成并通过测试  
 
 ---
@@ -379,7 +379,7 @@ file:///path/to/src/dashboard/components/KnowledgeHealthDashboard.html
 
 ## 📝 版本信息
 
-- **当前版本**: v1.0.0
+- **当前版本**: v2.0.1-alpha
 - **发布日期**: 2026-03-19
 - **实施者**: NecoRAG Team
 - **审核人**: Qi Jie

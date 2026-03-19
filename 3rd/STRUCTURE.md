@@ -235,10 +235,10 @@ graph TB
 git log design/3rd/
 
 # 查看特定版本
-git checkout v1.0.0 -- design/3rd/
+git checkout v2.0.1-alpha -- design/3rd/
 
 # 比较版本差异
-git diff v0.9.0 v1.0.0 -- design/3rd/
+git diff v2.0.1-alpha v2.0.1-alpha -- design/3rd/
 ```
 
 ### 更新频率
