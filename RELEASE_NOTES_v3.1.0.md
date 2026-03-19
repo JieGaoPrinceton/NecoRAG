@@ -1,10 +1,10 @@
-# NecoRAG v3.1.0-alpha 版本发布说明
+# NecoRAG v3.2.0-alpha 版本发布说明
 
 ## 📋 版本信息
 
-- **版本号**: `v3.1.0-alpha`
+- **版本号**: `v3.2.0-alpha`
 - **发布日期**: 2026-03-19
-- **上一版本**: `v3.0.0-alpha`
+- **上一版本**: `v3.2.0-alpha`
 - **变更类型**: 🔵 Minor Version (功能性增强)
 
 ---
@@ -40,7 +40,7 @@ python tools/code-count.py -p ..
 # 导出报告
 python tools/code-count.py -p .. -o
 
-# 生成文件名：code_count_v3.1.0-alpha_20260319_HHMMSS.md
+# 生成文件名：code_count_v3.2.0-alpha_20260319_HHMMSS.md
 ```
 
 ---
@@ -228,7 +228,7 @@ python tools/code-count.py -p ..
 # 输出示例：
 # 📊 NecoRAG 项目代码统计报告
 # ⏰ 统计时间：2026-03-19 12:23:07
-# 🏷️  项目版本：v3.1.0-alpha
+# 🏷️  项目版本：v3.2.0-alpha
 # 
 # 📁 总文件数：540
 # 📝 代码行数：163,586 (79.3%)
@@ -291,7 +291,7 @@ from src.workspace import UserManager
 
 ## 🎉 总结
 
-**v3.1.0-alpha** 是一个**功能性增强版本**，主要亮点：
+**v3.2.0-alpha** 是一个**功能性增强版本**，主要亮点：
 
 1. ✅ **Code Count 指令系统** - 完整的代码统计工具链
 2. ✅ **三级用户系统重构** - 清晰的 User → Team → Organization 架构
@@ -309,6 +309,6 @@ from src.workspace import UserManager
 **发布人**: AI Assistant  
 **审核人**: -  
 **状态**: ✅ 已发布  
-**下一步**: 准备 v3.1.0 正式版本
+**下一步**: 准备 v3.2.0-alpha 正式版本
 
 *NecoRAG - 让 AI 像大脑一样思考，像社会一样协作！* 🧠🌐

@@ -12,7 +12,7 @@
 
 ## ✅ 项目状态
 
-**当前版本**: v3.1.0-alpha  
+**当前版本**: v3.2.0-alpha  
 **项目状态**: 功能完善版，可视化调试面板完成  
 **最后更新**: 2026-03-19  
 **仓库地址**: https://gitee.com/qijie2026/NecoRAG
@@ -191,7 +191,7 @@ d:\code\NecoRAG\
 - 响应式生成（流式输出）
 - 多轮对话管理（上下文保持）
 
-### 🆕 新增核心模块（v3.1.0-alpha）
+### 🆕 新增核心模块（v3.2.0-alpha）
 
 #### ✅ 意图分析系统 (intent/)
 - 意图分类器（多级分类体系）
@@ -379,7 +379,7 @@ d:\code\NecoRAG\
 
 ---
 
-## 🌟 项目亮点（v3.1.0-alpha）
+## 🌟 项目亮点（v3.2.0-alpha）
 
 1. **完整的五层架构** - 从感知到交互的完整认知闭环
 2. **创新的记忆机制** - 动态权重衰减模拟生物记忆
@@ -430,14 +430,14 @@ d:\code\NecoRAG\
 
 ## 🎉 项目完成！
 
-**NecoRAG v3.1.0-alpha - 功能完善版**
+**NecoRAG v3.2.0-alpha - 功能完善版**
 
-**版本**: v3.1.0-alpha | **最后更新**: 2026-03-19  
+**版本**: v3.2.0-alpha | **最后更新**: 2026-03-19  
 **总文件数**: 445 个 | **总代码行数**: 164,167 行  
 **代码密度**: 80.2% | **测试覆盖率**: >80%
 
 [![Gitee](https://img.shields.io/badge/Gitee-仓库地址-red)](https://gitee.com/qijie2026/NecoRAG)
-[![Version](https://img.shields.io/badge/version-3.1.0-alpha--alpha-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.0-alpha--alpha-blue)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
 [![Code\ Quality](https://img.shields.io/badge/code%20quality-80.2%25-brightgreen)](tools/project_statistics.md)

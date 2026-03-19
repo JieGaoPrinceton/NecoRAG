@@ -2,7 +2,7 @@
 
 **Third-Party Systems Documentation Index**
 
-版本：v3.1.0-alpha  
+版本：v3.2.0-alpha  
 更新日期：2026-03-18
 
 ---
@@ -180,44 +180,156 @@ docker exec -it qdrant bash
 
 ## 📊 第三方系统清单总览
 
-### AI/ML 模型（6 个）
+### 完整技术栈架构
 
-| 系统 | 用途 | 推荐方案 | 文档章节 |
-|-----|------|---------|---------|
-| **Ollama** | LLM 推理 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#1-ollama-推荐--本地部署) |
-| **vLLM** | 高性能推理 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#12-vllm-高性能--生产环境) |
-| **BGE-M3** | 向量化 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#2-bge-m3-向量化服务) |
-| **BGE-Reranker** | 重排序 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#3-bge-reranker-v2-重排序服务) |
-| **Rasa NLU** | 意图识别 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#4-rasa-nlu-意图识别) |
-| **PaddleOCR** | OCR | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#6-ocr-服务可选) |
+NecoRAG 采用**五层认知架构**，集成 **20+ 第三方系统**，实现完整的 RAG 功能闭环。
 
-### 数据存储（3 个）
+```
+┌─────────────────────────────────────────────────────────┐
+│              NecoRAG 技术栈全景图                        │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  🎨 应用层 (2 个系统)                                    │
+│     Streamlit(前端) | LangGraph(编排引擎)                │
+│                                                         │
+│  🔤 AI 模型层 (8 个系统)                                 │
+│     Ollama/vLLM | BGE-M3 | BGE-Reranker | Rasa          │
+│     spaCy+jieba | PaddleOCR | HuggingFace TGI           │
+│                                                         │
+│  📄 处理层 (1 个系统)                                    │
+│     RAGFlow(深度文档解析)                                │
+│                                                         │
+│  💾 存储层 (5 个系统)                                    │
+│     Redis(L1) | Qdrant(L2) | Neo4j(L3)                  │
+│     MySQL(元数据) | MinIO(文件)                          │
+│                                                         │
+│  ⚙️ 中间件层 (2 个系统)                                  │
+│     APScheduler(定时) | Celery(异步队列)                 │
+│                                                         │
+│  📊 监控层 (3 个系统)                                    │
+│     Prometheus(采集) | Grafana(可视化) | APM(性能监控)    │
+│                                                         │
+│  🔍 增强层 (2 个系统)                                    │
+│     Elasticsearch(全文搜索) | Kibana(可视化)             │
+│                                                         │
+│  总计：23 个第三方系统                                   │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
 
-| 系统 | 用途 | 推荐方案 | 文档章节 |
-|-----|------|---------|---------|
-| **Redis** | L1 工作记忆 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#1-redis---l1-工作记忆) |
-| **Qdrant** | L2 语义记忆 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#2-qdrant---l2-语义记忆) |
-| **Neo4j** | L3 情景图谱 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#3-neo4j---l3-情景图谱) |
+### AI/ML 模型（8 个）
+
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **Ollama** | LLM 推理（本地） | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#11-ollama-推荐--本地部署) |
+| **vLLM** | LLM 推理（高性能） | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#12-vllm-高性能--生产环境) |
+| **BGE-M3** | 向量化（1024 维） | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#2-bge-m3-向量化服务) |
+| **BGE-Reranker-v2** | 重排序（精排） | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#3-bge-reranker-v2-重排序服务) |
+| **Rasa NLU** | 意图识别（可训练） | ⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#4-rasa-nlu-意图识别) |
+| **spaCy + jieba** | 中文 NLP 处理 | ⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#5-spacy-jieba-中文 nlp) |
+| **PaddleOCR** | OCR 文字识别 | ⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#61-paddleocr-推荐 - 中文优化) |
+| **HuggingFace TGI** | AI 意图情感分析 | ⭐⭐⭐⭐ | ✅ 已集成 | [DOCKER_IMAGES_GUIDE.md](./DOCKER_IMAGES_GUIDE.md#ai-意图分析与情感分析功能) |
+
+**核心能力**:
+- ✅ 支持中英文双语 NLP 处理
+- ✅ 6+ 种意图识别类型（信息查询、比较分析、推理演绎等）
+- ✅ 实时情感分析（正面/负面情绪检测）
+- ✅ 多语言自动检测和切换
+- ✅ 智能路由决策（基于意图和情感）
+
+### 数据存储（5 个）
+
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **Redis** | L1 工作记忆（缓存） | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#1-redis---l1-工作记忆) |
+| **Qdrant** | L2 语义向量库 | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#2-qdrant---l2-语义记忆) |
+| **Neo4j** | L3 情景图谱 | ⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#3-neo4j---l3-情景图谱) |
+| **MySQL** | 元数据存储 | ⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#ragflow-深度文档解析) |
+| **MinIO** | 文件对象存储 | ⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#ragflow-深度文档解析) |
+
+**三级存储架构**:
+- **L1 (Redis)**: <1ms 延迟，TTL 自动过期，模拟工作记忆遗忘
+- **L2 (Qdrant)**: 向量相似度检索，HNSW 索引，百万级<10ms
+- **L3 (Neo4j)**: 知识图谱多跳推理，Cypher 查询，关系挖掘
 
 ### 文档处理（1 个）
 
-| 系统 | 用途 | 推荐方案 | 文档章节 |
-|-----|------|---------|---------|
-| **RAGFlow** | 深度文档解析 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#ragflow-深度文档解析) |
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **RAGFlow** | 深度文档解析 | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#ragflow-深度文档解析) |
+
+**核心能力**:
+- ✅ 支持 PDF/Word/Excel/PPT/Markdown/HTML 多格式
+- ✅ OCR 集成（扫描件文字识别）
+- ✅ 表格结构还原（92%+准确率）
+- ✅ 层级关系保持（标题 - 段落 - 列表）
+- ✅ 公式识别（LaTeX 提取）
+
+### 编排引擎（1 个）
+
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **LangGraph** | 状态机编排 | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [DOCKER_IMAGES_GUIDE.md](./DOCKER_IMAGES_GUIDE.md#necorag-核心架构镜像) |
+
+**核心能力**:
+- ✅ 复杂循环状态机
+- ✅ "检索 - 反思 - 校正"闭环
+- ✅ 多 Agent 协作
+- ✅ 条件分支和循环
+- ✅ 状态持久化
 
 ### 中间件（2 个）
 
-| 系统 | 用途 | 推荐方案 | 文档章节 |
-|-----|------|---------|---------|
-| **APScheduler** | 定时任务调度 | ⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#apscheduler-定时任务) |
-| **Celery** | 分布式任务队列 | ⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#celery-分布式任务队列可选) |
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **APScheduler** | 定时任务调度 | ⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#apscheduler-定时任务) |
+| **Celery** | 分布式任务队列 | ⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#celery-分布式任务队列可选) |
 
-### 监控运维（2 个）
+**定时任务**:
+- 🕐 每日凌晨 3 点：批量知识更新
+- 🕕 每 6 小时：记忆衰减计算
+- 🕐 每小时：热点知识归档
+- 📅 每周日凌晨 2 点：图谱维护
 
-| 系统 | 用途 | 推荐方案 | 文档章节 |
-|-----|------|---------|---------|
-| **Prometheus** | 指标采集 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#prometheus-指标采集) |
-| **Grafana** | 可视化面板 | ⭐⭐⭐⭐⭐ | [third_party_systems.md](./third_party_systems.md#grafana-可视化面板) |
+### 监控运维（3 个）
+
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **Prometheus** | 指标采集 | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#prometheus-指标采集) |
+| **Grafana** | 可视化面板 | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [third_party_systems.md](./third_party_systems.md#grafana-可视化面板) |
+| **APM Server** | 应用性能监控 | ⭐⭐⭐⭐ | ✅ 已集成 | [DOCKER_IMAGES_GUIDE.md](./DOCKER_IMAGES_GUIDE.md#elasticsearch-全文搜索功能) |
+
+**监控指标**:
+- 📊 Query Throughput（吞吐量）
+- ⏱️ Query Latency Percentile（P50/P95/P99）
+- 💾 Memory Usage（内存使用）
+- 🎯 Retrieval Accuracy（检索准确率）
+- 🚨 自动告警规则（高错误率、高延迟）
+
+### 全文搜索（1 个）
+
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **Elasticsearch** | 分布式全文搜索 | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [DOCKER_IMAGES_GUIDE.md](./DOCKER_IMAGES_GUIDE.md#elasticsearch-全文搜索功能) |
+| **Kibana** | 搜索可视化 | ⭐⭐⭐⭐ | ✅ 已集成 | [DOCKER_IMAGES_GUIDE.md](./DOCKER_IMAGES_GUIDE.md#elasticsearch-全文搜索功能) |
+
+**混合搜索**:
+- 🔍 语义搜索（Qdrant 向量）
+- 📝 关键词搜索（Elasticsearch 全文）
+- ⚖️ 加权融合（0.7 语义 + 0.3 关键词）
+
+### 前端可视化（1 个）
+
+| 系统 | 用途 | 推荐方案 | 状态 | 文档章节 |
+|-----|------|---------|------|---------|
+| **Streamlit** | 快速前端开发 | ⭐⭐⭐⭐⭐ | ✅ 已集成 | [DOCKER_IMAGES_GUIDE.md](./DOCKER_IMAGES_GUIDE.md#necorag-核心架构镜像) |
+
+**核心能力**:
+- ✅ 交互式问答界面
+- ✅ 实时数据展示
+- ✅ 文件上传下载
+- ✅ 图表可视化
+- ✅ 置信度指标显示
 
 ---
 
@@ -230,6 +342,12 @@ docker exec -it qdrant bash
 第 4-5 天：阅读 third_party_systems.md 后半部分（存储与监控）
 第 6-7 天：本地搭建开发环境（参照 deployment_quickref.md）
 第 2 周：运行示例代码，理解各组件协作流程
+
+重点掌握:
+  ✅ Ollama LLM 推理服务部署
+  ✅ Redis/Qdrant/Neo4j 三级存储
+  ✅ RAGFlow 文档解析流程
+  ✅ FastAPI 接口调用
 ```
 
 ### 进阶级（2-4 周）
@@ -237,6 +355,13 @@ docker exec -it qdrant bash
 第 1 周：精读 selection_guide.md，理解技术选型逻辑
 第 2 周：深入某个具体组件（如 Qdrant 或 Neo4j）
 第 3-4 周：根据业务需求，定制优化方案
+
+深入学习:
+  ✅ BGE-M3 向量化与混合搜索
+  ✅ LangGraph 状态机编排
+  ✅ Elasticsearch 全文搜索
+  ✅ AI 意图情感分析集成
+  ✅ Prometheus+Grafana监控面板
 ```
 
 ### 专家级（1-2 月）
@@ -244,6 +369,14 @@ docker exec -it qdrant bash
 第 1-2 周：研究所有组件的源码和原理
 第 3-4 周：设计高可用架构和容灾方案
 第 5-8 周：性能调优和大规模部署实践
+
+专家技能:
+  ✅ vLLM 多 GPU 集群部署
+  ✅ Qdrant 分布式向量数据库
+  ✅ Neo4j 因果聚类
+  ✅ Celery 分布式任务队列
+  ✅ 混合搜索策略优化
+  ✅ 智能路由与负载均衡
 ```
 
 ---
@@ -269,17 +402,27 @@ docker exec -it qdrant bash
 
 ## 🔄 更新记录
 
-### v3.1.0-alpha (2026-03-18)
+### v3.2.0-alpha (2026-03-19) - 最新版本
+- ✅ 完整技术栈架构集成（23 个第三方系统）
+- ✅ NecoRAG 核心架构镜像（LangGraph/RAGFlow/vLLM/Streamlit）
+- ✅ AI 意图情感分析功能（HuggingFace TGI/BERT/多语言支持）
+- ✅ Elasticsearch 全文搜索（混合搜索方案）
+- ✅ OCR 文档扫描功能（OCRmyPDF/Tesseract/PaddleOCR）
+- ✅ BGE-M3 嵌入模型与 BGE-Reranker-v2重排序
+- ✅ 更新 README 索引，整合所有技术栈文档
+
+### v3.2.0-alpha (2026-03-18)
 - ✅ 初始版本发布
 - ✅ 完成 14+ 第三方系统详细文档
 - ✅ 提供技术选型指南
 - ✅ 提供部署配置速查表
 
 ### 计划更新
-- [ ] v3.1.0-alpha: 添加 Kubernetes 部署专题
-- [ ] v3.1.0-alpha: 添加性能调优最佳实践
-- [ ] v3.1.0-alpha: 添加故障排查案例库
-- [ ] v3.1.0-alpha: 多语言支持（英文版本）
+- [ ] v3.2.0-alpha: Kubernetes 部署专题
+- [ ] v3.2.0-alpha: 性能调优最佳实践
+- [ ] v3.2.0-alpha: 故障排查案例库
+- [ ] v3.2.0-alpha: 多语言支持（英文版本）
+- [ ] v3.2.0-alpha: 自动化运维工具链
 
 ---
 
@@ -324,28 +467,39 @@ git push origin docs/improve-3rd-party-docs
 ## 📋 快速链接汇总
 
 ### 核心文档
-- [📐 整体架构框架](../architecture_framework.md)
-- [📜 技术框架设计](../design.md)
-- [📖 项目 README](../../README.md)
+- [📐 整体架构框架](../architecture_framework.md) - 五层认知架构设计
+- [📜 技术框架设计](../design.md) - 完整技术栈与工程约束
+- [📖 项目 README](../../README.md) - NecoRAG 项目总览
 
 ### 第三方系统文档
-- [🔧 第三方系统详解](./third_party_systems.md)
-- [🎯 技术选型指南](./selection_guide.md)
-- [⚡ 部署配置速查表](./deployment_quickref.md)
+- [🔧 第三方系统详解](./third_party_systems.md) - 23 个系统集成详解 ⭐⭐⭐⭐⭐
+- [🎯 技术选型指南](./selection_guide.md) - 4 套配置方案对比 ⭐⭐⭐⭐
+- [⚡ 部署配置速查表](./deployment_quickref.md) - 运维命令手边必备 ⭐⭐⭐⭐⭐
+- [🐳 Docker 镜像导入指南](./DOCKER_IMAGES_GUIDE.md) - 一键导入所有镜像 ⭐⭐⭐⭐⭐
 
 ### 模块文档
-- [感知层](../../src/perception/README.md)
-- [记忆层](../../src/memory/README.md)
-- [检索层](../../src/retrieval/README.md)
-- [巩固层](../../src/refinement/README.md)
-- [交互层](../../src/response/README.md)
+- [感知层](../../src/perception/README.md) - 文档解析、NLP 处理、OCR
+- [记忆层](../../src/memory/README.md) - L1/L2/L3三级记忆存储
+- [检索层](../../src/retrieval/README.md) - 混合搜索、重排序
+- [巩固层](../../src/refinement/README.md) - 知识更新、记忆衰减
+- [交互层](../../src/response/README.md) - 答案生成、幻觉检测
+
+### 专项文档
+- [🧠 AI 意图情感分析](./DOCKER_IMAGES_GUIDE.md#ai-意图分析与情感分析功能) - 多语言 NLP 处理
+- [🔍 Elasticsearch 全文搜索](./DOCKER_IMAGES_GUIDE.md#elasticsearch-全文搜索功能) - 混合搜索方案
+- [📄 OCR 文档扫描](./DOCKER_IMAGES_GUIDE.md#ocr-文档扫描功能) - PDF/图片文字识别
+- [🏗️ NecoRAG 核心架构](./DOCKER_IMAGES_GUIDE.md#necorag-核心架构镜像) - LangGraph/RAGFlow/vLLM
 
 ### 外部资源
 - [Ollama 官方文档](https://ollama.ai/)
+- [vLLM 官方文档](https://docs.vllm.ai/)
 - [Qdrant 官方文档](https://qdrant.tech/documentation/)
 - [Neo4j 官方文档](https://neo4j.com/docs/)
 - [Rasa 官方文档](https://rasa.com/docs/)
 - [RAGFlow 官方文档](https://ragflow.io/)
+- [LangGraph 官方文档](https://langchain-ai.github.io/langgraph/)
+- [BGE-M3 论文](https://arxiv.org/abs/2307.15228)
+- [Elasticsearch 官方文档](https://www.elastic.co/guide/index.html)
 
 ---
 

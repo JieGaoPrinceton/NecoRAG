@@ -451,7 +451,7 @@ pytest tests/test_user/test_workspace.py -v
 
 **创建时间：** 2026-03-19  
 **创建者：** AI Assistant  
-**版本：** v3.1  
+**版本：** v3.2  
 **状态：** ✅ 已完成并投入使用
 
 *NecoRAG - 让 AI 像大脑一样思考，像社会一样协作！* 🧠🌐

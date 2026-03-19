@@ -46,11 +46,11 @@ python tools/auto_version_control.py --auto
 
 | 变更类型 | 检测条件 | 递增级别 | 示例 |
 |---------|---------|---------|------|
-| **重大重构** | 修改核心架构文件 | major | 3.1.0-alpha → 3.1.0-alpha |
-| **新功能** | 新增模块/功能文件 | minor | 3.1.0-alpha → 3.1.0-alpha |
-| **Bug 修复** | 修复错误、优化性能 | patch | 3.1.0-alpha → 3.1.0-alpha |
-| **文档更新** | 仅修改 .md 文件 | patch | 3.1.0-alpha → 3.1.0-alpha |
-| **配置调整** | 修改配置文件 | patch | 3.1.0-alpha → 3.1.0-alpha |
+| **重大重构** | 修改核心架构文件 | major | 3.2.0-alpha → 3.2.0-alpha |
+| **新功能** | 新增模块/功能文件 | minor | 3.2.0-alpha → 3.2.0-alpha |
+| **Bug 修复** | 修复错误、优化性能 | patch | 3.2.0-alpha → 3.2.0-alpha |
+| **文档更新** | 仅修改 .md 文件 | patch | 3.2.0-alpha → 3.2.0-alpha |
+| **配置调整** | 修改配置文件 | patch | 3.2.0-alpha → 3.2.0-alpha |
 
 ---
 
@@ -70,13 +70,13 @@ NecoRAG 自动版本控制系统
   🔧 配置调整：pyproject.toml
 
 变更类型：文档更新 + 配置调整
-建议版本递增：patch (3.1.0-alpha -> 3.1.0-alpha)
+建议版本递增：patch (3.2.0-alpha -> 3.2.0-alpha)
 
-✓ 已更新 VERSION 文件：3.1.0-alpha
-✓ 已更新 pyproject.toml: 3.1.0-alpha
+✓ 已更新 VERSION 文件：3.2.0-alpha
+✓ 已更新 pyproject.toml: 3.2.0-alpha
 ✓ 已同步 45 个 Markdown 文件
 
-新版本号：3.1.0-alpha
+新版本号：3.2.0-alpha
 ============================================================
 ```
 
@@ -86,14 +86,14 @@ NecoRAG 自动版本控制系统
 $ python tools/auto_version_control.py --interactive
 
 检测到变更，请确认版本递增级别:
-  1) patch (3.1.0-alpha -> 3.1.0-alpha) - 推荐
-  2) minor (3.1.0-alpha -> 3.1.0-alpha)
-  3) major (3.1.0-alpha -> 3.1.0-alpha)
+  1) patch (3.2.0-alpha -> 3.2.0-alpha) - 推荐
+  2) minor (3.2.0-alpha -> 3.2.0-alpha)
+  3) major (3.2.0-alpha -> 3.2.0-alpha)
   4) skip (跳过本次更新)
 
 请选择 [1-4]: 1
 
-✓ 版本已更新为 3.1.0-alpha
+✓ 版本已更新为 3.2.0-alpha
 ```
 
 ---
@@ -138,7 +138,7 @@ if "fix" in commit_message.lower():
 ### 3. 自动生成更新日志
 
 ```markdown
-## [3.1.0-alpha] - 2026-03-19
+## [3.2.0-alpha] - 2026-03-19
 
 ### 📝 文档更新
 - README.md - 更新版本号说明
