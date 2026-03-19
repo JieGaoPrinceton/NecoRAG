@@ -3,7 +3,7 @@
 **Neuro-Cognitive Retrieval-Augmented Generation**  
 **神经认知检索增强生成系统**
 
-版本：v2.0.1-alpha  
+版本：v3.0.0-alpha  
 更新日期：2026-03-18
 
 ---
@@ -819,43 +819,43 @@ graph TB
 ```yaml
 # 核心依赖
 python: ">=3.9"
-numpy: "^2.0.1-alpha"
-python-dateutil: "^2.0.1-alpha"
+numpy: "^3.0.0-alpha"
+python-dateutil: "^3.0.0-alpha"
 
 # Web 框架
-fastapi: "^2.0.1-alpha"
-uvicorn: "^2.0.1-alpha"
-pydantic: "^2.0.1-alpha"
+fastapi: "^3.0.0-alpha"
+uvicorn: "^3.0.0-alpha"
+pydantic: "^3.0.0-alpha"
 
 # AI/ML 模型
-transformers: "^2.0.1-alpha"
-torch: "^2.0.1-alpha"
-sentence-transformers: "^2.0.1-alpha"
+transformers: "^3.0.0-alpha"
+torch: "^3.0.0-alpha"
+sentence-transformers: "^3.0.0-alpha"
 
 # 数据库客户端
-redis: "^2.0.1-alpha"
-qdrant-client: "^2.0.1-alpha"
-neo4j: "^2.0.1-alpha"
+redis: "^3.0.0-alpha"
+qdrant-client: "^3.0.0-alpha"
+neo4j: "^3.0.0-alpha"
 
 # NLP 处理
-spacy: "^2.0.1-alpha"
-jieba: "^2.0.1-alpha"
-rasa: "^2.0.1-alpha"
+spacy: "^3.0.0-alpha"
+jieba: "^3.0.0-alpha"
+rasa: "^3.0.0-alpha"
 
 # 文档处理
-ragflow-sdk: "^2.0.1-alpha"  # 假设
-pytesseract: "^2.0.1-alpha"
+ragflow-sdk: "^3.0.0-alpha"  # 假设
+pytesseract: "^3.0.0-alpha"
 
 # 任务调度
-apscheduler: "^2.0.1-alpha"
-celery: "^2.0.1-alpha"
+apscheduler: "^3.0.0-alpha"
+celery: "^3.0.0-alpha"
 
 # 监控
-prometheus-client: "^2.0.1-alpha"
+prometheus-client: "^3.0.0-alpha"
 
 # 工具库
-python-dotenv: "^2.0.1-alpha"
-pyyaml: "^2.0.1-alpha"
+python-dotenv: "^3.0.0-alpha"
+pyyaml: "^3.0.0-alpha"
 ```
 
 ---

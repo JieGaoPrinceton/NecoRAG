@@ -29,6 +29,31 @@ from .sandbox import PluginSandbox
 logger = logging.getLogger(__name__)
 
 
+def _safe_extract_tar(tf: tarfile.TarFile, dest: Path) -> None:
+    """安全解压 tar 文件，防止目录遍历攻击"""
+    base = os.path.abspath(str(dest))
+    for member in tf.getmembers():
+        member_path = os.path.abspath(os.path.join(base, member.name))
+        if not member_path.startswith(base + os.sep) and member_path != base:
+            raise ValueError(f"检测到不安全的 tar 成员路径: {member.name}")
+        # 额外检查：禁止绝对路径和 .. 组件
+        if member.name.startswith('/') or '..' in member.name.split('/'):
+            raise ValueError(f"检测到不安全的 tar 成员路径: {member.name}")
+    tf.extractall(dest)
+
+
+def _safe_extract_zip(zf: zipfile.ZipFile, dest: Path) -> None:
+    """安全解压 zip 文件，防止目录遍历攻击"""
+    base = os.path.abspath(str(dest))
+    for name in zf.namelist():
+        member_path = os.path.abspath(os.path.join(base, name))
+        if not member_path.startswith(base + os.sep) and member_path != base:
+            raise ValueError(f"检测到不安全的 zip 成员路径: {name}")
+        if name.startswith('/') or '..' in name.split('/'):
+            raise ValueError(f"检测到不安全的 zip 成员路径: {name}")
+    zf.extractall(dest)
+
+
 class InstallHooks:
     """安装钩子回调管理"""
     
@@ -558,23 +583,23 @@ class PluginInstaller:
         try:
             if package_path.suffix == '.zip' or str(package_path).endswith('.zip'):
                 with zipfile.ZipFile(package_path, 'r') as zf:
-                    zf.extractall(install_dir)
+                    _safe_extract_zip(zf, install_dir)
                 logger.debug(f"解压 ZIP 包到: {install_dir}")
                     
             elif package_path.suffix == '.gz' or str(package_path).endswith('.tar.gz'):
                 with tarfile.open(package_path, 'r:gz') as tf:
-                    tf.extractall(install_dir)
+                    _safe_extract_tar(tf, install_dir)
                 logger.debug(f"解压 TAR.GZ 包到: {install_dir}")
                     
             else:
                 # 尝试作为 tar.gz 处理
                 try:
                     with tarfile.open(package_path, 'r:gz') as tf:
-                        tf.extractall(install_dir)
+                        _safe_extract_tar(tf, install_dir)
                 except tarfile.TarError:
                     # 尝试作为 zip 处理
                     with zipfile.ZipFile(package_path, 'r') as zf:
-                        zf.extractall(install_dir)
+                        _safe_extract_zip(zf, install_dir)
             
             return install_dir
             

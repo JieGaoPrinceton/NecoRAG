@@ -2,7 +2,7 @@
 
 ## 📋 功能概述
 
-**版本**: v2.0.1-alpha  
+**版本**: v3.0.0-alpha  
 **更新日期**: 2026-03-19  
 **新增模块**: Chain-of-Thought Reasoning (CoT 思维链推理)
 
@@ -697,7 +697,7 @@ def _evaluate_chain_quality(self, chain: List[CoTNode]) -> ChainMetrics:
 
 ## 📞 维护信息
 
-**功能版本**: v2.0.1-alpha  
+**功能版本**: v3.0.0-alpha  
 **开发团队**: NecoRAG DevOps Team  
 **最后更新**: 2026-03-19  
 **兼容性**: Python 3.9+, LangGraph 0.1+  

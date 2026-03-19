@@ -36,6 +36,14 @@ from src.adaptive import (
     FeedbackType,
 )
 
+# 插件市场（可选模块）
+try:
+    from src.marketplace.client import MarketplaceClient
+    from src.marketplace.config import MarketplaceConfig
+    _marketplace_available = True
+except ImportError:
+    _marketplace_available = False
+
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +107,9 @@ class NecoRAG:
         # 自适应学习引擎（延迟初始化）
         self._adaptive_engine: Optional[AdaptiveLearningEngine] = None
         
+        # 插件市场客户端（延迟初始化）
+        self.marketplace = None
+        
         # 统计信息
         self._stats = {
             "documents_ingested": 0,
@@ -129,6 +140,9 @@ class NecoRAG:
         
         # 初始化自适应学习引擎
         self._init_adaptive_learning()
+        
+        # 初始化插件市场
+        self._init_marketplace()
         
         self._initialized = True
         logger.info("NecoRAG initialized successfully")
@@ -181,6 +195,28 @@ class NecoRAG:
         
         self._adaptive_engine = AdaptiveLearningEngine(config=adaptive_config)
         logger.info("Adaptive learning engine initialized")
+    
+    def _init_marketplace(self):
+        """初始化插件市场（软依赖）"""
+        if not _marketplace_available:
+            logger.debug("插件市场模块不可用（非致命）")
+            return
+        
+        try:
+            marketplace_config = MarketplaceConfig()
+            # 如果主配置中有 marketplace 相关设置，合并进来
+            if hasattr(self.config, 'marketplace') and self.config.marketplace:
+                marketplace_config = self.config.marketplace
+            self.marketplace = MarketplaceClient(marketplace_config)
+            
+            # 将市场客户端注入到插件管理器（如果存在）
+            if hasattr(self, 'plugin_manager') and self.plugin_manager:
+                self.plugin_manager.set_marketplace_client(self.marketplace)
+            
+            logger.info("插件市场模块已初始化")
+        except Exception as e:
+            logger.warning(f"插件市场初始化失败（非致命）: {e}")
+            self.marketplace = None
     
     def _create_llm_client(self) -> BaseLLMClient:
         """根据配置创建 LLM 客户端"""
@@ -840,6 +876,33 @@ class NecoRAG:
         
         return self._adaptive_engine.periodic_optimization()
     
+    # ============== 插件市场 API ==============
+    
+    def search_plugins(self, query: str, **kwargs):
+        """搜索市场插件"""
+        if not self.marketplace:
+            logger.warning("插件市场未初始化")
+            return None
+        return self.marketplace.search(query, **kwargs)
+    
+    def install_plugin(self, plugin_id: str, version: str = None):
+        """从市场安装插件"""
+        if not self.marketplace:
+            logger.warning("插件市场未初始化")
+            return None
+        return self.marketplace.install(plugin_id, version=version)
+    
+    def get_marketplace_stats(self):
+        """获取市场统计信息"""
+        if not self.marketplace:
+            return {"available": False, "message": "插件市场未初始化"}
+        try:
+            stats = self.marketplace.get_marketplace_stats()
+            stats["available"] = True
+            return stats
+        except Exception as e:
+            return {"available": False, "error": str(e)}
+    
     def clear(self):
         """清空知识库"""
         if self._memory:
@@ -865,6 +928,13 @@ class NecoRAG:
     
     def close(self):
         """关闭并清理资源"""
+        # 关闭插件市场
+        if self.marketplace:
+            try:
+                self.marketplace.close()
+            except Exception:
+                pass
+        
         logger.info("NecoRAG closed")
     
     # ============== 类方法 ==============

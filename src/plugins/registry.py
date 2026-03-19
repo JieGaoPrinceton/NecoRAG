@@ -6,7 +6,7 @@
 import importlib
 import pkgutil
 import logging
-from typing import Dict, List, Type, Optional, Set
+from typing import Dict, List, Type, Optional, Set, Any
 from pathlib import Path
 
 from .base import BasePlugin, PluginType
@@ -20,6 +20,10 @@ class PluginRegistry:
         self._loaded_plugins: Dict[str, BasePlugin] = {}
         self._plugin_paths: Set[str] = set()
         self.logger = logging.getLogger(__name__)
+        # 市场集成
+        self._version_index: Dict[str, Dict[str, type]] = {}  # plugin_id -> {version -> plugin_class}
+        self._marketplace_metadata: Dict[str, Dict] = {}  # plugin_id -> marketplace metadata cache
+        self._marketplace_id_map: Dict[str, str] = {}  # marketplace_plugin_id -> registry_key
     
     def register_plugin(self, plugin_class: Type[BasePlugin]) -> bool:
         """
@@ -43,6 +47,12 @@ class PluginRegistry:
             
             self._plugins[plugin_id] = plugin_class
             self.logger.info(f"Plugin registered: {plugin_id}")
+            
+            # 建立 marketplace_id 映射
+            marketplace_id = getattr(plugin_class, 'marketplace_id', '')
+            if marketplace_id:
+                self._marketplace_id_map[marketplace_id] = plugin_id
+            
             return True
             
         except Exception as e:
@@ -129,6 +139,20 @@ class PluginRegistry:
             BasePlugin: 插件实例或None
         """
         return self._loaded_plugins.get(plugin_id)
+    
+    def get_plugin_by_marketplace_id(self, marketplace_id: str) -> Optional[BasePlugin]:
+        """
+        通过市场 ID 获取插件实例
+        Args:
+            marketplace_id: 市场插件ID
+        Returns:
+            BasePlugin: 插件实例或None
+        """
+        registry_key = self._marketplace_id_map.get(marketplace_id)
+        if registry_key:
+            return self._loaded_plugins.get(registry_key)
+        # 降级：直接尝试用 marketplace_id 作为 key 查找
+        return self._loaded_plugins.get(marketplace_id)
     
     def get_plugin_class(self, plugin_id: str) -> Optional[Type[BasePlugin]]:
         """
@@ -251,6 +275,108 @@ class PluginRegistry:
     def loaded_count(self) -> int:
         """已加载的插件数量"""
         return len(self._loaded_plugins)
+    
+    # ========== 市场集成方法 ==========
+    
+    def register_version(self, plugin_id: str, version: str, 
+                         plugin_class: type) -> bool:
+        """
+        注册插件的特定版本
+        
+        Args:
+            plugin_id: 插件 ID
+            version: 版本号
+            plugin_class: 插件类
+        
+        Returns:
+            bool: 注册是否成功
+        """
+        try:
+            if plugin_id not in self._version_index:
+                self._version_index[plugin_id] = {}
+            
+            if version in self._version_index[plugin_id]:
+                self.logger.warning(f"Version {version} of plugin {plugin_id} already registered")
+                return False
+            
+            self._version_index[plugin_id][version] = plugin_class
+            self.logger.debug(f"Registered version {version} for plugin {plugin_id}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Failed to register version: {str(e)}")
+            return False
+    
+    def get_version(self, plugin_id: str, version: str) -> Optional[type]:
+        """
+        获取插件的特定版本
+        
+        Args:
+            plugin_id: 插件 ID
+            version: 版本号
+        
+        Returns:
+            Optional[type]: 插件类或 None
+        """
+        if plugin_id in self._version_index:
+            return self._version_index[plugin_id].get(version)
+        return None
+    
+    def get_versions(self, plugin_id: str) -> List[str]:
+        """
+        获取插件所有已注册的版本
+        
+        Args:
+            plugin_id: 插件 ID
+        
+        Returns:
+            List[str]: 版本号列表
+        """
+        if plugin_id in self._version_index:
+            return list(self._version_index[plugin_id].keys())
+        return []
+    
+    def set_marketplace_metadata(self, plugin_id: str, metadata: Dict) -> None:
+        """
+        缓存市场元数据
+        
+        Args:
+            plugin_id: 插件 ID
+            metadata: 元数据字典
+        """
+        self._marketplace_metadata[plugin_id] = metadata
+        self.logger.debug(f"Cached marketplace metadata for plugin {plugin_id}")
+    
+    def get_marketplace_metadata(self, plugin_id: str) -> Optional[Dict]:
+        """
+        获取缓存的市场元数据
+        
+        Args:
+            plugin_id: 插件 ID
+        
+        Returns:
+            Optional[Dict]: 元数据字典或 None
+        """
+        return self._marketplace_metadata.get(plugin_id)
+    
+    def list_marketplace_plugins(self) -> List[Dict]:
+        """
+        列出所有有市场元数据的插件
+        
+        Returns:
+            List[Dict]: 插件信息列表，包含 plugin_id 和元数据
+        """
+        result = []
+        for plugin_id, metadata in self._marketplace_metadata.items():
+            plugin_info = {
+                "plugin_id": plugin_id,
+                "metadata": metadata,
+                "registered": plugin_id in self._plugins,
+                "loaded": plugin_id in self._loaded_plugins,
+                "versions": self.get_versions(plugin_id)
+            }
+            result.append(plugin_info)
+        return result
 
 
 # 全局插件注册表实例

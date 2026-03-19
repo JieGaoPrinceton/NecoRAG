@@ -168,7 +168,7 @@ python src/dashboard/test_knowledge_health_dashboard.py
 
 ## 📞 支持
 
-**版本**: v2.0.1-alpha  
+**版本**: v3.0.0-alpha  
 **日期**: 2026-03-19  
 **兼容性**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 

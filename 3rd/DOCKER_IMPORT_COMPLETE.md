@@ -66,7 +66,7 @@
 
 | # | 镜像名称 | 大小 | 用途 | 说明 |
 |---|---------|------|------|------|
-| 1 | milvusdb/milvus:v2.0.1-alpha | ~707MB | Milvus 向量数据库 | Qdrant 的替代方案 |
+| 1 | milvusdb/milvus:v3.0.0-alpha | ~707MB | Milvus 向量数据库 | Qdrant 的替代方案 |
 | 2 | memgraph/memgraph:latest | ~203MB | Memgraph 图数据库 | Neo4j 的替代方案 |
 | 3 | prom/prometheus:latest | ~146MB | Prometheus 指标收集 | 增强监控能力 |
 | 4 | apache/superset:latest | ~643MB | Superset 数据可视化 | 增强可视化能力 |
@@ -360,7 +360,7 @@ grafana/grafana     latest              300MB               2 weeks ago
 
 **创建者**: NecoRAG DevOps Team  
 **创建日期**: 2026-03-19  
-**版本**: v2.0.1-alpha  
+**版本**: v3.0.0-alpha  
 **兼容性**: 
 - Bash 4.0+
 - Docker 20.10+

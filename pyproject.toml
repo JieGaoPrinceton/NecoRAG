@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "necorag"
-version = "2.0.1-alpha"
+version = "3.0.0-alpha"
 description = "NecoRAG - Neuro-Cognitive Retrieval-Augmented Generation Framework"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -26,6 +26,7 @@ classifiers = [
 
 dependencies = [
     "numpy>=1.24.0",
+    "packaging>=21.0",
     "python-dateutil>=2.8.0",
 ]
 

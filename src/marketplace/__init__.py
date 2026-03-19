@@ -118,6 +118,13 @@ from .repository import (
 # 统一入口客户端
 from .client import MarketplaceClient
 
+# REST API 端点
+from .api import (
+    marketplace_router,
+    get_client,
+    set_client,
+)
+
 __all__ = [
     # 枚举类型
     'PluginType',
@@ -175,6 +182,10 @@ __all__ = [
     'RepositoryManager',
     # 统一入口客户端
     'MarketplaceClient',
+    # REST API 端点
+    'marketplace_router',
+    'get_client',
+    'set_client',
 ]
 
 __version__ = '0.1.0'

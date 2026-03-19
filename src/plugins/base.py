@@ -3,6 +3,9 @@
 定义插件的标准接口和生命周期管理
 """
 
+# 用于类型提示的前向引用
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Dict, Any, Optional, List

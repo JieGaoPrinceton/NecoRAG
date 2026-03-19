@@ -48,6 +48,15 @@ except ImportError:
     ConfigManager = None  # type: ignore
     _HAS_DASHBOARD = False
 
+# 插件市场模块（可选）
+try:
+    from src.marketplace import MarketplaceClient, MarketplaceConfig
+    _HAS_MARKETPLACE = True
+except ImportError:
+    MarketplaceClient = None  # type: ignore
+    MarketplaceConfig = None  # type: ignore
+    _HAS_MARKETPLACE = False
+
 # 领域权重模块导出
 from src.domain import (
     DomainConfig,
@@ -209,4 +218,8 @@ __all__ = [
     "CollectiveIntelligence",
     "AdaptiveLearningEngine",
     "create_adaptive_engine",
+    
+    # 插件市场模块
+    "MarketplaceClient",
+    "MarketplaceConfig",
 ]

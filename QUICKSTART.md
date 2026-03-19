@@ -2,7 +2,7 @@
 
 ## 🎯 5 分钟上手 NecoRAG
 
-### v2.0.1-alpha 新版本特性 ⭐
+### v3.0.0-alpha 新版本特性 ⭐
 
 **智能路由与策略融合引擎**：整合意图分析、CoT思维链和用户画像的三层决策架构，让系统更智能地理解你的查询意图并提供个性化响应。
 
@@ -53,7 +53,7 @@ python example_usage.py
 # 或者运行调试面板示例（推荐）
 python example/debug_panel_demo.py
 
-# v2.0 新增：运行智能路由专项示例
+# v3.0 新增：运行智能路由专项示例
 python src/retrieval/smart_routing/example_usage.py
 ```
 
@@ -63,7 +63,7 @@ python src/retrieval/smart_routing/example_usage.py
 3. Adaptive Retrieval - 混合检索与智能早停
 4. Refinement Agent - 内容精炼与幻觉检测
 5. Response Interface - 情境自适应响应
-6. **🆕 Smart Routing Engine** - 智能路由与策略融合（v2.0 新增） ⭐
+6. **🆕 Smart Routing Engine** - 智能路由与策略融合（v3.0 新增） ⭐
 
 ### 第四步：启动 Dashboard
 
@@ -81,8 +81,8 @@ start_dashboard.bat
 **访问地址**：
 - Web UI: http://localhost:8000
 - API文档：http://localhost:8000/docs
-- **调试面板**: http://localhost:8000/debug ⭐ (v2.0.1-alpha 新增)
-- **智能路由监控**: http://localhost:8000/debug/routing ⭐ (v2.0.1-alpha 新增)
+- **调试面板**: http://localhost:8000/debug ⭐ (v3.0.0-alpha 新增)
+- **智能路由监控**: http://localhost:8000/debug/routing ⭐ (v3.0.0-alpha 新增)
 
 ---
 
@@ -136,7 +136,7 @@ ResponseInterface.respond()         # 5. 交互层：响应生成
 
 ```python
 from src import PerceptionEngine, MemoryManager, AdaptiveRetriever
-# v2.0 新增：导入智能路由组件
+# v3.0 新增：导入智能路由组件
 from src.retrieval.smart_routing import StrategyFusionEngine, IntentRouter, UserProfileAdapter, CoTController
 
 # ========== 五层架构完整流程 ==========
@@ -154,7 +154,7 @@ for chunk in chunks:
 # 【L3 检索层】智能路由与自适应检索
 query = "什么是深度学习？"
 
-# v2.0: 智能路由引擎决策
+# v3.0: 智能路由引擎决策
 decision = await strategy_engine.route_query(
     query=query,
     user_id="test_user"
@@ -166,7 +166,7 @@ print(f"推荐策略：{decision.strategies}")
 retriever = AdaptiveRetriever(memory=memory)
 results = retriever.retrieve(
     query=query,
-    domain_weight_enabled=True  # v2.0.1-alpha 新功能
+    domain_weight_enabled=True  # v3.0.0-alpha 新功能
 )
 
 # 【L4 巩固层】内容精炼与幻觉检测（可选）
@@ -201,7 +201,7 @@ print(retriever.get_retrieval_trace())
 3. 输入名称和描述（如"开发环境"、"生产环境"）
 4. 点击 "创建"
 
-### 2. 配置模块参数（包含 v2.0.1-alpha 新模块）
+### 2. 配置模块参数（包含 v3.0.0-alpha 新模块）
 
 1. 选择一个 Profile
 2. 切换到对应模块 Tab：
@@ -211,7 +211,7 @@ print(retriever.get_retrieval_trace())
      - L3 Adaptive Retrieval (自适应检索)
      - L4 Refinement Agent (精炼代理)
      - L5 Response Interface (响应接口)
-   - **v2.0.1-alpha 新增增强模块**：
+   - **v3.0.0-alpha 新增增强模块**：
      - Intent Analysis (意图分析)
      - Domain Weight (领域权重)
      - Knowledge Evolution (知识演化)
@@ -220,7 +220,7 @@ print(retriever.get_retrieval_trace())
      - Adaptive Optimization (自适应优化)
      - Plugins (插件扩展)
      - Interface (接口服务)
-   - **🆕 v2.0.1-alpha 核心新增**：
+   - **🆕 v3.0.0-alpha 核心新增**：
      - Smart Routing & Strategy Fusion (智能路由与策略融合) ⭐
 3. 修改参数值（实时生效）
 4. 点击“保存配置”
@@ -239,7 +239,7 @@ Dashboard 底部实时显示：
 
 ---
 
-## 🔌 RESTful API 使用（v2.0.1-alpha 新增 Interface 模块）
+## 🔌 RESTful API 使用（v3.0.0-alpha 新增 Interface 模块）
 
 ### 获取所有 Profiles
 
@@ -265,7 +265,7 @@ curl -X PUT http://localhost:8000/api/profiles/{profile_id}/modules/retrieval \
     "parameters": {
       "top_k": 20,
       "pounce_threshold": 0.90,
-      "domain_weight_enabled": true  // v2.0.1-alpha 新功能
+      "domain_weight_enabled": true  // v3.0.0-alpha 新功能
     }
   }'
 ```
@@ -276,7 +276,7 @@ curl -X PUT http://localhost:8000/api/profiles/{profile_id}/modules/retrieval \
 curl http://localhost:8000/api/stats | jq .
 ```
 
-### WebSocket 实时推送（v2.0.1-alpha 新增）
+### WebSocket 实时推送（v3.0.0-alpha 新增）
 
 ```python
 import asyncio
@@ -293,7 +293,7 @@ asyncio.run(listen())
 
 ---
 
-## 💡 v2.0.1-alpha 核心功能演示
+## 💡 v3.0.0-alpha 核心功能演示
 
 ### 1. 记忆衰减机制（增强版）
 
@@ -302,7 +302,7 @@ from src.memory import MemoryDecay
 
 decay = MemoryDecay(
     decay_rate=0.1,
-    consolidation_interval=300  # v2.0.1-alpha: 支持固化间隔配置
+    consolidation_interval=300  # v3.0.0-alpha: 支持固化间隔配置
 )
 
 # 计算权重（融合时间衰减和访问频率）
@@ -323,7 +323,7 @@ from src.retrieval import AdaptiveRetriever
 retriever = AdaptiveRetriever(
     memory=memory,
     confidence_threshold=0.85,  # 置信度阈值达标时立即停止
-    domain_weight_enabled=True  # v2.0.1-alpha: 启用领域权重计算
+    domain_weight_enabled=True  # v3.0.0-alpha: 启用领域权重计算
 )
 
 # 检索时自动判断是否扑击（早停）
@@ -356,12 +356,12 @@ interface = ResponseInterface(
 response = interface.respond(
     query=query,
     refinement_result=grooming_result,
-    include_evidence_sources=True  # v2.0.1-alpha: 包含证据来源追溯
+    include_evidence_sources=True  # v3.0.0-alpha: 包含证据来源追溯
 )
 
 # 输出详细的思维链（检索路径 + 证据来源 + 推理过程）
 print(response.thinking_chain)
-print(response.evidence_sources)  # v2.0.1-alpha 新增
+print(response.evidence_sources)  # v3.0.0-alpha 新增
 ```
 
 输出示例：
@@ -377,7 +377,7 @@ print(response.evidence_sources)  # v2.0.1-alpha 新增
 
 ---
 
-## 🛠️ 常见问题（v2.0.1-alphaa1.9.0-alpha 更新）
+## 🛠️ 常见问题（v3.0.0-alphaa1.9.0-alpha 更新）
 
 ### Q1: 如何安装所有依赖？
 
@@ -385,10 +385,10 @@ print(response.evidence_sources)  # v2.0.1-alpha 新增
 # 仅安装核心依赖
 pip install -r requirements.txt
 
-# 安装 v2.0.1-alpha 新功能依赖（推荐）
+# 安装 v3.0.0-alpha 新功能依赖（推荐）
 pip install jieba scipy prometheus-client PyJWT python-jose plotly scikit-learn
 
-# v2.0.1-alpha 智能路由引擎无需额外依赖，已包含在核心库中
+# v3.0.0-alpha 智能路由引擎无需额外依赖，已包含在核心库中
 
 # 安装开发依赖
 cd tools && pip install -r requirements-dev.txt
@@ -444,14 +444,14 @@ config_manager.import_profile(
 **配置管理**: [Dashboard](src/dashboard/README.md) - Web 配置与监控界面 ⭐  
 **调试工具**: [Debug Panel](src/dashboard/debug/README.md) - 思维路径可视化 ⭐ NEW
 
-### v2.0.1-alphaa1.9.0-alpha 新增模块文档
+### v3.0.0-alphaa1.9.0-alpha 新增模块文档
 
-#### 🆕 v2.0.1-alpha 新增：智能路由与策略融合引擎 ⭐⭐⭐
+#### 🆕 v3.0.0-alpha 新增：智能路由与策略融合引擎 ⭐⭐⭐
 16. [Smart Routing Engine](src/retrieval/smart_routing/README.md) - 智能路由引擎详解 ⭐
 17. [Implementation Summary](src/retrieval/smart_routing/IMPLEMENTATION_SUMMARY.md) - 实现总结 ⭐
 18. [Example Usage](src/retrieval/smart_routing/example_usage.py) - 使用示例代码 ⭐
 
-#### v2.0.1-alpha 新增模块文档
+#### v3.0.0-alpha 新增模块文档
 
 8. [Intent Analyzer](src/intent/README.md) - 意图分析系统 ⭐
 9. [Domain Weight](src/domain/README.md) - 领域权重系统 ⭐
@@ -472,7 +472,7 @@ config_manager.import_profile(
 
 - [项目总览](README.md) - 项目主文档 ⭐
 - [快速开始](QUICKSTART.md) - 本指南 ⭐
-- [项目完成标志](PROJECT_COMPLETE.md) - v2.0.1-alpha/v2.0.1-alpha 完成报告 ⭐
+- [项目完成标志](PROJECT_COMPLETE.md) - v3.0.0-alpha/v3.0.0-alpha 完成报告 ⭐
 - [最终状态报告](PROJECT_FINAL_STATUS.md) - 技术架构和成果 ⭐
 - [更新日志](CHANGELOG.md) - 详细变更记录 ⭐
 
@@ -480,11 +480,11 @@ config_manager.import_profile(
 
 ## 🎯 下一步（结合当前进度）
 
-### ✅ 已完成（v2.0.1-alpha & v2.0.1-alpha）
+### ✅ 已完成（v3.0.0-alpha & v3.0.0-alpha）
 - ✅ 五层认知架构框架搭建
 - ✅ 可视化调试面板完整实现（思维路径可视化、实时监控、A/B 测试）
 - ✅ 8 个新增核心模块（意图分析、领域权重、知识演化、监控告警、安全、自适应优化、插件系统、Interface 模块）
-- ✅ **智能路由与策略融合引擎**（v2.0.1-alpha 新增） ⭐⭐⭐
+- ✅ **智能路由与策略融合引擎**（v3.0.0-alpha 新增） ⭐⭐⭐
   - 三层决策架构（意图识别→用户画像→策略融合）
   - 7 大类语义意图智能路由
   - 个性化专业度适配（专家/中级/新手）
@@ -538,9 +538,9 @@ config_manager.import_profile(
 
 **祝你使用愉快！** 🐱🧠
 
-*Let's make AI think like a brain, and act like a cat.*
+*Let's make AI think like a brain*
 
-**NecoRAG v2.0.1-alpha** | 最后更新：2026-03-19  
+**NecoRAG v3.0.0-alpha** | 最后更新：2026-03-19  
 [查看完整文档](README.md) | [Wiki 知识库](docs/wiki/README.md) | [示例代码](example/)
 
 </div>

@@ -15,6 +15,13 @@ from .models import (
 )
 from .knowledge_service import knowledge_service
 
+# 尝试导入插件市场路由（可选模块）
+try:
+    from src.marketplace.api import marketplace_router
+    _marketplace_available = True
+except ImportError:
+    _marketplace_available = False
+
 
 def create_api_app() -> FastAPI:
     """创建API应用"""
@@ -148,6 +155,11 @@ def create_api_app() -> FastAPI:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"生成建议失败: {str(e)}"
             )
+    
+    # 挂载插件市场路由（如果可用）
+    if _marketplace_available:
+        app.include_router(marketplace_router, prefix="/api/v1/marketplace")
+        logger.info("插件市场 API 路由已挂载")
     
     return app
 

@@ -2,7 +2,7 @@
 
 ## 📋 功能概述
 
-**版本**: v2.0.1-alpha  
+**版本**: v3.0.0-alpha  
 **更新日期**: 2026-03-19  
 **新增功能**: 智能网络检测与镜像源自动切换
 
@@ -426,7 +426,7 @@ traceroute registry-1.docker.io
 ## 📞 维护信息
 
 **功能开发**: NecoRAG DevOps Team  
-**版本**: v2.0.1-alpha  
+**版本**: v3.0.0-alpha  
 **最后更新**: 2026-03-19  
 **兼容性**: Bash 4.0+, Docker 20.10+  
 **支持平台**: macOS, Linux, WSL  

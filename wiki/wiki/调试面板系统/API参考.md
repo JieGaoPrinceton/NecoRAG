@@ -227,7 +227,7 @@ GET /api/debug/health
 {
   "status": "healthy",
   "timestamp": "2024-01-01T12:00:00Z",
-  "version": "2.0.1-alpha",
+  "version": "3.0.0-alpha",
   "components": {
     "websocket": true,
     "database": true,
@@ -359,5 +359,5 @@ API版本通过URL前缀管理：
 - 未来版本将使用相应的版本号
 
 ---
-*文档版本: v2.0.1-alpha*
+*文档版本: v3.0.0-alpha*
 *最后更新: 2026年3月19日*
