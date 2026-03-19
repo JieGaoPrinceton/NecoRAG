@@ -1,0 +1,508 @@
+{
+  "version_id": "v_20260319_171230",
+  "version_name": "AI 扩充后的版本",
+  "description": "自动创建了12个L3 意图",
+  "timestamp": "20260319_171230",
+  "tree_data": {
+    "tree_id": "custom_20260319_171230",
+    "name": "意图体系_20260319",
+    "description": "用户自定义的三级意图体系",
+    "roots": [
+      "l1_知识查询",
+      "l1_任务指导",
+      "l1_分析推理"
+    ],
+    "all_intents": {
+      "l1_知识查询": {
+        "intent_id": "l1_知识查询",
+        "name": "知识查询",
+        "level": "l1",
+        "description": "查询事实性知识和信息",
+        "parent_id": null,
+        "children": [
+          "l1_知识查询_l2_事实查证",
+          "l1_知识查询_l2_概念解释",
+          "l1_知识查询_l2_定义询问",
+          "l1_知识查询_l2_数据检索"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_事实查证": {
+        "intent_id": "l1_知识查询_l2_事实查证",
+        "name": "事实查证",
+        "level": "l2",
+        "description": "查找具体事实和数据",
+        "parent_id": "l1_知识查询",
+        "children": [
+          "l1_知识查询_l2_事实查证_l3_auto_1"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_概念解释": {
+        "intent_id": "l1_知识查询_l2_概念解释",
+        "name": "概念解释",
+        "level": "l2",
+        "description": "理解概念和术语",
+        "parent_id": "l1_知识查询",
+        "children": [
+          "l1_知识查询_l2_概念解释_l3_auto_2"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_定义询问": {
+        "intent_id": "l1_知识查询_l2_定义询问",
+        "name": "定义询问",
+        "level": "l2",
+        "description": "查询定义和含义",
+        "parent_id": "l1_知识查询",
+        "children": [
+          "l1_知识查询_l2_定义询问_l3_auto_3"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_数据检索": {
+        "intent_id": "l1_知识查询_l2_数据检索",
+        "name": "数据检索",
+        "level": "l2",
+        "description": "获取统计数据和信息",
+        "parent_id": "l1_知识查询",
+        "children": [
+          "l1_知识查询_l2_数据检索_l3_auto_4"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导": {
+        "intent_id": "l1_任务指导",
+        "name": "任务指导",
+        "level": "l1",
+        "description": "获取操作步骤和方法指导",
+        "parent_id": null,
+        "children": [
+          "l1_任务指导_l2_逐步指导",
+          "l1_任务指导_l2_最佳实践",
+          "l1_任务指导_l2_故障排除",
+          "l1_任务指导_l2_配置部署"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_逐步指导": {
+        "intent_id": "l1_任务指导_l2_逐步指导",
+        "name": "逐步指导",
+        "level": "l2",
+        "description": "详细的操作步骤",
+        "parent_id": "l1_任务指导",
+        "children": [
+          "l1_任务指导_l2_逐步指导_l3_auto_5"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_最佳实践": {
+        "intent_id": "l1_任务指导_l2_最佳实践",
+        "name": "最佳实践",
+        "level": "l2",
+        "description": "推荐的方法和技巧",
+        "parent_id": "l1_任务指导",
+        "children": [
+          "l1_任务指导_l2_最佳实践_l3_auto_6"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_故障排除": {
+        "intent_id": "l1_任务指导_l2_故障排除",
+        "name": "故障排除",
+        "level": "l2",
+        "description": "问题解决和调试",
+        "parent_id": "l1_任务指导",
+        "children": [
+          "l1_任务指导_l2_故障排除_l3_auto_7"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_配置部署": {
+        "intent_id": "l1_任务指导_l2_配置部署",
+        "name": "配置部署",
+        "level": "l2",
+        "description": "系统配置和部署",
+        "parent_id": "l1_任务指导",
+        "children": [
+          "l1_任务指导_l2_配置部署_l3_auto_8"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理": {
+        "intent_id": "l1_分析推理",
+        "name": "分析推理",
+        "level": "l1",
+        "description": "进行分析、比较和推理",
+        "parent_id": null,
+        "children": [
+          "l1_分析推理_l2_对比分析",
+          "l1_分析推理_l2_因果推理",
+          "l1_分析推理_l2_评估判断",
+          "l1_分析推理_l2_趋势预测"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_对比分析": {
+        "intent_id": "l1_分析推理_l2_对比分析",
+        "name": "对比分析",
+        "level": "l2",
+        "description": "比较不同事物的差异",
+        "parent_id": "l1_分析推理",
+        "children": [
+          "l1_分析推理_l2_对比分析_l3_auto_9"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_因果推理": {
+        "intent_id": "l1_分析推理_l2_因果推理",
+        "name": "因果推理",
+        "level": "l2",
+        "description": "分析原因和结果",
+        "parent_id": "l1_分析推理",
+        "children": [
+          "l1_分析推理_l2_因果推理_l3_auto_10"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_评估判断": {
+        "intent_id": "l1_分析推理_l2_评估判断",
+        "name": "评估判断",
+        "level": "l2",
+        "description": "评价和判断优劣",
+        "parent_id": "l1_分析推理",
+        "children": [
+          "l1_分析推理_l2_评估判断_l3_auto_11"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_趋势预测": {
+        "intent_id": "l1_分析推理_l2_趋势预测",
+        "name": "趋势预测",
+        "level": "l2",
+        "description": "预测发展趋势",
+        "parent_id": "l1_分析推理",
+        "children": [
+          "l1_分析推理_l2_趋势预测_l3_auto_12"
+        ],
+        "keywords": [],
+        "examples": [],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_事实查证_l3_auto_1": {
+        "intent_id": "l1_知识查询_l2_事实查证_l3_auto_1",
+        "name": "XX",
+        "level": "l3",
+        "description": "包含类似'XX 是什么时候成立的？'的查询",
+        "parent_id": "l1_知识查询_l2_事实查证",
+        "children": [],
+        "keywords": [
+          "XX",
+          "谁发明了计算机",
+          "是什么时候成立的",
+          "地球有多大年纪",
+          "是啥时候成立的"
+        ],
+        "examples": [
+          "XX 是什么时候成立的？",
+          "XX 是什么时候成立的?",
+          "XX 是啥时候成立的？",
+          "谁发明了计算机？",
+          "谁发明了计算机?"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_概念解释_l3_auto_2": {
+        "intent_id": "l1_知识查询_l2_概念解释_l3_auto_2",
+        "name": "请解释一下区块链",
+        "level": "l3",
+        "description": "包含类似'什么是量子计算？'的查询",
+        "parent_id": "l1_知识查询_l2_概念解释",
+        "children": [],
+        "keywords": [
+          "请解释一下区块链",
+          "什么是量子计算",
+          "人工智能是什么意思",
+          "啥是量子计算"
+        ],
+        "examples": [
+          "什么是量子计算？",
+          "什么是量子计算?",
+          "啥是量子计算？",
+          "请解释一下区块链",
+          "请解释一下区块链"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_定义询问_l3_auto_3": {
+        "intent_id": "l1_知识查询_l2_定义询问_l3_auto_3",
+        "name": "机器学习的定义",
+        "level": "l3",
+        "description": "包含类似'机器学习的定义'的查询",
+        "parent_id": "l1_知识查询_l2_定义询问",
+        "children": [],
+        "keywords": [
+          "机器学习的定义",
+          "深度学习的定义是什么",
+          "请定义自然语言处理",
+          "深度学习的定义是啥"
+        ],
+        "examples": [
+          "机器学习的定义",
+          "机器学习的定义",
+          "机器学习的定义",
+          "深度学习的定义是什么？",
+          "深度学习的定义是什么?"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_知识查询_l2_数据检索_l3_auto_4": {
+        "intent_id": "l1_知识查询_l2_数据检索_l3_auto_4",
+        "name": "关于数据检索的问题",
+        "level": "l3",
+        "description": "包含类似'关于数据检索的问题'的查询",
+        "parent_id": "l1_知识查询_l2_数据检索",
+        "children": [],
+        "keywords": [
+          "关于数据检索的问题"
+        ],
+        "examples": [
+          "关于数据检索的问题",
+          "关于数据检索的问题",
+          "关于数据检索的问题"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_逐步指导_l3_auto_5": {
+        "intent_id": "l1_任务指导_l2_逐步指导_l3_auto_5",
+        "name": "Python",
+        "level": "l3",
+        "description": "包含类似'如何安装 Python？'的查询",
+        "parent_id": "l1_任务指导_l2_逐步指导",
+        "children": [],
+        "keywords": [
+          "Python",
+          "如何安装",
+          "Git",
+          "怎么配置",
+          "Hello",
+          "World",
+          "教我写",
+          "程序"
+        ],
+        "examples": [
+          "如何安装 Python？",
+          "如何安装 Python?",
+          "如何安装 Python？",
+          "怎么配置 Git？",
+          "怎么配置 Git?"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_最佳实践_l3_auto_6": {
+        "intent_id": "l1_任务指导_l2_最佳实践_l3_auto_6",
+        "name": "Python",
+        "level": "l3",
+        "description": "包含类似'Python 编码规范'的查询",
+        "parent_id": "l1_任务指导_l2_最佳实践",
+        "children": [],
+        "keywords": [
+          "Python",
+          "编码规范",
+          "如何写出优雅的代码",
+          "软件开发的最佳实践"
+        ],
+        "examples": [
+          "Python 编码规范",
+          "Python 编码规范",
+          "Python 编码规范",
+          "如何写出优雅的代码？",
+          "如何写出优雅的代码?"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_故障排除_l3_auto_7": {
+        "intent_id": "l1_任务指导_l2_故障排除_l3_auto_7",
+        "name": "代码报错了怎么办",
+        "level": "l3",
+        "description": "包含类似'代码报错了怎么办？'的查询",
+        "parent_id": "l1_任务指导_l2_故障排除",
+        "children": [],
+        "keywords": [
+          "代码报错了怎么办",
+          "程序运行不起来",
+          "bug",
+          "遇到",
+          "如何解决"
+        ],
+        "examples": [
+          "代码报错了怎么办？",
+          "代码报错了怎么办?",
+          "代码报错了怎么办？",
+          "程序运行不起来",
+          "程序运行不起来"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_任务指导_l2_配置部署_l3_auto_8": {
+        "intent_id": "l1_任务指导_l2_配置部署_l3_auto_8",
+        "name": "关于配置部署的问题",
+        "level": "l3",
+        "description": "包含类似'关于配置部署的问题'的查询",
+        "parent_id": "l1_任务指导_l2_配置部署",
+        "children": [],
+        "keywords": [
+          "关于配置部署的问题"
+        ],
+        "examples": [
+          "关于配置部署的问题",
+          "关于配置部署的问题",
+          "关于配置部署的问题"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_对比分析_l3_auto_9": {
+        "intent_id": "l1_分析推理_l2_对比分析_l3_auto_9",
+        "name": "Python",
+        "level": "l3",
+        "description": "包含类似'Python 和 Java 哪个更好？'的查询",
+        "parent_id": "l1_分析推理_l2_对比分析",
+        "children": [],
+        "keywords": [
+          "Python",
+          "Java",
+          "哪个更好",
+          "MySQL",
+          "PostgreSQL",
+          "的区别",
+          "前端和后端的差异"
+        ],
+        "examples": [
+          "Python 和 Java 哪个更好？",
+          "Python 和 Java 哪个更好?",
+          "Python 和 Java 哪个更好？",
+          "MySQL 和 PostgreSQL 的区别",
+          "MySQL 和 PostgreSQL 的区别"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_因果推理_l3_auto_10": {
+        "intent_id": "l1_分析推理_l2_因果推理_l3_auto_10",
+        "name": "为什么天空是蓝的",
+        "level": "l3",
+        "description": "包含类似'为什么天空是蓝的？'的查询",
+        "parent_id": "l1_分析推理_l2_因果推理",
+        "children": [],
+        "keywords": [
+          "为什么天空是蓝的",
+          "为什么会下雨",
+          "AI",
+          "为什么会犯错",
+          "为啥天空是蓝的",
+          "为啥会下雨"
+        ],
+        "examples": [
+          "为什么天空是蓝的？",
+          "为什么天空是蓝的?",
+          "为啥天空是蓝的？",
+          "为什么会下雨？",
+          "为什么会下雨?"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_评估判断_l3_auto_11": {
+        "intent_id": "l1_分析推理_l2_评估判断_l3_auto_11",
+        "name": "哪个编程语言最适合新手",
+        "level": "l3",
+        "description": "包含类似'哪个编程语言最适合新手？'的查询",
+        "parent_id": "l1_分析推理_l2_评估判断",
+        "children": [],
+        "keywords": [
+          "哪个编程语言最适合新手",
+          "这款手机值得买吗",
+          "这个方案可行吗"
+        ],
+        "examples": [
+          "哪个编程语言最适合新手？",
+          "哪个编程语言最适合新手?",
+          "哪个编程语言最适合新手？",
+          "这款手机值得买吗？",
+          "这款手机值得买吗?"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      },
+      "l1_分析推理_l2_趋势预测_l3_auto_12": {
+        "intent_id": "l1_分析推理_l2_趋势预测_l3_auto_12",
+        "name": "关于趋势预测的问题",
+        "level": "l3",
+        "description": "包含类似'关于趋势预测的问题'的查询",
+        "parent_id": "l1_分析推理_l2_趋势预测",
+        "children": [],
+        "keywords": [
+          "关于趋势预测的问题"
+        ],
+        "examples": [
+          "关于趋势预测的问题",
+          "关于趋势预测的问题",
+          "关于趋势预测的问题"
+        ],
+        "routing_config": {},
+        "metadata": {}
+      }
+    }
+  }
+}

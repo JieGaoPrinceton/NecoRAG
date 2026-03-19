@@ -418,5 +418,5 @@ function exportReport() {
 ---
 
 **最后更新**: 2026-03-19  
-**版本**: v3.2.0-alpha  
+**版本**: v3.3.0-alpha  
 **作者**: NecoRAG Team

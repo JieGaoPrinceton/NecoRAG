@@ -1,7 +1,7 @@
 """
 NecoRAG Domain Module - 领域知识与权重管理
 
-提供领域配置、时间权重、领域相关性评分和综合权重计算功能
+提供领域配置、时间权重、领域相关性评分、综合权重计算和知识库管理功能
 """
 
 from .config import (
@@ -11,6 +11,13 @@ from .config import (
     DomainConfig,
     DomainConfigManager,
     create_example_domain,
+)
+
+from .knowledge_base import (
+    FAQItem,
+    KnowledgeBase,
+    KnowledgeBaseManager,
+    create_example_knowledge_base,
 )
 
 from .temporal_weight import (
@@ -45,6 +52,12 @@ __all__ = [
     "DomainConfig",
     "DomainConfigManager",
     "create_example_domain",
+    
+    # 知识库管理
+    "FAQItem",
+    "KnowledgeBase",
+    "KnowledgeBaseManager",
+    "create_example_knowledge_base",
     
     # 时间权重
     "TemporalTier",

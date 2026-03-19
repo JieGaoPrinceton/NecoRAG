@@ -2,7 +2,7 @@
 
 **Docker Image Management Scripts**
 
-版本：v3.2.0-alpha  
+版本：v3.3.0-alpha  
 更新日期：2026-03-19
 
 ---
@@ -90,12 +90,12 @@ chmod +x verify_docker_images.sh
 
 | 镜像名称 | 版本 | 大小 | 用途 |
 |---------|------|------|------|
-| milvusdb/milvus | v3.2.0-alpha | ~707MB | Milvus 向量数据库（备选） |
+| milvusdb/milvus | v3.3.0-alpha | ~707MB | Milvus 向量数据库（备选） |
 | memgraph/memgraph | latest | ~203MB | Memgraph 图数据库（备选） |
 | prom/prometheus | latest | ~146MB | Prometheus 指标收集 |
 | apache/superset | latest | ~643MB | Superset 数据可视化 |
-| elasticsearch/elasticsearch | 8.11.0 | ~1.8GB | Elasticsearch 全文搜索 |
-| kibana/kibana | 8.11.0 | ~1.2GB | Kibana 可视化仪表盘 |
+| elasticsearch/elasticsearch | 3.3.0-alpha | ~1.8GB | Elasticsearch 全文搜索 |
+| kibana/kibana | 3.3.0-alpha | ~1.2GB | Kibana 可视化仪表盘 |
 
 **总计**:
 - 必需镜像：~9.9GB
@@ -208,7 +208,7 @@ docker history redis:7-alpine
 ### 第二次查询（2026-03-19）
 
 **新增查询**:
-- milvusdb/milvus:v3.2.0-alpha: ~707MB
+- milvusdb/milvus:v3.3.0-alpha: ~707MB
 - memgraph/memgraph:latest: ~203MB
 - prom/prometheus:latest: ~146MB
 - apache/superset:latest: ~643MB
@@ -227,7 +227,7 @@ docker history redis:7-alpine
 
 ## 🔄 更新日志
 
-### v3.2.0-alpha (2026-03-19)
+### v3.3.0-alpha (2026-03-19)
 
 **新增功能**:
 - ✅ 交互式镜像选择菜单

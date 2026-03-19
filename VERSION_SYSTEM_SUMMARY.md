@@ -2,13 +2,13 @@
 
 ## ✅ 完成情况
 
-已成功创建完整的版本号管理系统，从 **v3.2.0-alpha** 开始，支持自动递增和批量同步。
+已成功创建完整的版本号管理系统，从 **v3.3.0-alpha** 开始，支持自动递增和批量同步。
 
 ## 📁 创建的文件
 
 ### 1. 核心文件
 - **`VERSION`** - 版本号源文件（唯一数据源）
-  - 当前内容：`3.2.0-alpha`
+  - 当前内容：`3.3.0-alpha`
   - 位置：项目根目录
 
 ### 2. 工具脚本
@@ -37,17 +37,17 @@
 # 查看当前版本
 python tools/version_manager.py show
 
-# 递增补丁号（3.2.0-alpha -> 3.2.0-alpha）
+# 递增补丁号（3.3.0-alpha -> 3.3.0-alpha）
 python tools/version_manager.py bump patch
 
-# 递增次版本号（3.2.0-alpha -> 3.2.0-alpha）
+# 递增次版本号（3.3.0-alpha -> 3.3.0-alpha）
 python tools/version_manager.py bump minor
 
-# 递增主版本号（3.2.0-alpha -> 3.2.0-alpha）
+# 递增主版本号（3.3.0-alpha -> 3.3.0-alpha）
 python tools/version_manager.py bump major
 
 # 直接设置版本
-python tools/version_manager.py set 3.2.0-alpha
+python tools/version_manager.py set 3.3.0-alpha
 ```
 
 ### 2. 批量同步
@@ -62,9 +62,9 @@ python tools/version_manager.py sync --dry-run
 ### 3. 智能更新
 自动识别并更新以下模式：
 - ✅ 徽章链接中的版本号：`[![Version](...v1.9.0-alpha...)]`
-- ✅ 完整版本号：`v3.2.0-alpha`, `V3.2.0-alpha-alpha-alpha-alpha-alpha-alpha`
-- ✅ 短版本号：`v3.2`
-- ✅ 纯文本版本号：`3.2.0-alpha`
+- ✅ 完整版本号：`v3.3.0-alpha`, `V3.3.0-alpha-alpha-alpha-alpha-alpha-alpha-alpha`
+- ✅ 短版本号：`v3.3`
+- ✅ 纯文本版本号：`3.3.0-alpha`
 - ✅ 更新日期：`**最后更新**: 2026-03-19`
 
 ## 📊 测试结果
@@ -73,7 +73,7 @@ python tools/version_manager.py sync --dry-run
 ```
 找到 272 个 Markdown 文件
 完成！已更新 45/272 个文件
-当前版本号：3.2.0-alpha
+当前版本号：3.3.0-alpha
 ```
 
 ### 更新的文件类型
@@ -101,11 +101,11 @@ python tools/version_manager.py sync
 
 # 4. 提交更改
 git add VERSION pyproject.toml *.md
-git commit -m "chore: bump version to 3.2.0-alpha"
+git commit -m "chore: bump version to 3.3.0-alpha"
 
 # 5. 打标签（可选）
-git tag v3.2.0-alpha
-git push origin v3.2.0-alpha
+git tag v3.3.0-alpha
+git push origin v3.3.0-alpha
 ```
 
 ## 💡 技术亮点
@@ -131,17 +131,17 @@ git push origin v3.2.0-alpha
 ```bash
 # 发现严重 Bug，需要立即发布补丁
 python tools/version_manager.py bump patch
-# 输出：✓ 已更新 VERSION 文件：3.2.0-alpha
-#      ✓ 版本号已递增：3.2.0-alpha
+# 输出：✓ 已更新 VERSION 文件：3.3.0-alpha
+#      ✓ 版本号已递增：3.3.0-alpha
 #      完成！已更新 45/272 个文件
 ```
 
 ### 示例 2：大版本发布
 ```bash
 # 准备发布 2.0 正式版
-python tools/version_manager.py set 3.2.0-alpha
+python tools/version_manager.py set 3.3.0-alpha
 python tools/version_manager.py sync
-# 所有文件中的版本号自动更新为 3.2.0-alpha
+# 所有文件中的版本号自动更新为 3.3.0-alpha
 ```
 
 ### 示例 3：预览更改
@@ -222,5 +222,5 @@ python tools/version_manager.py bump minor
 ---
 
 **创建时间**: 2026-03-19  
-**版本**: 3.2.0-alpha  
+**版本**: 3.3.0-alpha  
 **作者**: NecoRAG Team

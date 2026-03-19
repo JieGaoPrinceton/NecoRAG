@@ -1,0 +1,273 @@
+{
+  "tree_id": "custom_20260319_171230",
+  "name": "我的意图体系 v1.0",
+  "description": "用户自定义的三级意图体系",
+  "roots": [
+    "l1_知识查询",
+    "l1_任务指导",
+    "l1_分析推理",
+    "l1_创造探索"
+  ],
+  "all_intents": {
+    "l1_知识查询": {
+      "intent_id": "l1_知识查询",
+      "name": "知识查询",
+      "level": "l1",
+      "description": "查询事实性知识和信息",
+      "parent_id": null,
+      "children": [
+        "l1_知识查询_l2_事实查证",
+        "l1_知识查询_l2_概念解释",
+        "l1_知识查询_l2_定义询问",
+        "l1_知识查询_l2_数据检索"
+      ],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_知识查询_l2_事实查证": {
+      "intent_id": "l1_知识查询_l2_事实查证",
+      "name": "事实查证",
+      "level": "l2",
+      "description": "查找具体事实和数据",
+      "parent_id": "l1_知识查询",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_知识查询_l2_概念解释": {
+      "intent_id": "l1_知识查询_l2_概念解释",
+      "name": "概念解释",
+      "level": "l2",
+      "description": "理解概念和术语",
+      "parent_id": "l1_知识查询",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_知识查询_l2_定义询问": {
+      "intent_id": "l1_知识查询_l2_定义询问",
+      "name": "定义询问",
+      "level": "l2",
+      "description": "查询定义和含义",
+      "parent_id": "l1_知识查询",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_知识查询_l2_数据检索": {
+      "intent_id": "l1_知识查询_l2_数据检索",
+      "name": "数据检索",
+      "level": "l2",
+      "description": "获取统计数据和信息",
+      "parent_id": "l1_知识查询",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_任务指导": {
+      "intent_id": "l1_任务指导",
+      "name": "任务指导",
+      "level": "l1",
+      "description": "获取操作步骤和方法指导",
+      "parent_id": null,
+      "children": [
+        "l1_任务指导_l2_逐步指导",
+        "l1_任务指导_l2_最佳实践",
+        "l1_任务指导_l2_故障排除",
+        "l1_任务指导_l2_配置部署"
+      ],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_任务指导_l2_逐步指导": {
+      "intent_id": "l1_任务指导_l2_逐步指导",
+      "name": "逐步指导",
+      "level": "l2",
+      "description": "详细的操作步骤",
+      "parent_id": "l1_任务指导",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_任务指导_l2_最佳实践": {
+      "intent_id": "l1_任务指导_l2_最佳实践",
+      "name": "最佳实践",
+      "level": "l2",
+      "description": "推荐的方法和技巧",
+      "parent_id": "l1_任务指导",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_任务指导_l2_故障排除": {
+      "intent_id": "l1_任务指导_l2_故障排除",
+      "name": "故障排除",
+      "level": "l2",
+      "description": "问题解决和调试",
+      "parent_id": "l1_任务指导",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_任务指导_l2_配置部署": {
+      "intent_id": "l1_任务指导_l2_配置部署",
+      "name": "配置部署",
+      "level": "l2",
+      "description": "系统配置和部署",
+      "parent_id": "l1_任务指导",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_分析推理": {
+      "intent_id": "l1_分析推理",
+      "name": "分析推理",
+      "level": "l1",
+      "description": "进行分析、比较和推理",
+      "parent_id": null,
+      "children": [
+        "l1_分析推理_l2_对比分析",
+        "l1_分析推理_l2_因果推理",
+        "l1_分析推理_l2_评估判断",
+        "l1_分析推理_l2_趋势预测"
+      ],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_分析推理_l2_对比分析": {
+      "intent_id": "l1_分析推理_l2_对比分析",
+      "name": "对比分析",
+      "level": "l2",
+      "description": "比较不同事物的差异",
+      "parent_id": "l1_分析推理",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_分析推理_l2_因果推理": {
+      "intent_id": "l1_分析推理_l2_因果推理",
+      "name": "因果推理",
+      "level": "l2",
+      "description": "分析原因和结果",
+      "parent_id": "l1_分析推理",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_分析推理_l2_评估判断": {
+      "intent_id": "l1_分析推理_l2_评估判断",
+      "name": "评估判断",
+      "level": "l2",
+      "description": "评价和判断优劣",
+      "parent_id": "l1_分析推理",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_分析推理_l2_趋势预测": {
+      "intent_id": "l1_分析推理_l2_趋势预测",
+      "name": "趋势预测",
+      "level": "l2",
+      "description": "预测发展趋势",
+      "parent_id": "l1_分析推理",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_创造探索": {
+      "intent_id": "l1_创造探索",
+      "name": "创造探索",
+      "level": "l1",
+      "description": "创造性思维和探索性问题",
+      "parent_id": null,
+      "children": [
+        "l1_创造探索_l2_创意生成",
+        "l1_创造探索_l2_场景探索",
+        "l1_创造探索_l2_推荐请求",
+        "l1_创造探索_l2_方案设计"
+      ],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_创造探索_l2_创意生成": {
+      "intent_id": "l1_创造探索_l2_创意生成",
+      "name": "创意生成",
+      "level": "l2",
+      "description": "产生新想法和方案",
+      "parent_id": "l1_创造探索",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_创造探索_l2_场景探索": {
+      "intent_id": "l1_创造探索_l2_场景探索",
+      "name": "场景探索",
+      "level": "l2",
+      "description": "探索不同可能性",
+      "parent_id": "l1_创造探索",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_创造探索_l2_推荐请求": {
+      "intent_id": "l1_创造探索_l2_推荐请求",
+      "name": "推荐请求",
+      "level": "l2",
+      "description": "寻求建议和推荐",
+      "parent_id": "l1_创造探索",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    },
+    "l1_创造探索_l2_方案设计": {
+      "intent_id": "l1_创造探索_l2_方案设计",
+      "name": "方案设计",
+      "level": "l2",
+      "description": "设计方案和规划",
+      "parent_id": "l1_创造探索",
+      "children": [],
+      "keywords": [],
+      "examples": [],
+      "routing_config": {},
+      "metadata": {}
+    }
+  }
+}

@@ -1,7 +1,7 @@
 # NecoRAG 双仓库配置完成总结
 
 **配置完成时间**: 2026-03-19  
-**版本**: v3.2.0-alpha  
+**版本**: v3.3.0-alpha  
 **状态**: ✅ 已完成并测试通过
 
 ---
@@ -169,11 +169,11 @@ git push github main
 
 ```bash
 # 1. 创建版本标签
-git tag -a v3.2.0-alpha -m "Release version 3.2.0-alpha"
+git tag -a v3.3.0-alpha -m "Release version 3.3.0-alpha"
 
 # 2. 同步标签到两个仓库
-git push origin v3.2.0-alpha
-git push github v3.2.0-alpha
+git push origin v3.3.0-alpha
+git push github v3.3.0-alpha
 
 # 或使用工具一键同步
 cd tools
@@ -369,10 +369,10 @@ main (生产)
 
 ```bash
 # 语义化版本
-v3.2.0-alpha    # 预发布
-v3.2.0          # 正式版
-v3.2.1          # Bug 修复
-v4.0.0-beta     # 大版本测试
+v3.3.0-alpha    # 预发布
+v3.3.0-alpha          # 正式版
+v3.3.0-alpha          # Bug 修复
+v3.3.0-alpha     # 大版本测试
 ```
 
 ---
@@ -413,9 +413,9 @@ v4.0.0-beta     # 大版本测试
 3. **自动标签同步**
    ```bash
    # 创建标签后自动同步到两个仓库
-   git tag -a v3.2.0
-   git push origin v3.2.0
-   git push github v3.2.0
+   git tag -a v3.3.0-alpha
+   git push origin v3.3.0-alpha
+   git push github v3.3.0-alpha
    ```
 
 ### 监控告警
@@ -491,7 +491,7 @@ python sync_repos.py
 
 **配置完成！双仓库同步系统已就绪！** 🚀
 
-**版本**: v3.2.0-alpha  
+**版本**: v3.3.0-alpha  
 **完成时间**: 2026-03-19  
 **状态**: ✅ 已完成并测试通过
 

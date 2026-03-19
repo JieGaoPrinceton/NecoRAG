@@ -1,6 +1,6 @@
 # NecoRAG 双仓库同步指南
 
-**版本**: v3.2.0-alpha  
+**版本**: v3.3.0-alpha  
 **更新日期**: 2026-03-19
 
 ---
@@ -233,11 +233,11 @@ git sync-all
 
 ```bash
 # 1. 创建版本标签
-git tag -a v3.2.0-alpha -m "Release version 3.2.0-alpha"
+git tag -a v3.3.0-alpha -m "Release version 3.3.0-alpha"
 
 # 2. 推送标签到两个仓库
-git push origin v3.2.0-alpha
-git push github v3.2.0-alpha
+git push origin v3.3.0-alpha
+git push github v3.3.0-alpha
 
 # 或使用工具
 python sync_repos.py
@@ -374,10 +374,10 @@ main (生产环境)
 
 ```bash
 # 语义化版本
-v3.2.0-alpha    # 预发布版本
-v3.2.0          # 正式版本
-v3.2.1          # Bug 修复版本
-v4.0.0-beta     # 大版本测试版
+v3.3.0-alpha    # 预发布版本
+v3.3.0-alpha          # 正式版本
+v3.3.0-alpha          # Bug 修复版本
+v3.3.0-alpha     # 大版本测试版
 ```
 
 ### 4. 同步频率
