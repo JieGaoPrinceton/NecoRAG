@@ -10,7 +10,7 @@ from enum import Enum
 import logging
 
 from .models import (
-    UserProfile, UserRole,
+    UserProfile, UserRole, QueryRecord,
     PersonalSpace, PublicContributionSpace, HybridCollaborationSpace,
     TeamMembership, TeamRole, PermissionType, SpaceType
 )

@@ -1,7 +1,7 @@
 """
-多用户系统与知识空间管理模块
+User Layer - 个人用户层
 
-提供个人工作空间、公共贡献空间和混合协作空间的完整实现
+提供用户画像、个人空间、用户偏好等个人级功能
 """
 
 from .models import (
@@ -11,10 +11,12 @@ from .models import (
     KnowledgeContribution,
     TeamMembership,
     TeamRole,
-    Permission,
+    PermissionType,
     PersonalSpace,
     PublicContributionSpace,
     HybridCollaborationSpace,
+    SpaceType,
+    UserRole,
 )
 from .manager import UserManager, WorkspaceManager
 from .permissions import PermissionManager, AccessControl
@@ -27,10 +29,13 @@ __all__ = [
     'KnowledgeContribution',
     'TeamMembership',
     'TeamRole',
-    'Permission',
+    'PermissionType',
     'PersonalSpace',
     'PublicContributionSpace',
     'HybridCollaborationSpace',
+    'SpaceType',
+    'UserRole',
+    
     # Managers
     'UserManager',
     'WorkspaceManager',

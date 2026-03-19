@@ -25,8 +25,8 @@ pip install -r requirements.txt
 ```
 
 确保安装了以下新依赖：
-- `requests>=3.0.0-alpha` - HTTP 请求库
-- `python-dotenv>=3.0.0-alpha` - 环境变量管理
+- `requests>=3.0.1-alpha` - HTTP 请求库
+- `python-dotenv>=3.0.1-alpha` - 环境变量管理
 
 ### 2. 推送项目到 Gitee
 

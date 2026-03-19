@@ -1,4 +1,4 @@
-# 项目文档更新总结 (v3.0.0-alpha)
+# 项目文档更新总结 (v3.0.1-alpha)
 
 ## 📋 更新概览
 
@@ -11,7 +11,7 @@
 
 ## 🎯 更新目标
 
-全面反映 NecoRAG v3.0.0-alpha 的最新状态，包括：
+全面反映 NecoRAG v3.0.1-alpha 的最新状态，包括：
 - ✅ 8 个新增核心模块（意图分析、领域权重、知识演化、监控告警、安全、自适应优化、插件系统、Interface 模块）
 - ✅ 可视化调试面板完整功能（思维路径可视化、实时监控、A/B 测试）
 - ✅ 性能监控系统（20+ 指标）
@@ -25,7 +25,7 @@
 ### 1. 版本信息和徽章
 
 **新增内容**：
-- Version 徽章：`v3.0.0-alpha`
+- Version 徽章：`v3.0.1-alpha`
 - Code Quality 徽章：`80.2%`
 - 当前版本统计数据：445 个文件，164,167 行代码
 
@@ -37,7 +37,7 @@
 - 🔄 自我反思能力
 - 🎨 可解释性输出
 - ⚙️ 配置管理系统
-- 🔍 **可视化调试面板**（v3.0.0-alpha 新增）⭐
+- 🔍 **可视化调试面板**（v3.0.1-alpha 新增）⭐
 - 📊 **性能监控系统**（20+ 指标）⭐
 - 🛡️ **安全与权限**（JWT/OAuth2）⭐
 - 🔌 **插件扩展系统**（热插拔）⭐
@@ -48,7 +48,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│              NecoRAG v3.0.0-alpha 新增模块                     │
+│              NecoRAG v3.0.1-alpha 新增模块                     │
 ├─────────────────────────────────────────────────────────┤
 │  🧠 意图分析系统 (intent/)                              │
 │  🌐 领域权重系统 (domain/)                              │
@@ -79,8 +79,8 @@
 2. 早停机制 (Early Termination)
 3. 思维链可视化
 4. 幻觉自检闭环
-5. **领域权重计算**（v3.0.0-alpha 新增）⭐
-6. **意图分析系统**（v3.0.0-alpha 新增）⭐
+5. **领域权重计算**（v3.0.1-alpha 新增）⭐
+6. **意图分析系统**（v3.0.1-alpha 新增）⭐
 
 ### 6. 性能目标表格更新
 
@@ -93,7 +93,7 @@
 ### 7. 开发路线图大幅更新
 
 **Phase 2 更新**：
-- 标注了 8 个 v3.0.0-alpha 已完成的模块 ⭐
+- 标注了 8 个 v3.0.1-alpha 已完成的模块 ⭐
 - 新增生产环境认证和分布式监控支持
 
 **Phase 3 更新**：
@@ -158,7 +158,7 @@ pip install plotly matplotlib
 
 **分为两部分**：
 - 核心依赖（7 个项目）
-- v3.0.0-alpha 新增感谢（5 个项目：Prometheus, Grafana, PyJWT, SciPy, Plotly）
+- v3.0.1-alpha 新增感谢（5 个项目：Prometheus, Grafana, PyJWT, SciPy, Plotly）
 
 ### 12. 底部信息更新
 
@@ -188,7 +188,7 @@ python example/debug_panel_demo.py
 ### 3. Dashboard 访问地址
 
 **新增**：
-- 调试面板：`http://localhost:8000/debug` ⭐ (v3.0.0-alpha 新增)
+- 调试面板：`http://localhost:8000/debug` ⭐ (v3.0.1-alpha 新增)
 
 ### 4. 最小工作示例重构
 
@@ -201,7 +201,7 @@ python example/debug_panel_demo.py
 ### 5. Dashboard 使用说明增强
 
 **新增内容**：
-- v3.0.0-alpha 新增模块的配置说明（8 个新模块 Tab）
+- v3.0.1-alpha 新增模块的配置说明（8 个新模块 Tab）
 - 实时统计信息扩展（20+ 系统指标、错误统计）
 - 暗色/亮色主题切换说明
 
@@ -226,7 +226,7 @@ python example/debug_panel_demo.py
 ### 8. 常见问题更新
 
 **更新的问题**：
-- Q1: 依赖安装（区分核心依赖和 v3.0.0-alpha 新功能依赖）
+- Q1: 依赖安装（区分核心依赖和 v3.0.1-alpha 新功能依赖）
 - Q2: Dashboard 启动（支持 --host 参数）
 - Q3: 自定义配置（支持相对路径、JSON/YAML格式、批量导入）
 
@@ -234,13 +234,13 @@ python example/debug_panel_demo.py
 
 **更新为新的模块路径**：
 - `src/perception/`, `src/memory/`, `src/retrieval/`, 等
-- 新增 8 个 v3.0.0-alpha 模块文档链接
+- 新增 8 个 v3.0.1-alpha 模块文档链接
 - 新增调试面板文档链接
 
 ### 10. 下一步规划更新
 
 **分为三类**：
-- ✅ 已完成（v3.0.0-alpha）- 列出所有已完成的功能
+- ✅ 已完成（v3.0.1-alpha）- 列出所有已完成的功能
 - 🔄 进行中（计划中）- 真实组件集成、Docker 部署等
 - 📅 未来规划（2026 Q4）- 异步知识固化、插件市场等
 
@@ -278,17 +278,17 @@ python example/debug_panel_demo.py
 
 **总计新增 12 个包**：
 - `websockets>=12.0` - WebSocket 实时通信
-- `jieba>=3.0.0-alpha` - 中文分词
-- `scipy>=3.0.0-alpha` - 科学计算
-- `prometheus-client>=3.0.0-alpha` - Prometheus 指标收集
-- `PyJWT>=3.0.0-alpha` - JWT 认证
-- `python-jose[cryptography]>=3.0.0-alpha` - OAuth2 支持
-- `statsmodels>=3.0.0-alpha` - 统计分析模型
-- `plotly>=3.0.0-alpha` - 交互式图表
-- `matplotlib>=3.0.0-alpha` - 静态图表
-- `scikit-learn>=3.0.0-alpha` - 机器学习
-- `pytest-cov>=3.0.0-alpha` - 测试覆盖率统计
-- `passlib[bcrypt]>=3.0.0-alpha` - 密码加密
+- `jieba>=3.0.1-alpha` - 中文分词
+- `scipy>=3.0.1-alpha` - 科学计算
+- `prometheus-client>=3.0.1-alpha` - Prometheus 指标收集
+- `PyJWT>=3.0.1-alpha` - JWT 认证
+- `python-jose[cryptography]>=3.0.1-alpha` - OAuth2 支持
+- `statsmodels>=3.0.1-alpha` - 统计分析模型
+- `plotly>=3.0.1-alpha` - 交互式图表
+- `matplotlib>=3.0.1-alpha` - 静态图表
+- `scikit-learn>=3.0.1-alpha` - 机器学习
+- `pytest-cov>=3.0.1-alpha` - 测试覆盖率统计
+- `passlib[bcrypt]>=3.0.1-alpha` - 密码加密
 
 ### 3. 安装指南
 
@@ -303,7 +303,7 @@ python example/debug_panel_demo.py
 
 **新增**：
 - Python 版本要求：3.9+
-- 版本号：v3.0.0-alpha
+- 版本号：v3.0.1-alpha
 - 最后更新日期
 - 双语说明（中英文）
 
@@ -347,7 +347,7 @@ python example/debug_panel_demo.py
 ## 🎯 更新优势
 
 ### 1. 信息完整性
-- ✅ 覆盖了所有 v3.0.0-alpha 新增的 8 个核心模块
+- ✅ 覆盖了所有 v3.0.1-alpha 新增的 8 个核心模块
 - ✅ 详细说明了可视化调试面板的 7 大功能
 - ✅ 提供了完整的依赖清单和安装指南
 
@@ -369,7 +369,7 @@ python example/debug_panel_demo.py
 ### 5. 一致性保证
 - ✅ 所有引用路径已更新为最新位置
 - ✅ 模块名称统一使用新路径（`src.*`）
-- ✅ 版本信息一致（v3.0.0-alpha）
+- ✅ 版本信息一致（v3.0.1-alpha）
 
 ---
 
@@ -430,9 +430,9 @@ python example/debug_panel_demo.py
 
 <div align="center">
 
-**NecoRAG v3.0.0-alpha - 功能完善版**
+**NecoRAG v3.0.1-alpha - 功能完善版**
 
-[![Version](https://img.shields.io/badge/version-3.0.0-alpha--alpha-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.0.1-alpha--alpha-blue.svg)](CHANGELOG.md)
 [![Code Quality](https://img.shields.io/badge/code%20quality-80.2%25-brightgreen.svg)](tools/project_statistics.md)
 
 **Let's make AI think like a brain, and act like a cat.** 🐱🧠

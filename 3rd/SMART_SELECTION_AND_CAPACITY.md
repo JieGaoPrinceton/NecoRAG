@@ -2,7 +2,7 @@
 
 ## 🎯 功能概述
 
-**版本**: v3.0.0-alpha  
+**版本**: v3.0.1-alpha  
 **更新日期**: 2026-03-19  
 **新增功能**: 交互式镜像选择、容量计算、磁盘空间检查
 
@@ -38,7 +38,7 @@
 | neo4j:5-community | 1,200 MB | 必需 |
 | ollama/ollama:latest | 2,000 MB | 必需 |
 | grafana/grafana:latest | 300 MB | 必需 |
-| milvusdb/milvus:v3.0.0-alpha | 707 MB | 可选 |
+| milvusdb/milvus:v3.0.1-alpha | 707 MB | 可选 |
 | memgraph/memgraph:latest | 203 MB | 可选 |
 | prom/prometheus:latest | 146 MB | 可选 |
 | apache/superset:latest | 643 MB | 可选 |
@@ -117,7 +117,7 @@ $ ./import_docker_images.sh
 【可选镜像】(可选择下载)
   序号   镜像名称                              用途
   ------------------------------------------------------------
-  1     milvusdb/milvus:v3.0.0-alpha               707MB
+  1     milvusdb/milvus:v3.0.1-alpha               707MB
   2     memgraph/memgraph:latest             203MB
   3     prom/prometheus:latest               146MB
   4     apache/superset:latest               643MB
@@ -135,7 +135,7 @@ $ ./import_docker_images.sh
 
 请选择要下载的可选镜像 (可多选，用空格分隔):
 
-  1     milvusdb/milvus:v3.0.0-alpha               707MB
+  1     milvusdb/milvus:v3.0.1-alpha               707MB
   2     memgraph/memgraph:latest             203MB
   3     prom/prometheus:latest               146MB
   4     apache/superset:latest               643MB
@@ -190,7 +190,7 @@ declare -A IMAGE_SIZES=(
     ["neo4j:5-community"]=1200
     ["ollama/ollama:latest"]=2000
     ["grafana/grafana:latest"]=300
-    ["milvusdb/milvus:v3.0.0-alpha"]=707
+    ["milvusdb/milvus:v3.0.1-alpha"]=707
     ["memgraph/memgraph:latest"]=203
     ["prom/prometheus:latest"]=146
     ["apache/superset:latest"]=643
@@ -277,7 +277,7 @@ check_disk_space() {
 
 **包含**:
 - ✅ 所有必需镜像
-- ✅ milvusdb/milvus:v3.0.0-alpha (707MB)
+- ✅ milvusdb/milvus:v3.0.1-alpha (707MB)
 - ✅ memgraph/memgraph:latest (203MB)
 - ✅ prom/prometheus:latest (146MB)
 - ✅ apache/superset:latest (643MB)
@@ -440,7 +440,7 @@ sudo yum install bc
 
 ## 📞 维护信息
 
-**功能版本**: v3.0.0-alpha  
+**功能版本**: v3.0.1-alpha  
 **开发团队**: NecoRAG DevOps Team  
 **最后更新**: 2026-03-19  
 **兼容性**: Bash 4.0+, Docker 20.10+, bc 命令  

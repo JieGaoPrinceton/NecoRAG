@@ -3,7 +3,7 @@
 ## 📋 更新概览
 
 **更新时间**: 2026-03-19  
-**版本**: v3.0.0-alpha  
+**版本**: v3.0.1-alpha  
 **目标**: 根据项目最新功能模块，全面整理和更新依赖列表
 
 ## 📊 更新效果
@@ -21,7 +21,7 @@
 1. ✅ Core Dependencies (核心依赖) - 6 个包
 2. ✅ Dashboard & Web Framework (Dashboard 框架) - 3 个包
 
-#### v3.0.0-alpha 新增模块依赖
+#### v3.0.1-alpha 新增模块依赖
 3. ✅ Intent Analysis (意图分析系统) - jieba + 可选深度学习
 4. ✅ Domain Weight System (领域权重系统) - scipy
 5. ✅ Knowledge Evolution (知识演化系统) - apscheduler/celery（可选）
@@ -47,21 +47,21 @@
 
 ## 🆕 新增依赖包
 
-### v3.0.0-alpha 模块新增
+### v3.0.1-alpha 模块新增
 
 | 模块 | 新增依赖 | 用途 |
 |------|---------|------|
-| **Intent Analysis** | `jieba>=3.0.0-alpha` | 中文分词与关键词提取 |
-| **Domain Weight** | `scipy>=3.0.0-alpha` | 科学计算，相似度计算 |
-| **Monitoring** | `prometheus-client>=3.0.0-alpha` | Prometheus 指标收集 |
-| **Security** | `PyJWT>=3.0.0-alpha` | JWT 认证 |
-| **Security** | `python-jose[cryptography]>=3.0.0-alpha` | OAuth2 支持 |
-| **A/B Testing** | `statsmodels>=3.0.0-alpha` | 统计分析模型 |
-| **Visualization** | `plotly>=3.0.0-alpha` | 交互式图表 |
-| **Visualization** | `matplotlib>=3.0.0-alpha` | 静态图表 |
-| **Adaptive Opt.** | `scikit-learn>=3.0.0-alpha` | 机器学习，偏好预测 |
+| **Intent Analysis** | `jieba>=3.0.1-alpha` | 中文分词与关键词提取 |
+| **Domain Weight** | `scipy>=3.0.1-alpha` | 科学计算，相似度计算 |
+| **Monitoring** | `prometheus-client>=3.0.1-alpha` | Prometheus 指标收集 |
+| **Security** | `PyJWT>=3.0.1-alpha` | JWT 认证 |
+| **Security** | `python-jose[cryptography]>=3.0.1-alpha` | OAuth2 支持 |
+| **A/B Testing** | `statsmodels>=3.0.1-alpha` | 统计分析模型 |
+| **Visualization** | `plotly>=3.0.1-alpha` | 交互式图表 |
+| **Visualization** | `matplotlib>=3.0.1-alpha` | 静态图表 |
+| **Adaptive Opt.** | `scikit-learn>=3.0.1-alpha` | 机器学习，偏好预测 |
 | **Dashboard** | `websockets>=12.0` | WebSocket 实时通信 |
-| **Testing** | `pytest-cov>=3.0.0-alpha` | 测试覆盖率统计 |
+| **Testing** | `pytest-cov>=3.0.1-alpha` | 测试覆盖率统计 |
 
 ### 总计新增
 - **新增包数量**: 12 个
@@ -73,7 +73,7 @@
 ### 1. 结构化组织
 - ✅ 使用清晰的分隔线和标题
 - ✅ 按功能模块分组
-- ✅ 标注 [v3.0.0-alpha] 标识新增模块
+- ✅ 标注 [v3.0.1-alpha] 标识新增模块
 - ✅ 区分必需依赖和可选依赖
 
 ### 2. 详细注释
@@ -91,7 +91,7 @@
 
 ### 4. 版本信息
 - ✅ 添加了 Python 版本要求 (3.9+)
-- ✅ 添加了版本号 (v3.0.0-alpha)
+- ✅ 添加了版本号 (v3.0.1-alpha)
 - ✅ 添加了最后更新日期
 - ✅ 双语说明（中英文）
 
@@ -107,7 +107,7 @@ pip install numpy python-dateutil aiohttp requests python-dotenv pydantic
 pip install fastapi uvicorn websockets
 ```
 
-### v3.0.0-alpha 新功能（推荐安装）
+### v3.0.1-alpha 新功能（推荐安装）
 ```bash
 pip install jieba scipy prometheus-client PyJWT python-jose plotly scikit-learn
 ```
@@ -138,7 +138,7 @@ pip install langchain langgraph openai anthropic
 ### 按类型分类
 - **核心依赖**: 6 个
 - **Dashboard**: 3 个
-- **v3.0.0-alpha 新增**: 12 个
+- **v3.0.1-alpha 新增**: 12 个
 - **测试工具**: 3 个
 - **开发工具**: 3 个
 - **可选集成**: ~15 个（注释状态）
