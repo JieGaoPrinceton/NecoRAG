@@ -1,3 +1,4 @@
+```gitignore
 # Python
 __pycache__/
 *.py[cod]
@@ -19,54 +20,64 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Virtual Environment
+# Virtual environments
 venv/
-env/
 ENV/
-.venv
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+env.bak/
+.venv/
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
 
-# Distribution
-*.manifest
-*.spec
-
-# Logs
-*.log
-logs/
-
-# Database
-*.db
-*.sqlite3
-
-# Configs (keep templates)
-configs/*.json
-!configs/.gitkeep
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
 
 # Environment
 .env
+.env.local
+*.env.*
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Temporary
-*.tmp
-*.bak
-*.cache
+# Logs
+*.log
 
-# Project specific
-configs/
-*.pyc
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+```
